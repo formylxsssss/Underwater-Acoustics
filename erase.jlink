@@ -1,0 +1,6 @@
+speed 96000
+si swd
+connect
+r
+erase 08000000, 0800BFFF
+exit
