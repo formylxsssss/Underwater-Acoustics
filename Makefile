@@ -21,6 +21,9 @@ ALLCSRC =
 ALLINC =
 include ARM_SEGGER_RTT/segger_rtt.mk
 
+include diff_signal/diff_signal.mk
+
+include sensor_device/sensor_device.mk
 ######################################
 # building variables
 ######################################
@@ -124,12 +127,13 @@ AS_INCLUDES =
 
 # C includes
 C_INCLUDES =  \
+. \
 Core/Inc \
 Drivers/STM32F1xx_HAL_Driver/Inc \
 Drivers/STM32F1xx_HAL_Driver/Inc/Legacy \
 Drivers/CMSIS/Device/ST/STM32F1xx/Include \
 Drivers/CMSIS/Include \
-Drivers/CMSIS/Include
+Drivers/CMSIS/Include 
 
 
 C_INCLUDES += $(ALLINC)

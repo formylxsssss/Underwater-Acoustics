@@ -23,7 +23,8 @@
 #include "tim.h"
 #include "usb.h"
 #include "gpio.h"
-
+#include "diff_signal.h"
+#include "ADXL345.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -93,6 +94,8 @@ int main(void)
   MX_TIM3_Init();
   MX_USB_PCD_Init();
   MX_TIM8_Init();
+  ADXL345_Init();
+  // DiffSignal_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */

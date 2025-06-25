@@ -1,0 +1,3 @@
+#define DHT22_PIN_PORT GPIOB
+#define DHT22_PIN   11
+

@@ -1,5 +1,5 @@
-build/main.o: Core/Src/main.c Core/Inc/main.h \
- Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h \
+build/DHT22.o: sensor_device/DHT22.c diff_signal/diff_signal.h \
+ Core/Inc/main.h Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h \
  Core/Inc/stm32f1xx_hal_conf.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_def.h \
@@ -24,9 +24,9 @@ build/main.o: Core/Src/main.c Core/Inc/main.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h \
- Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h Core/Inc/spi.h \
- Core/Inc/main.h Core/Inc/tim.h Core/Inc/usb.h Core/Inc/gpio.h \
- diff_signal/diff_signal.h
+ Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h Custcom_Pin.h
+
+diff_signal/diff_signal.h:
 
 Core/Inc/main.h:
 
@@ -86,14 +86,4 @@ Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h:
 
 Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h:
 
-Core/Inc/spi.h:
-
-Core/Inc/main.h:
-
-Core/Inc/tim.h:
-
-Core/Inc/usb.h:
-
-Core/Inc/gpio.h:
-
-diff_signal/diff_signal.h:
+Custcom_Pin.h:

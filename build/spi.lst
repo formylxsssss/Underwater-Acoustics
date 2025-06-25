@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccfb7JUP.s 			page 1
+ARM GAS  /tmp/ccEXeuqp.s 			page 1
 
 
    1              		.cpu cortex-m3
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccfb7JUP.s 			page 1
   30:Core/Src/spi.c **** void MX_SPI2_Init(void)
   31:Core/Src/spi.c **** {
   27              		.loc 1 31 1 view -0
-ARM GAS  /tmp/ccfb7JUP.s 			page 2
+ARM GAS  /tmp/ccEXeuqp.s 			page 2
 
 
   28              		.cfi_startproc
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccfb7JUP.s 			page 1
   43:Core/Src/spi.c ****   hspi2.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
   71              		.loc 1 43 3 is_stmt 1 view .LVU21
   72              		.loc 1 43 29 is_stmt 0 view .LVU22
-ARM GAS  /tmp/ccfb7JUP.s 			page 3
+ARM GAS  /tmp/ccEXeuqp.s 			page 3
 
 
   73 0024 8362     		str	r3, [r0, #40]
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccfb7JUP.s 			page 1
  118              	.LCFI1:
  119              		.cfi_def_cfa_offset 8
  120              		.cfi_offset 4, -8
-ARM GAS  /tmp/ccfb7JUP.s 			page 4
+ARM GAS  /tmp/ccEXeuqp.s 			page 4
 
 
  121              		.cfi_offset 14, -4
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccfb7JUP.s 			page 1
  144              		.cfi_remember_state
  145              		.cfi_def_cfa_offset 8
  146              		@ sp needed
-ARM GAS  /tmp/ccfb7JUP.s 			page 5
+ARM GAS  /tmp/ccEXeuqp.s 			page 5
 
 
  147 0018 10BD     		pop	{r4, pc}
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccfb7JUP.s 			page 1
   71:Core/Src/spi.c ****     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
  187              		.loc 1 71 5 is_stmt 1 view .LVU53
   71:Core/Src/spi.c ****     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-ARM GAS  /tmp/ccfb7JUP.s 			page 6
+ARM GAS  /tmp/ccEXeuqp.s 			page 6
 
 
  188              		.loc 1 71 26 is_stmt 0 view .LVU54
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccfb7JUP.s 			page 1
  232              		.syntax unified
  233              		.thumb
  234              		.thumb_func
-ARM GAS  /tmp/ccfb7JUP.s 			page 7
+ARM GAS  /tmp/ccEXeuqp.s 			page 7
 
 
  235              		.fpu softvfp
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccfb7JUP.s 			page 1
  265 000e D369     		ldr	r3, [r2, #28]
  266 0010 23F48043 		bic	r3, r3, #16384
  267 0014 D361     		str	r3, [r2, #28]
-ARM GAS  /tmp/ccfb7JUP.s 			page 8
+ARM GAS  /tmp/ccEXeuqp.s 			page 8
 
 
  102:Core/Src/spi.c **** 
@@ -455,21 +455,21 @@ ARM GAS  /tmp/ccfb7JUP.s 			page 1
  298              		.file 11 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h"
  299              		.file 12 "Core/Inc/spi.h"
  300              		.file 13 "Core/Inc/main.h"
-ARM GAS  /tmp/ccfb7JUP.s 			page 9
+ARM GAS  /tmp/ccEXeuqp.s 			page 9
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 spi.c
-     /tmp/ccfb7JUP.s:16     .text.MX_SPI2_Init:0000000000000000 $t
-     /tmp/ccfb7JUP.s:24     .text.MX_SPI2_Init:0000000000000000 MX_SPI2_Init
-     /tmp/ccfb7JUP.s:96     .text.MX_SPI2_Init:0000000000000038 $d
+     /tmp/ccEXeuqp.s:16     .text.MX_SPI2_Init:0000000000000000 $t
+     /tmp/ccEXeuqp.s:24     .text.MX_SPI2_Init:0000000000000000 MX_SPI2_Init
+     /tmp/ccEXeuqp.s:96     .text.MX_SPI2_Init:0000000000000038 $d
                             *COM*:0000000000000058 hspi2
-     /tmp/ccfb7JUP.s:102    .text.HAL_SPI_MspInit:0000000000000000 $t
-     /tmp/ccfb7JUP.s:109    .text.HAL_SPI_MspInit:0000000000000000 HAL_SPI_MspInit
-     /tmp/ccfb7JUP.s:224    .text.HAL_SPI_MspInit:0000000000000070 $d
-     /tmp/ccfb7JUP.s:230    .text.HAL_SPI_MspDeInit:0000000000000000 $t
-     /tmp/ccfb7JUP.s:237    .text.HAL_SPI_MspDeInit:0000000000000000 HAL_SPI_MspDeInit
-     /tmp/ccfb7JUP.s:280    .text.HAL_SPI_MspDeInit:0000000000000024 $d
+     /tmp/ccEXeuqp.s:102    .text.HAL_SPI_MspInit:0000000000000000 $t
+     /tmp/ccEXeuqp.s:109    .text.HAL_SPI_MspInit:0000000000000000 HAL_SPI_MspInit
+     /tmp/ccEXeuqp.s:224    .text.HAL_SPI_MspInit:0000000000000070 $d
+     /tmp/ccEXeuqp.s:230    .text.HAL_SPI_MspDeInit:0000000000000000 $t
+     /tmp/ccEXeuqp.s:237    .text.HAL_SPI_MspDeInit:0000000000000000 HAL_SPI_MspDeInit
+     /tmp/ccEXeuqp.s:280    .text.HAL_SPI_MspDeInit:0000000000000024 $d
 
 UNDEFINED SYMBOLS
 HAL_SPI_Init

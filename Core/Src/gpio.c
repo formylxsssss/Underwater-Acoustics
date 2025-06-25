@@ -19,7 +19,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "gpio.h"
-
+#include "Custcom_Pin.h"
 /* USER CODE BEGIN 0 */
 
 /* USER CODE END 0 */
@@ -70,10 +70,10 @@ void MX_GPIO_Init(void)
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PB11 */
-  GPIO_InitStruct.Pin = GPIO_PIN_11;
+  GPIO_InitStruct.Pin = DHT22_PIN;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+  HAL_GPIO_Init(DHT22_PIN_PORT, &GPIO_InitStruct);
 
 }
 

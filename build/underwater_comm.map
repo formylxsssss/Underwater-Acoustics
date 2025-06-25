@@ -1110,6 +1110,58 @@ Discarded input sections
  .debug_frame   0x0000000000000000       0xe0 build/SEGGER_RTT_printf.o
  .ARM.attributes
                 0x0000000000000000       0x2d build/SEGGER_RTT_printf.o
+ .text          0x0000000000000000        0x0 build/diff_signal.o
+ .data          0x0000000000000000        0x0 build/diff_signal.o
+ .bss           0x0000000000000000        0x0 build/diff_signal.o
+ .text.DWT_Delay_Init
+                0x0000000000000000       0x24 build/diff_signal.o
+ .text.DWT_Delay_us
+                0x0000000000000000       0x2c build/diff_signal.o
+ .text.DiffSignal_Stop
+                0x0000000000000000       0x18 build/diff_signal.o
+ .text.DiffSignal_Init
+                0x0000000000000000       0x3c build/diff_signal.o
+ .text.DiffSignal_Send
+                0x0000000000000000       0x24 build/diff_signal.o
+ .text.DiffSignal_Senddata
+                0x0000000000000000       0x42 build/diff_signal.o
+ .debug_info    0x0000000000000000     0x153d build/diff_signal.o
+ .debug_abbrev  0x0000000000000000      0x2d1 build/diff_signal.o
+ .debug_loc     0x0000000000000000      0x1a5 build/diff_signal.o
+ .debug_aranges
+                0x0000000000000000       0x48 build/diff_signal.o
+ .debug_ranges  0x0000000000000000       0x68 build/diff_signal.o
+ .debug_line    0x0000000000000000      0x422 build/diff_signal.o
+ .debug_str     0x0000000000000000      0xc94 build/diff_signal.o
+ .comment       0x0000000000000000       0x4d build/diff_signal.o
+ .debug_frame   0x0000000000000000       0x90 build/diff_signal.o
+ .ARM.attributes
+                0x0000000000000000       0x2d build/diff_signal.o
+ .text          0x0000000000000000        0x0 build/ADXL345.o
+ .data          0x0000000000000000        0x0 build/ADXL345.o
+ .bss           0x0000000000000000        0x0 build/ADXL345.o
+ .debug_line    0x0000000000000000        0x0 build/ADXL345.o
+ .debug_str     0x0000000000000000       0xcc build/ADXL345.o
+ .comment       0x0000000000000000       0x4d build/ADXL345.o
+ .ARM.attributes
+                0x0000000000000000       0x33 build/ADXL345.o
+ .text          0x0000000000000000        0x0 build/DHT22.o
+ .data          0x0000000000000000        0x0 build/DHT22.o
+ .bss           0x0000000000000000        0x0 build/DHT22.o
+ .text.DHT22_Read
+                0x0000000000000000       0x50 build/DHT22.o
+ .debug_info    0x0000000000000000      0xc87 build/DHT22.o
+ .debug_abbrev  0x0000000000000000      0x247 build/DHT22.o
+ .debug_loc     0x0000000000000000       0x73 build/DHT22.o
+ .debug_aranges
+                0x0000000000000000       0x20 build/DHT22.o
+ .debug_ranges  0x0000000000000000       0x10 build/DHT22.o
+ .debug_line    0x0000000000000000      0x324 build/DHT22.o
+ .debug_str     0x0000000000000000      0x698 build/DHT22.o
+ .comment       0x0000000000000000       0x4d build/DHT22.o
+ .debug_frame   0x0000000000000000       0x2c build/DHT22.o
+ .ARM.attributes
+                0x0000000000000000       0x2d build/DHT22.o
  .text          0x0000000000000000       0x14 build/startup_stm32f103xe.o
  .data          0x0000000000000000        0x0 build/startup_stm32f103xe.o
  .bss           0x0000000000000000        0x0 build/startup_stm32f103xe.o
@@ -1229,6 +1281,9 @@ LOAD build/stm32f1xx_ll_usb.o
 LOAD build/system_stm32f1xx.o
 LOAD build/SEGGER_RTT.o
 LOAD build/SEGGER_RTT_printf.o
+LOAD build/diff_signal.o
+LOAD build/ADXL345.o
+LOAD build/DHT22.o
 LOAD build/startup_stm32f103xe.o
 LOAD /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc_nano.a
 LOAD /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a
@@ -1914,6 +1969,7 @@ APBPrescTable                                     build/system_stm32f1xx.o
 BusFault_Handler                                  build/stm32f1xx_it.o
 CAN1_RX1_IRQHandler                               build/startup_stm32f103xe.o
 CAN1_SCE_IRQHandler                               build/startup_stm32f103xe.o
+DHT22_Read                                        build/DHT22.o
 DMA1_Channel1_IRQHandler                          build/startup_stm32f103xe.o
 DMA1_Channel2_IRQHandler                          build/startup_stm32f103xe.o
 DMA1_Channel3_IRQHandler                          build/startup_stm32f103xe.o
@@ -1925,8 +1981,15 @@ DMA2_Channel1_IRQHandler                          build/startup_stm32f103xe.o
 DMA2_Channel2_IRQHandler                          build/startup_stm32f103xe.o
 DMA2_Channel3_IRQHandler                          build/startup_stm32f103xe.o
 DMA2_Channel4_5_IRQHandler                        build/startup_stm32f103xe.o
+DWT_Delay_Init                                    build/diff_signal.o
+DWT_Delay_us                                      build/diff_signal.o
+                                                  build/DHT22.o
 DebugMon_Handler                                  build/stm32f1xx_it.o
 Default_Handler                                   build/startup_stm32f103xe.o
+DiffSignal_Init                                   build/diff_signal.o
+DiffSignal_Send                                   build/diff_signal.o
+DiffSignal_Senddata                               build/diff_signal.o
+DiffSignal_Stop                                   build/diff_signal.o
 EXTI0_IRQHandler                                  build/startup_stm32f103xe.o
 EXTI15_10_IRQHandler                              build/startup_stm32f103xe.o
 EXTI1_IRQHandler                                  build/startup_stm32f103xe.o
@@ -2011,6 +2074,7 @@ HAL_GPIO_Init                                     build/stm32f1xx_hal_gpio.o
                                                   build/gpio.o
 HAL_GPIO_LockPin                                  build/stm32f1xx_hal_gpio.o
 HAL_GPIO_ReadPin                                  build/stm32f1xx_hal_gpio.o
+                                                  build/DHT22.o
 HAL_GPIO_TogglePin                                build/stm32f1xx_hal_gpio.o
 HAL_GPIO_WritePin                                 build/stm32f1xx_hal_gpio.o
                                                   build/gpio.o
@@ -2295,6 +2359,7 @@ HAL_TIM_PWM_PulseFinishedCallback                 build/stm32f1xx_hal_tim.o
                                                   build/stm32f1xx_hal_tim_ex.o
 HAL_TIM_PWM_PulseFinishedHalfCpltCallback         build/stm32f1xx_hal_tim.o
 HAL_TIM_PWM_Start                                 build/stm32f1xx_hal_tim.o
+                                                  build/diff_signal.o
 HAL_TIM_PWM_Start_DMA                             build/stm32f1xx_hal_tim.o
 HAL_TIM_PWM_Start_IT                              build/stm32f1xx_hal_tim.o
 HAL_TIM_PWM_Stop                                  build/stm32f1xx_hal_tim.o
@@ -2365,6 +2430,7 @@ SVC_Handler                                       build/stm32f1xx_it.o
 SysTick_Handler                                   build/stm32f1xx_it.o
 SystemClock_Config                                build/main.o
 SystemCoreClock                                   build/system_stm32f1xx.o
+                                                  build/diff_signal.o
                                                   build/stm32f1xx_hal_rcc.o
                                                   build/stm32f1xx_hal.o
                                                   build/stm32f1xx_hal_spi.o
@@ -2535,7 +2601,9 @@ hardware_init_hook                                /opt/gcc-arm-none-eabi-9-2020-
 hpcd_USB_FS                                       build/usb.o
 hspi2                                             build/spi.o
 htim1                                             build/tim.o
+                                                  build/diff_signal.o
 htim3                                             build/tim.o
+                                                  build/diff_signal.o
 htim8                                             build/tim.o
 main                                              build/main.o
                                                   build/startup_stm32f103xe.o
