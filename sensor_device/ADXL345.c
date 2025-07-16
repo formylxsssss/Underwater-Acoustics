@@ -1,4 +1,4 @@
-#include "adxl345.h"
+#include "ADXL345.h"
 
 // SPI读寄存器
 static uint8_t ADXL345_ReadReg(uint8_t reg)

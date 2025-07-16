@@ -1,5 +1,5 @@
-build/stm32f1xx_hal_pcd.o: \
- Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_pcd.c \
+build/diff_signal_rx.o: diff_signal/diff_signal_rx.c \
+ diff_signal/diff_signal_rx.h Core/Inc/main.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h \
  Core/Inc/stm32f1xx_hal_conf.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h \
@@ -27,7 +27,12 @@ build/stm32f1xx_hal_pcd.o: \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h \
- Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h
+ Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h \
+ diff_signal/diff_signal.h
+
+diff_signal/diff_signal_rx.h:
+
+Core/Inc/main.h:
 
 Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h:
 
@@ -88,3 +93,5 @@ Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd.h:
 Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h:
 
 Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h:
+
+diff_signal/diff_signal.h:

@@ -21,6 +21,10 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32f1xx_it.h"
+#include "diff_signal_rx.h"
+#include "stm32f1xx_hal_adc.h"
+extern TIM_HandleTypeDef htim2;
+extern ADC_HandleTypeDef hadc1;
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 /* USER CODE END Includes */
@@ -60,6 +64,24 @@
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
+
+
+
+void EXTI1_IRQHandler(void)
+{
+    HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_1);
+}
+
+void TIM2_IRQHandler(void)
+{
+    HAL_TIM_IRQHandler(&htim2);
+}
+
+void ADC1_2_IRQHandler(void)
+{
+  HAL_ADC_IRQHandler(&hadc1);
+}
+
 
 /******************************************************************************/
 /*           Cortex-M3 Processor Interruption and Exception Handlers          */

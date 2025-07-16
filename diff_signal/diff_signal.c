@@ -2,7 +2,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include "diff_signal.h"
-
+#include "diff_signal_rx.h"
+#include "SEGGER_RTT.h"
 // 初始化 DWT 微秒延迟功能
 void DWT_Delay_Init(void)
 {
@@ -10,7 +11,11 @@ void DWT_Delay_Init(void)
     DWT->CYCCNT = 0;
     DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
 }
-
+/**
+ * @brief 使用dwt进行us级延时，已经验证过，没有问题；
+ * 
+ * @param us 
+ */
 void DWT_Delay_us(uint32_t us)
 {
     uint32_t cycles = (SystemCoreClock / 1000000L) * us;
@@ -21,8 +26,17 @@ void DWT_Delay_us(uint32_t us)
 
 void DiffSignal_Init(void)
 {
-    HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
-    HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
+   HAL_StatusTypeDef error =  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
+   if(error != HAL_OK )
+   {
+     myprintf("tim11_pwm_start_error\n");
+   }
+     error = HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
+    if(error != HAL_OK)
+    {
+        myprintf("tim33_pwm_start_error\n");
+    }
+     
 
     // 反相 PA7 对应的 TIM3_CH2
     TIM3->CCER &= ~TIM_CCER_CC2P;
@@ -54,20 +68,28 @@ void DiffSignal_Stop(void)
 
 void DiffSignal_Senddata(uint8_t *data, uint16_t length)
 {
-    for (uint16_t i = 0; i < length; i++)
-    {
-        uint8_t byte = data[i];
+    // for (uint16_t i = 0; i < length; i++)
+    // {
+    //     uint8_t byte = data[i];
 
-        for (int bit = 7; bit >= 0; bit--)
-        {
-            if ((byte >> bit) & 0x01)
-            {
-                DiffSignal_Send(BIT_DURATION_US);
-            }
-            else
-            {
-                DWT_Delay_us(BIT_DURATION_US);
-            }
-        }
-    }
+    //     // 起始位 0
+    //     DWT_Delay_us(BIT_DURATION_US); 
+ 
+    //     for (int bit = 0; bit < 8; bit++)
+    //     {
+    //         if ((byte >> bit) & 0x01)
+    //         {
+    //             DiffSignal_Send(BIT_DURATION_US);
+    //         }
+    //         else
+    //         {
+    //             DWT_Delay_us(BIT_DURATION_US);
+    //         }
+    //     }
+    //     // 停止位 1
+    //     DiffSignal_Send(BIT_DURATION_US);
+    DiffSignal_Send(1000);
+    DWT_Delay_us(100000);
+
+    // }
 }

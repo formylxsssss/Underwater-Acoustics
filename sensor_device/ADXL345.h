@@ -24,5 +24,6 @@ extern SPI_HandleTypeDef hspi2;
 uint8_t ADXL345_ReadID(void);
 void ADXL345_Init(void);
 void ADXL345_ReadXYZ(int16_t *x, int16_t *y, int16_t *z);
-float ADXL345_ConvertToG(int16_t raw)
+float ADXL345_ConvertToG(int16_t raw);
 #endif
+    

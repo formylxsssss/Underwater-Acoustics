@@ -4,7 +4,8 @@
 #include "main.h"
 
 #define BAUD_RATE 2400
-#define BIT_DURATION_US (1000000 / BAUD_RATE)
+
+// #define BIT_DURATION_US (1000000 / BAUD_RATE)
 
 void DiffSignal_Init(void);
 void DiffSignal_Send(uint16_t duration_us);

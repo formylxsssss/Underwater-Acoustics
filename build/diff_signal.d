@@ -16,6 +16,8 @@ build/diff_signal.o: diff_signal/diff_signal.c Core/Inc/tim.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma_ex.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_cortex.h \
+ Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_adc.h \
+ Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_adc_ex.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h \
@@ -25,7 +27,8 @@ build/diff_signal.o: diff_signal/diff_signal.c Core/Inc/tim.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h \
- diff_signal/diff_signal.h Core/Inc/main.h
+ diff_signal/diff_signal.h Core/Inc/main.h diff_signal/diff_signal_rx.h \
+ ARM_SEGGER_RTT/SEGGER_RTT.h ARM_SEGGER_RTT/SEGGER_RTT_Conf.h
 
 Core/Inc/tim.h:
 
@@ -69,6 +72,10 @@ Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma_ex.h:
 
 Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_cortex.h:
 
+Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_adc.h:
+
+Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_adc_ex.h:
+
 Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h:
 
 Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h:
@@ -90,3 +97,9 @@ Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h:
 diff_signal/diff_signal.h:
 
 Core/Inc/main.h:
+
+diff_signal/diff_signal_rx.h:
+
+ARM_SEGGER_RTT/SEGGER_RTT.h:
+
+ARM_SEGGER_RTT/SEGGER_RTT_Conf.h:

@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccdFIDvO.s 			page 1
+ARM GAS  /tmp/ccGixJzt.s 			page 1
 
 
    1              		.cpu cortex-m3
@@ -48,7 +48,7 @@ ARM GAS  /tmp/ccdFIDvO.s 			page 1
    9:sensor_device/DHT22.c ****     uint8_t i, data = 0;
   38              		.loc 1 9 5 view .LVU1
   39              	.LVL0:
-  10:sensor_device/DHT22.c ****     for (i = 0; i < 8; i++) {
+  10:sensor_device/DHT22.c ****     for (i = 0; i < 8; i++)
   40              		.loc 1 10 5 view .LVU2
    9:sensor_device/DHT22.c ****     uint8_t i, data = 0;
   41              		.loc 1 9 16 is_stmt 0 view .LVU3
@@ -58,108 +58,114 @@ ARM GAS  /tmp/ccdFIDvO.s 			page 1
   45              		.loc 1 10 5 view .LVU5
   46 0006 07E0     		b	.L2
   47              	.LVL1:
-ARM GAS  /tmp/ccdFIDvO.s 			page 2
+ARM GAS  /tmp/ccGixJzt.s 			page 2
 
 
   48              	.L5:
-  11:sensor_device/DHT22.c ****         while (HAL_GPIO_ReadPin( DHT22_PIN_PORT, DHT22_PIN) == GPIO_PIN_RESET); // 等待高电平
-  12:sensor_device/DHT22.c ****         DWT_Delay_us(40); // 延时40us
-  13:sensor_device/DHT22.c ****         if (HAL_GPIO_ReadPin( DHT22_PIN_PORT, DHT22_PIN) == GPIO_PIN_SET) {
-  14:sensor_device/DHT22.c ****             data |= (1 << (7 - i)); // 如果是高电平，则设置当前位
-  15:sensor_device/DHT22.c ****         }
-  16:sensor_device/DHT22.c ****         while (HAL_GPIO_ReadPin( DHT22_PIN_PORT, DHT22_PIN) == GPIO_PIN_SET); // 等待低电平
-  49              		.loc 1 16 77 is_stmt 1 discriminator 1 view .LVU6
-  50              		.loc 1 16 15 discriminator 1 view .LVU7
-  51              		.loc 1 16 16 is_stmt 0 discriminator 1 view .LVU8
+  11:sensor_device/DHT22.c ****     {
+  12:sensor_device/DHT22.c ****         while (HAL_GPIO_ReadPin(DHT22_PIN_PORT, DHT22_PIN) == GPIO_PIN_RESET)
+  13:sensor_device/DHT22.c ****             ;             // 等待高电平
+  14:sensor_device/DHT22.c ****         DWT_Delay_us(40); // 延时40us
+  15:sensor_device/DHT22.c ****         if (HAL_GPIO_ReadPin(DHT22_PIN_PORT, DHT22_PIN) == GPIO_PIN_SET)
+  16:sensor_device/DHT22.c ****         {
+  17:sensor_device/DHT22.c ****             data |= (1 << (7 - i)); // 如果是高电平，则设置当前位
+  18:sensor_device/DHT22.c ****         }
+  19:sensor_device/DHT22.c ****         while (HAL_GPIO_ReadPin(DHT22_PIN_PORT, DHT22_PIN) == GPIO_PIN_SET)
+  20:sensor_device/DHT22.c ****             ; // 等待低电平
+  49              		.loc 1 20 13 is_stmt 1 discriminator 1 view .LVU6
+  19:sensor_device/DHT22.c ****             ; // 等待低电平
+  50              		.loc 1 19 15 discriminator 1 view .LVU7
+  19:sensor_device/DHT22.c ****             ; // 等待低电平
+  51              		.loc 1 19 16 is_stmt 0 discriminator 1 view .LVU8
   52 0008 0B21     		movs	r1, #11
   53 000a 1048     		ldr	r0, .L8
   54 000c FFF7FEFF 		bl	HAL_GPIO_ReadPin
   55              	.LVL2:
-  56              		.loc 1 16 15 discriminator 1 view .LVU9
+  19:sensor_device/DHT22.c ****             ; // 等待低电平
+  56              		.loc 1 19 15 discriminator 1 view .LVU9
   57 0010 0128     		cmp	r0, #1
   58 0012 F9D0     		beq	.L5
-  10:sensor_device/DHT22.c ****     for (i = 0; i < 8; i++) {
+  10:sensor_device/DHT22.c ****     for (i = 0; i < 8; i++)
   59              		.loc 1 10 24 is_stmt 1 discriminator 2 view .LVU10
-  10:sensor_device/DHT22.c ****     for (i = 0; i < 8; i++) {
+  10:sensor_device/DHT22.c ****     for (i = 0; i < 8; i++)
   60              		.loc 1 10 25 is_stmt 0 discriminator 2 view .LVU11
   61 0014 0134     		adds	r4, r4, #1
   62              	.LVL3:
-  10:sensor_device/DHT22.c ****     for (i = 0; i < 8; i++) {
+  10:sensor_device/DHT22.c ****     for (i = 0; i < 8; i++)
   63              		.loc 1 10 25 discriminator 2 view .LVU12
   64 0016 E4B2     		uxtb	r4, r4
   65              	.LVL4:
   66              	.L2:
-  10:sensor_device/DHT22.c ****     for (i = 0; i < 8; i++) {
+  10:sensor_device/DHT22.c ****     for (i = 0; i < 8; i++)
   67              		.loc 1 10 17 is_stmt 1 discriminator 1 view .LVU13
-  10:sensor_device/DHT22.c ****     for (i = 0; i < 8; i++) {
+  10:sensor_device/DHT22.c ****     for (i = 0; i < 8; i++)
   68              		.loc 1 10 5 is_stmt 0 discriminator 1 view .LVU14
   69 0018 072C     		cmp	r4, #7
   70 001a 15D8     		bhi	.L7
   71              	.L3:
-  11:sensor_device/DHT22.c ****         while (HAL_GPIO_ReadPin( DHT22_PIN_PORT, DHT22_PIN) == GPIO_PIN_RESET); // 等待高电平
-  72              		.loc 1 11 79 is_stmt 1 discriminator 1 view .LVU15
-  11:sensor_device/DHT22.c ****         while (HAL_GPIO_ReadPin( DHT22_PIN_PORT, DHT22_PIN) == GPIO_PIN_RESET); // 等待高电平
-  73              		.loc 1 11 15 discriminator 1 view .LVU16
-  11:sensor_device/DHT22.c ****         while (HAL_GPIO_ReadPin( DHT22_PIN_PORT, DHT22_PIN) == GPIO_PIN_RESET); // 等待高电平
-  74              		.loc 1 11 16 is_stmt 0 discriminator 1 view .LVU17
+  13:sensor_device/DHT22.c ****         DWT_Delay_us(40); // 延时40us
+  72              		.loc 1 13 13 is_stmt 1 discriminator 1 view .LVU15
+  12:sensor_device/DHT22.c ****             ;             // 等待高电平
+  73              		.loc 1 12 15 discriminator 1 view .LVU16
+  12:sensor_device/DHT22.c ****             ;             // 等待高电平
+  74              		.loc 1 12 16 is_stmt 0 discriminator 1 view .LVU17
   75 001c 0B21     		movs	r1, #11
   76 001e 0B48     		ldr	r0, .L8
   77 0020 FFF7FEFF 		bl	HAL_GPIO_ReadPin
   78              	.LVL5:
-  11:sensor_device/DHT22.c ****         while (HAL_GPIO_ReadPin( DHT22_PIN_PORT, DHT22_PIN) == GPIO_PIN_RESET); // 等待高电平
-  79              		.loc 1 11 15 discriminator 1 view .LVU18
+  12:sensor_device/DHT22.c ****             ;             // 等待高电平
+  79              		.loc 1 12 15 discriminator 1 view .LVU18
   80 0024 0028     		cmp	r0, #0
   81 0026 F9D0     		beq	.L3
-  12:sensor_device/DHT22.c ****         if (HAL_GPIO_ReadPin( DHT22_PIN_PORT, DHT22_PIN) == GPIO_PIN_SET) {
-  82              		.loc 1 12 9 is_stmt 1 view .LVU19
+  14:sensor_device/DHT22.c ****         if (HAL_GPIO_ReadPin(DHT22_PIN_PORT, DHT22_PIN) == GPIO_PIN_SET)
+ARM GAS  /tmp/ccGixJzt.s 			page 3
+
+
+  82              		.loc 1 14 9 is_stmt 1 view .LVU19
   83 0028 2820     		movs	r0, #40
   84 002a FFF7FEFF 		bl	DWT_Delay_us
   85              	.LVL6:
-  13:sensor_device/DHT22.c ****             data |= (1 << (7 - i)); // 如果是高电平，则设置当前位
-  86              		.loc 1 13 9 view .LVU20
-  13:sensor_device/DHT22.c ****             data |= (1 << (7 - i)); // 如果是高电平，则设置当前位
-ARM GAS  /tmp/ccdFIDvO.s 			page 3
-
-
-  87              		.loc 1 13 13 is_stmt 0 view .LVU21
+  15:sensor_device/DHT22.c ****         {
+  86              		.loc 1 15 9 view .LVU20
+  15:sensor_device/DHT22.c ****         {
+  87              		.loc 1 15 13 is_stmt 0 view .LVU21
   88 002e 0B21     		movs	r1, #11
   89 0030 0648     		ldr	r0, .L8
   90 0032 FFF7FEFF 		bl	HAL_GPIO_ReadPin
   91              	.LVL7:
-  13:sensor_device/DHT22.c ****             data |= (1 << (7 - i)); // 如果是高电平，则设置当前位
-  92              		.loc 1 13 12 view .LVU22
+  15:sensor_device/DHT22.c ****         {
+  92              		.loc 1 15 12 view .LVU22
   93 0036 0128     		cmp	r0, #1
   94 0038 E6D1     		bne	.L5
-  14:sensor_device/DHT22.c ****         }
-  95              		.loc 1 14 13 is_stmt 1 view .LVU23
-  14:sensor_device/DHT22.c ****         }
-  96              		.loc 1 14 30 is_stmt 0 view .LVU24
+  17:sensor_device/DHT22.c ****         }
+  95              		.loc 1 17 13 is_stmt 1 view .LVU23
+  17:sensor_device/DHT22.c ****         }
+  96              		.loc 1 17 30 is_stmt 0 view .LVU24
   97 003a C4F10702 		rsb	r2, r4, #7
-  14:sensor_device/DHT22.c ****         }
-  98              		.loc 1 14 24 view .LVU25
+  17:sensor_device/DHT22.c ****         }
+  98              		.loc 1 17 24 view .LVU25
   99 003e 0123     		movs	r3, #1
  100 0040 9340     		lsls	r3, r3, r2
-  14:sensor_device/DHT22.c ****         }
- 101              		.loc 1 14 18 view .LVU26
+  17:sensor_device/DHT22.c ****         }
+ 101              		.loc 1 17 18 view .LVU26
  102 0042 2B43     		orrs	r3, r3, r5
  103 0044 DDB2     		uxtb	r5, r3
  104              	.LVL8:
-  14:sensor_device/DHT22.c ****         }
- 105              		.loc 1 14 18 view .LVU27
+  17:sensor_device/DHT22.c ****         }
+ 105              		.loc 1 17 18 view .LVU27
  106 0046 DFE7     		b	.L5
  107              	.L7:
-  17:sensor_device/DHT22.c ****     }
-  18:sensor_device/DHT22.c **** 
-  19:sensor_device/DHT22.c ****     return data;
- 108              		.loc 1 19 5 is_stmt 1 view .LVU28
-  20:sensor_device/DHT22.c **** 
-  21:sensor_device/DHT22.c **** }...
- 109              		.loc 1 21 1 is_stmt 0 view .LVU29
+  21:sensor_device/DHT22.c ****     }
+  22:sensor_device/DHT22.c **** 
+  23:sensor_device/DHT22.c ****     return data;
+ 108              		.loc 1 23 5 is_stmt 1 view .LVU28
+  24:sensor_device/DHT22.c **** }...
+ 109              		.loc 1 24 1 is_stmt 0 view .LVU29
  110 0048 2846     		mov	r0, r5
  111 004a 38BD     		pop	{r3, r4, r5, pc}
  112              	.LVL9:
  113              	.L9:
- 114              		.loc 1 21 1 view .LVU30
+ 114              		.loc 1 24 1 view .LVU30
  115              		.align	2
  116              	.L8:
  117 004c 000C0140 		.word	1073810432
@@ -172,25 +178,25 @@ ARM GAS  /tmp/ccdFIDvO.s 			page 1
  125              		.file 4 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/_types.h"
  126              		.file 5 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/reent.h"
  127              		.file 6 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/lock.h"
+ARM GAS  /tmp/ccGixJzt.s 			page 4
+
+
  128              		.file 7 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/_stdint.h"
  129              		.file 8 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/stdlib.h"
  130              		.file 9 "Drivers/CMSIS/Include/core_cm3.h"
  131              		.file 10 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/system_stm32f1xx.h"
  132              		.file 11 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xe.h"
  133              		.file 12 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio.h"
-ARM GAS  /tmp/ccdFIDvO.s 			page 4
-
-
  134              		.file 13 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h"
  135              		.file 14 "diff_signal/diff_signal.h"
-ARM GAS  /tmp/ccdFIDvO.s 			page 5
+ARM GAS  /tmp/ccGixJzt.s 			page 5
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 DHT22.c
-     /tmp/ccdFIDvO.s:16     .text.DHT22_Read:0000000000000000 $t
-     /tmp/ccdFIDvO.s:24     .text.DHT22_Read:0000000000000000 DHT22_Read
-     /tmp/ccdFIDvO.s:117    .text.DHT22_Read:000000000000004c $d
+     /tmp/ccGixJzt.s:16     .text.DHT22_Read:0000000000000000 $t
+     /tmp/ccGixJzt.s:24     .text.DHT22_Read:0000000000000000 DHT22_Read
+     /tmp/ccGixJzt.s:117    .text.DHT22_Read:000000000000004c $d
 
 UNDEFINED SYMBOLS
 HAL_GPIO_ReadPin

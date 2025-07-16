@@ -1,6 +1,5 @@
-speed 48000
+speed 2400
 si swd
-device STM32F103RC
 connect
 loadfile build/underwater_comm.hex
 r

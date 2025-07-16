@@ -1,5 +1,10 @@
 {
     "files.associations": {
-        "diff_signal.h": "c"
+        "diff_signal.h": "c",
+        "diff_signal_rx.h": "c",
+        "stm32f1xx_hal.h": "c",
+        "stm32f1xx_it.h": "c",
+        "stm32f1xx_hal_adc.h": "c",
+        "segger_rtt.h": "c"
     }
 }

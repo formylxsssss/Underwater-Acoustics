@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccgQ3jcN.s 			page 1
+ARM GAS  /tmp/ccbefcH4.s 			page 1
 
 
    1              		.cpu cortex-m3
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccgQ3jcN.s 			page 1
   30:Core/Src/stm32f1xx_hal_msp.c **** 
   31:Core/Src/stm32f1xx_hal_msp.c **** /* USER CODE END TD */
   32:Core/Src/stm32f1xx_hal_msp.c **** 
-ARM GAS  /tmp/ccgQ3jcN.s 			page 2
+ARM GAS  /tmp/ccbefcH4.s 			page 2
 
 
   33:Core/Src/stm32f1xx_hal_msp.c **** /* Private define ------------------------------------------------------------*/
@@ -111,14 +111,14 @@ ARM GAS  /tmp/ccgQ3jcN.s 			page 1
   36              	.LBB2:
   37              		.loc 1 70 3 view .LVU2
   38              		.loc 1 70 3 view .LVU3
-  39 0002 0E4B     		ldr	r3, .L3
+  39 0002 0A4B     		ldr	r3, .L3
   40 0004 9A69     		ldr	r2, [r3, #24]
   41 0006 42F00102 		orr	r2, r2, #1
   42 000a 9A61     		str	r2, [r3, #24]
   43              		.loc 1 70 3 view .LVU4
   44 000c 9A69     		ldr	r2, [r3, #24]
   45 000e 02F00102 		and	r2, r2, #1
-ARM GAS  /tmp/ccgQ3jcN.s 			page 3
+ARM GAS  /tmp/ccbefcH4.s 			page 3
 
 
   46 0012 0092     		str	r2, [sp]
@@ -147,59 +147,39 @@ ARM GAS  /tmp/ccgQ3jcN.s 			page 1
   74:Core/Src/stm32f1xx_hal_msp.c **** 
   75:Core/Src/stm32f1xx_hal_msp.c ****   /** DISABLE: JTAG-DP Disabled and SW-DP Disabled
   76:Core/Src/stm32f1xx_hal_msp.c ****   */
-  77:Core/Src/stm32f1xx_hal_msp.c ****   __HAL_AFIO_REMAP_SWJ_DISABLE();
-  66              		.loc 1 77 3 view .LVU13
-  67              	.LBB4:
-  68              		.loc 1 77 3 view .LVU14
-  69 0028 054A     		ldr	r2, .L3+4
-  70 002a 5368     		ldr	r3, [r2, #4]
-  71              	.LVL0:
-  72              		.loc 1 77 3 view .LVU15
-  73 002c 23F0E063 		bic	r3, r3, #117440512
-  74              	.LVL1:
-  75              		.loc 1 77 3 view .LVU16
-  76 0030 43F08063 		orr	r3, r3, #67108864
-  77              	.LVL2:
-  78              		.loc 1 77 3 view .LVU17
-  79 0034 5360     		str	r3, [r2, #4]
-  80              	.LBE4:
-  81              		.loc 1 77 3 view .LVU18
+  77:Core/Src/stm32f1xx_hal_msp.c ****   // __HAL_AFIO_REMAP_SWJ_DISABLE();
   78:Core/Src/stm32f1xx_hal_msp.c **** 
   79:Core/Src/stm32f1xx_hal_msp.c ****   /* USER CODE BEGIN MspInit 1 */
   80:Core/Src/stm32f1xx_hal_msp.c **** 
   81:Core/Src/stm32f1xx_hal_msp.c ****   /* USER CODE END MspInit 1 */
   82:Core/Src/stm32f1xx_hal_msp.c **** }
-  82              		.loc 1 82 1 is_stmt 0 view .LVU19
-  83 0036 02B0     		add	sp, sp, #8
-  84              	.LCFI1:
-  85              		.cfi_def_cfa_offset 0
-  86              		@ sp needed
-  87 0038 7047     		bx	lr
-  88              	.L4:
-  89 003a 00BF     		.align	2
-  90              	.L3:
-ARM GAS  /tmp/ccgQ3jcN.s 			page 4
-
-
-  91 003c 00100240 		.word	1073876992
-  92 0040 00000140 		.word	1073807360
-  93              		.cfi_endproc
-  94              	.LFE65:
-  96              		.text
-  97              	.Letext0:
-  98              		.file 2 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/machine/_default_types.h"
-  99              		.file 3 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/_stdint.h"
- 100              		.file 4 "Drivers/CMSIS/Include/core_cm3.h"
- 101              		.file 5 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/system_stm32f1xx.h"
- 102              		.file 6 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xe.h"
- 103              		.file 7 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h"
-ARM GAS  /tmp/ccgQ3jcN.s 			page 5
+  66              		.loc 1 82 1 is_stmt 0 view .LVU13
+  67 0028 02B0     		add	sp, sp, #8
+  68              	.LCFI1:
+  69              		.cfi_def_cfa_offset 0
+  70              		@ sp needed
+  71 002a 7047     		bx	lr
+  72              	.L4:
+  73              		.align	2
+  74              	.L3:
+  75 002c 00100240 		.word	1073876992
+  76              		.cfi_endproc
+  77              	.LFE65:
+  79              		.text
+  80              	.Letext0:
+  81              		.file 2 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/machine/_default_types.h"
+  82              		.file 3 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/_stdint.h"
+  83              		.file 4 "Drivers/CMSIS/Include/core_cm3.h"
+  84              		.file 5 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/system_stm32f1xx.h"
+  85              		.file 6 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xe.h"
+  86              		.file 7 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h"
+ARM GAS  /tmp/ccbefcH4.s 			page 4
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 stm32f1xx_hal_msp.c
-     /tmp/ccgQ3jcN.s:16     .text.HAL_MspInit:0000000000000000 $t
-     /tmp/ccgQ3jcN.s:24     .text.HAL_MspInit:0000000000000000 HAL_MspInit
-     /tmp/ccgQ3jcN.s:91     .text.HAL_MspInit:000000000000003c $d
+     /tmp/ccbefcH4.s:16     .text.HAL_MspInit:0000000000000000 $t
+     /tmp/ccbefcH4.s:24     .text.HAL_MspInit:0000000000000000 HAL_MspInit
+     /tmp/ccbefcH4.s:75     .text.HAL_MspInit:000000000000002c $d
 
 NO UNDEFINED SYMBOLS

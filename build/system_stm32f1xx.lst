@@ -1,4 +1,4 @@
-ARM GAS  /tmp/cc3RI1AD.s 			page 1
+ARM GAS  /tmp/ccxmoPco.s 			page 1
 
 
    1              		.cpu cortex-m3
@@ -58,7 +58,7 @@ ARM GAS  /tmp/cc3RI1AD.s 			page 1
   30:Core/Src/system_stm32f1xx.c ****   *    are using different crystal you have to adapt the HSE value to your own
   31:Core/Src/system_stm32f1xx.c ****   *    configuration.
   32:Core/Src/system_stm32f1xx.c ****   *        
-ARM GAS  /tmp/cc3RI1AD.s 			page 2
+ARM GAS  /tmp/ccxmoPco.s 			page 2
 
 
   33:Core/Src/system_stm32f1xx.c ****   ******************************************************************************
@@ -106,7 +106,7 @@ ARM GAS  /tmp/cc3RI1AD.s 			page 1
   75:Core/Src/system_stm32f1xx.c ****   */
   76:Core/Src/system_stm32f1xx.c **** 
   77:Core/Src/system_stm32f1xx.c **** #if !defined  (HSE_VALUE) 
-  78:Core/Src/system_stm32f1xx.c ****   #define HSE_VALUE               8000000U /*!< Default value of the External oscillator in Hz.
+  78:Core/Src/system_stm32f1xx.c ****   #define HSE_VALUE               16000000U /*!< Default value of the External oscillator in Hz.
   79:Core/Src/system_stm32f1xx.c ****                                                 This value can be provided and adapted by the user 
   80:Core/Src/system_stm32f1xx.c **** #endif /* HSE_VALUE */
   81:Core/Src/system_stm32f1xx.c **** 
@@ -118,7 +118,7 @@ ARM GAS  /tmp/cc3RI1AD.s 			page 1
   87:Core/Src/system_stm32f1xx.c **** /*!< Uncomment the following line if you need to use external SRAM  */ 
   88:Core/Src/system_stm32f1xx.c **** #if defined(STM32F100xE) || defined(STM32F101xE) || defined(STM32F101xG) || defined(STM32F103xE) ||
   89:Core/Src/system_stm32f1xx.c **** /* #define DATA_IN_ExtSRAM */
-ARM GAS  /tmp/cc3RI1AD.s 			page 3
+ARM GAS  /tmp/ccxmoPco.s 			page 3
 
 
   90:Core/Src/system_stm32f1xx.c **** #endif /* STM32F100xE || STM32F101xE || STM32F101xG || STM32F103xE || STM32F103xG */
@@ -178,7 +178,7 @@ ARM GAS  /tmp/cc3RI1AD.s 			page 1
  144:Core/Src/system_stm32f1xx.c **** const uint8_t APBPrescTable[8U] =  {0, 0, 0, 0, 1, 2, 3, 4};
  145:Core/Src/system_stm32f1xx.c **** 
  146:Core/Src/system_stm32f1xx.c **** /**
-ARM GAS  /tmp/cc3RI1AD.s 			page 4
+ARM GAS  /tmp/ccxmoPco.s 			page 4
 
 
  147:Core/Src/system_stm32f1xx.c ****   * @}
@@ -238,7 +238,7 @@ ARM GAS  /tmp/cc3RI1AD.s 			page 1
   40              		.syntax unified
   41              		.thumb
   42              		.thumb_func
-ARM GAS  /tmp/cc3RI1AD.s 			page 5
+ARM GAS  /tmp/ccxmoPco.s 			page 5
 
 
   43              		.fpu softvfp
@@ -298,7 +298,7 @@ ARM GAS  /tmp/cc3RI1AD.s 			page 1
  233:Core/Src/system_stm32f1xx.c **** #if defined(STM32F100xB) || defined(STM32F100xE)
  234:Core/Src/system_stm32f1xx.c ****   uint32_t prediv1factor = 0U;
  235:Core/Src/system_stm32f1xx.c **** #endif /* STM32F100xB or STM32F100xE */
-ARM GAS  /tmp/cc3RI1AD.s 			page 6
+ARM GAS  /tmp/ccxmoPco.s 			page 6
 
 
  236:Core/Src/system_stm32f1xx.c ****     
@@ -358,7 +358,7 @@ ARM GAS  /tmp/cc3RI1AD.s 			page 1
  277:Core/Src/system_stm32f1xx.c ****         }
  278:Core/Src/system_stm32f1xx.c ****  #endif
  279:Core/Src/system_stm32f1xx.c ****       }
-ARM GAS  /tmp/cc3RI1AD.s 			page 7
+ARM GAS  /tmp/ccxmoPco.s 			page 7
 
 
  280:Core/Src/system_stm32f1xx.c **** #else
@@ -418,7 +418,7 @@ ARM GAS  /tmp/cc3RI1AD.s 			page 1
   77              	.L9:
  243:Core/Src/system_stm32f1xx.c ****       break;
   78              		.loc 1 243 7 view .LVU12
-ARM GAS  /tmp/cc3RI1AD.s 			page 8
+ARM GAS  /tmp/ccxmoPco.s 			page 8
 
 
  243:Core/Src/system_stm32f1xx.c ****       break;
@@ -469,7 +469,7 @@ ARM GAS  /tmp/cc3RI1AD.s 			page 1
  111              	.LVL8:
  246:Core/Src/system_stm32f1xx.c ****       break;
  112              		.loc 1 246 23 view .LVU25
- 113 0038 134A     		ldr	r2, .L10+8
+ 113 0038 154A     		ldr	r2, .L10+16
  114 003a 1A60     		str	r2, [r3]
  247:Core/Src/system_stm32f1xx.c ****     case 0x08U:  /* PLL used as system clock */
  115              		.loc 1 247 7 is_stmt 1 view .LVU26
@@ -478,7 +478,7 @@ ARM GAS  /tmp/cc3RI1AD.s 			page 1
  118              	.L4:
  251:Core/Src/system_stm32f1xx.c ****       pllsource = RCC->CFGR & RCC_CFGR_PLLSRC;
  119              		.loc 1 251 7 view .LVU27
-ARM GAS  /tmp/cc3RI1AD.s 			page 9
+ARM GAS  /tmp/ccxmoPco.s 			page 9
 
 
  251:Core/Src/system_stm32f1xx.c ****       pllsource = RCC->CFGR & RCC_CFGR_PLLSRC;
@@ -512,7 +512,7 @@ ARM GAS  /tmp/cc3RI1AD.s 			page 1
  139              		.loc 1 260 9 is_stmt 1 view .LVU36
  260:Core/Src/system_stm32f1xx.c ****       }
  140              		.loc 1 260 45 is_stmt 0 view .LVU37
- 141 0050 0F4A     		ldr	r2, .L10+16
+ 141 0050 104A     		ldr	r2, .L10+20
  142              	.LVL14:
  260:Core/Src/system_stm32f1xx.c ****       }
  143              		.loc 1 260 45 view .LVU38
@@ -538,14 +538,14 @@ ARM GAS  /tmp/cc3RI1AD.s 			page 1
  158              		.loc 1 270 12 view .LVU43
  159 0060 12F4003F 		tst	r2, #131072
  160 0064 05D0     		beq	.L8
-ARM GAS  /tmp/cc3RI1AD.s 			page 10
+ARM GAS  /tmp/ccxmoPco.s 			page 10
 
 
  272:Core/Src/system_stm32f1xx.c ****         }
  161              		.loc 1 272 11 is_stmt 1 view .LVU44
  272:Core/Src/system_stm32f1xx.c ****         }
  162              		.loc 1 272 47 is_stmt 0 view .LVU45
- 163 0066 0A4A     		ldr	r2, .L10+16
+ 163 0066 084A     		ldr	r2, .L10+8
  164 0068 02FB03F3 		mul	r3, r2, r3
  165              	.LVL18:
  272:Core/Src/system_stm32f1xx.c ****         }
@@ -559,7 +559,7 @@ ARM GAS  /tmp/cc3RI1AD.s 			page 1
  172              		.loc 1 276 11 is_stmt 1 view .LVU47
  276:Core/Src/system_stm32f1xx.c ****         }
  173              		.loc 1 276 39 is_stmt 0 view .LVU48
- 174 0072 054A     		ldr	r2, .L10+8
+ 174 0072 074A     		ldr	r2, .L10+16
  175 0074 02FB03F3 		mul	r3, r2, r3
  176              	.LVL20:
  276:Core/Src/system_stm32f1xx.c ****         }
@@ -574,58 +574,59 @@ ARM GAS  /tmp/cc3RI1AD.s 			page 1
  185 0084 00000000 		.word	.LANCHOR0
  186 0088 00127A00 		.word	8000000
  187 008c 00000000 		.word	.LANCHOR1
- 188 0090 00093D00 		.word	4000000
- 189              		.cfi_endproc
- 190              	.LFE66:
- 192              		.global	APBPrescTable
- 193              		.global	AHBPrescTable
- 194              		.global	SystemCoreClock
- 195              		.section	.data.SystemCoreClock,"aw"
- 196              		.align	2
- 197              		.set	.LANCHOR0,. + 0
- 200              	SystemCoreClock:
- 201 0000 0024F400 		.word	16000000
- 202              		.section	.rodata.AHBPrescTable,"a"
- 203              		.align	2
- 204              		.set	.LANCHOR1,. + 0
- 207              	AHBPrescTable:
- 208 0000 00000000 		.ascii	"\000\000\000\000\000\000\000\000\001\002\003\004\006"
- 208      00000000 
- 208      01020304 
- 208      06
- 209 000d 070809   		.ascii	"\007\010\011"
- 210              		.section	.rodata.APBPrescTable,"a"
- 211              		.align	2
- 214              	APBPrescTable:
- 215 0000 00000000 		.ascii	"\000\000\000\000\001\002\003\004"
-ARM GAS  /tmp/cc3RI1AD.s 			page 11
+ 188 0090 0024F400 		.word	16000000
+ 189 0094 00093D00 		.word	4000000
+ 190              		.cfi_endproc
+ 191              	.LFE66:
+ 193              		.global	APBPrescTable
+ 194              		.global	AHBPrescTable
+ 195              		.global	SystemCoreClock
+ 196              		.section	.data.SystemCoreClock,"aw"
+ 197              		.align	2
+ 198              		.set	.LANCHOR0,. + 0
+ 201              	SystemCoreClock:
+ 202 0000 0024F400 		.word	16000000
+ 203              		.section	.rodata.AHBPrescTable,"a"
+ 204              		.align	2
+ 205              		.set	.LANCHOR1,. + 0
+ 208              	AHBPrescTable:
+ 209 0000 00000000 		.ascii	"\000\000\000\000\000\000\000\000\001\002\003\004\006"
+ 209      00000000 
+ 209      01020304 
+ 209      06
+ 210 000d 070809   		.ascii	"\007\010\011"
+ 211              		.section	.rodata.APBPrescTable,"a"
+ 212              		.align	2
+ 215              	APBPrescTable:
+ARM GAS  /tmp/ccxmoPco.s 			page 11
 
 
- 215      01020304 
- 216              		.text
- 217              	.Letext0:
- 218              		.file 2 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/machine/_default_types.h"
- 219              		.file 3 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/_stdint.h"
- 220              		.file 4 "Drivers/CMSIS/Include/core_cm3.h"
- 221              		.file 5 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/system_stm32f1xx.h"
- 222              		.file 6 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xe.h"
- 223              		.file 7 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f1xx.h"
- 224              		.file 8 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h"
-ARM GAS  /tmp/cc3RI1AD.s 			page 12
+ 216 0000 00000000 		.ascii	"\000\000\000\000\001\002\003\004"
+ 216      01020304 
+ 217              		.text
+ 218              	.Letext0:
+ 219              		.file 2 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/machine/_default_types.h"
+ 220              		.file 3 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/_stdint.h"
+ 221              		.file 4 "Drivers/CMSIS/Include/core_cm3.h"
+ 222              		.file 5 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/system_stm32f1xx.h"
+ 223              		.file 6 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xe.h"
+ 224              		.file 7 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f1xx.h"
+ 225              		.file 8 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h"
+ARM GAS  /tmp/ccxmoPco.s 			page 12
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 system_stm32f1xx.c
-     /tmp/cc3RI1AD.s:16     .text.SystemInit:0000000000000000 $t
-     /tmp/cc3RI1AD.s:24     .text.SystemInit:0000000000000000 SystemInit
-     /tmp/cc3RI1AD.s:38     .text.SystemCoreClockUpdate:0000000000000000 $t
-     /tmp/cc3RI1AD.s:45     .text.SystemCoreClockUpdate:0000000000000000 SystemCoreClockUpdate
-     /tmp/cc3RI1AD.s:184    .text.SystemCoreClockUpdate:0000000000000080 $d
-     /tmp/cc3RI1AD.s:214    .rodata.APBPrescTable:0000000000000000 APBPrescTable
-     /tmp/cc3RI1AD.s:207    .rodata.AHBPrescTable:0000000000000000 AHBPrescTable
-     /tmp/cc3RI1AD.s:200    .data.SystemCoreClock:0000000000000000 SystemCoreClock
-     /tmp/cc3RI1AD.s:196    .data.SystemCoreClock:0000000000000000 $d
-     /tmp/cc3RI1AD.s:203    .rodata.AHBPrescTable:0000000000000000 $d
-     /tmp/cc3RI1AD.s:211    .rodata.APBPrescTable:0000000000000000 $d
+     /tmp/ccxmoPco.s:16     .text.SystemInit:0000000000000000 $t
+     /tmp/ccxmoPco.s:24     .text.SystemInit:0000000000000000 SystemInit
+     /tmp/ccxmoPco.s:38     .text.SystemCoreClockUpdate:0000000000000000 $t
+     /tmp/ccxmoPco.s:45     .text.SystemCoreClockUpdate:0000000000000000 SystemCoreClockUpdate
+     /tmp/ccxmoPco.s:184    .text.SystemCoreClockUpdate:0000000000000080 $d
+     /tmp/ccxmoPco.s:215    .rodata.APBPrescTable:0000000000000000 APBPrescTable
+     /tmp/ccxmoPco.s:208    .rodata.AHBPrescTable:0000000000000000 AHBPrescTable
+     /tmp/ccxmoPco.s:201    .data.SystemCoreClock:0000000000000000 SystemCoreClock
+     /tmp/ccxmoPco.s:197    .data.SystemCoreClock:0000000000000000 $d
+     /tmp/ccxmoPco.s:204    .rodata.AHBPrescTable:0000000000000000 $d
+     /tmp/ccxmoPco.s:212    .rodata.APBPrescTable:0000000000000000 $d
 
 NO UNDEFINED SYMBOLS
