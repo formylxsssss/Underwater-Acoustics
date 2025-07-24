@@ -29,8 +29,10 @@ build/main.o: Core/Src/main.c Core/Inc/main.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h Core/Inc/spi.h \
  Core/Inc/main.h Core/Inc/tim.h Core/Inc/usb.h Core/Inc/gpio.h \
  diff_signal/diff_signal.h sensor_device/ADXL345.h \
- Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio_ex.h \
- ARM_SEGGER_RTT/SEGGER_RTT.h ARM_SEGGER_RTT/SEGGER_RTT_Conf.h
+ ARM_SEGGER_RTT/SEGGER_RTT.h ARM_SEGGER_RTT/SEGGER_RTT_Conf.h \
+ sensor_device/DHT22.h \
+ Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio_ex.h Custcom_Pin.h \
+ Core/Inc/soft_spi.h sensor_device/eeprom.h
 
 Core/Inc/main.h:
 
@@ -108,8 +110,16 @@ diff_signal/diff_signal.h:
 
 sensor_device/ADXL345.h:
 
-Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio_ex.h:
-
 ARM_SEGGER_RTT/SEGGER_RTT.h:
 
 ARM_SEGGER_RTT/SEGGER_RTT_Conf.h:
+
+sensor_device/DHT22.h:
+
+Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio_ex.h:
+
+Custcom_Pin.h:
+
+Core/Inc/soft_spi.h:
+
+sensor_device/eeprom.h:

@@ -2,7 +2,11 @@
 #define __ADXL345_H
 
 #include "stm32f1xx_hal.h"
-
+#include "stdint.h"
+#include "stdlib.h"
+#include "string.h"
+#include "spi.h"
+#include "SEGGER_RTT.h"
 // 使用外部提供的 SPI 句柄
 extern SPI_HandleTypeDef hspi2;
 
@@ -23,7 +27,7 @@ extern SPI_HandleTypeDef hspi2;
 // 函数接口
 uint8_t ADXL345_ReadID(void);
 void ADXL345_Init(void);
-void ADXL345_ReadXYZ(int16_t *x, int16_t *y, int16_t *z);
+void ADXL345_ReadXYZ(float *x, float *y, float *z);
 float ADXL345_ConvertToG(int16_t raw);
 #endif
     

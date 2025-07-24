@@ -1,4 +1,4 @@
-ARM GAS  /tmp/cc0XLlbB.s 			page 1
+ARM GAS  /tmp/ccB9GRBL.s 			page 1
 
 
    1              		.cpu cortex-m3
@@ -58,7 +58,7 @@ ARM GAS  /tmp/cc0XLlbB.s 			page 1
   36              		.cfi_offset 6, -8
   37              		.cfi_offset 14, -4
   38 0002 8CB0     		sub	sp, sp, #48
-ARM GAS  /tmp/cc0XLlbB.s 			page 2
+ARM GAS  /tmp/ccB9GRBL.s 			page 2
 
 
   39              	.LCFI1:
@@ -118,7 +118,7 @@ ARM GAS  /tmp/cc0XLlbB.s 			page 1
   84              		.loc 1 29 13 is_stmt 0 view .LVU19
   85 0036 314B     		ldr	r3, .L3+4
   86 0038 0993     		str	r3, [sp, #36]
-ARM GAS  /tmp/cc0XLlbB.s 			page 3
+ARM GAS  /tmp/ccB9GRBL.s 			page 3
 
 
   30:diff_signal/diff_signal_rx.c ****     gp.Pull = GPIO_NOPULL;
@@ -178,7 +178,7 @@ ARM GAS  /tmp/cc0XLlbB.s 			page 1
  132              		.loc 1 38 58 view .LVU35
  133 007a 013B     		subs	r3, r3, #1
  134              		.loc 1 38 30 view .LVU36
-ARM GAS  /tmp/cc0XLlbB.s 			page 4
+ARM GAS  /tmp/ccB9GRBL.s 			page 4
 
 
  135 007c 4360     		str	r3, [r0, #4]
@@ -189,27 +189,27 @@ ARM GAS  /tmp/cc0XLlbB.s 			page 1
   40:diff_signal/diff_signal_rx.c ****     htim2.Init.Period        = BIT_DURATION_US - 1;
  139              		.loc 1 40 5 is_stmt 1 view .LVU39
  140              		.loc 1 40 30 is_stmt 0 view .LVU40
- 141 0080 40F2F313 		movw	r3, #499
- 142 0084 C360     		str	r3, [r0, #12]
+ 141 0080 CF23     		movs	r3, #207
+ 142 0082 C360     		str	r3, [r0, #12]
   41:diff_signal/diff_signal_rx.c ****     htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
  143              		.loc 1 41 5 is_stmt 1 view .LVU41
  144              		.loc 1 41 30 is_stmt 0 view .LVU42
- 145 0086 0461     		str	r4, [r0, #16]
+ 145 0084 0461     		str	r4, [r0, #16]
   42:diff_signal/diff_signal_rx.c ****     HAL_TIM_Base_Init(&htim2);
  146              		.loc 1 42 5 is_stmt 1 view .LVU43
- 147 0088 FFF7FEFF 		bl	HAL_TIM_Base_Init
+ 147 0086 FFF7FEFF 		bl	HAL_TIM_Base_Init
  148              	.LVL4:
   43:diff_signal/diff_signal_rx.c ****     HAL_NVIC_SetPriority(TIM2_IRQn, 1, 0);
  149              		.loc 1 43 5 view .LVU44
- 150 008c 2246     		mov	r2, r4
- 151 008e 0121     		movs	r1, #1
- 152 0090 1C20     		movs	r0, #28
- 153 0092 FFF7FEFF 		bl	HAL_NVIC_SetPriority
+ 150 008a 2246     		mov	r2, r4
+ 151 008c 0121     		movs	r1, #1
+ 152 008e 1C20     		movs	r0, #28
+ 153 0090 FFF7FEFF 		bl	HAL_NVIC_SetPriority
  154              	.LVL5:
   44:diff_signal/diff_signal_rx.c ****     HAL_NVIC_EnableIRQ(TIM2_IRQn);
  155              		.loc 1 44 5 view .LVU45
- 156 0096 1C20     		movs	r0, #28
- 157 0098 FFF7FEFF 		bl	HAL_NVIC_EnableIRQ
+ 156 0094 1C20     		movs	r0, #28
+ 157 0096 FFF7FEFF 		bl	HAL_NVIC_EnableIRQ
  158              	.LVL6:
   45:diff_signal/diff_signal_rx.c **** 
   46:diff_signal/diff_signal_rx.c ****     // 4) ADC1 初始化，软件触发模式，单次转换+中断
@@ -218,107 +218,107 @@ ARM GAS  /tmp/cc0XLlbB.s 			page 1
  160              	.LBB5:
  161              		.loc 1 47 5 view .LVU47
  162              		.loc 1 47 5 view .LVU48
- 163 009c AB69     		ldr	r3, [r5, #24]
- 164 009e 43F40073 		orr	r3, r3, #512
- 165 00a2 AB61     		str	r3, [r5, #24]
+ 163 009a AB69     		ldr	r3, [r5, #24]
+ 164 009c 43F40073 		orr	r3, r3, #512
+ 165 00a0 AB61     		str	r3, [r5, #24]
  166              		.loc 1 47 5 view .LVU49
- 167 00a4 AB69     		ldr	r3, [r5, #24]
- 168 00a6 03F40073 		and	r3, r3, #512
- 169 00aa 0493     		str	r3, [sp, #16]
+ 167 00a2 AB69     		ldr	r3, [r5, #24]
+ 168 00a4 03F40073 		and	r3, r3, #512
+ 169 00a8 0493     		str	r3, [sp, #16]
  170              		.loc 1 47 5 view .LVU50
- 171 00ac 049B     		ldr	r3, [sp, #16]
+ 171 00aa 049B     		ldr	r3, [sp, #16]
  172              	.LBE5:
  173              		.loc 1 47 5 view .LVU51
   48:diff_signal/diff_signal_rx.c ****     hadc1.Instance                   = ADC1;
  174              		.loc 1 48 5 view .LVU52
  175              		.loc 1 48 38 is_stmt 0 view .LVU53
- 176 00ae 184D     		ldr	r5, .L3+24
- 177 00b0 184B     		ldr	r3, .L3+28
- 178 00b2 2B60     		str	r3, [r5]
+ 176 00ac 184D     		ldr	r5, .L3+24
+ 177 00ae 194B     		ldr	r3, .L3+28
+ 178 00b0 2B60     		str	r3, [r5]
   49:diff_signal/diff_signal_rx.c ****     hadc1.Init.ScanConvMode          = ADC_SCAN_DISABLE;
  179              		.loc 1 49 5 is_stmt 1 view .LVU54
  180              		.loc 1 49 38 is_stmt 0 view .LVU55
-ARM GAS  /tmp/cc0XLlbB.s 			page 5
+ARM GAS  /tmp/ccB9GRBL.s 			page 5
 
 
- 181 00b4 AC60     		str	r4, [r5, #8]
+ 181 00b2 AC60     		str	r4, [r5, #8]
   50:diff_signal/diff_signal_rx.c ****     hadc1.Init.ContinuousConvMode    = DISABLE;
  182              		.loc 1 50 5 is_stmt 1 view .LVU56
  183              		.loc 1 50 38 is_stmt 0 view .LVU57
- 184 00b6 2C73     		strb	r4, [r5, #12]
+ 184 00b4 2C73     		strb	r4, [r5, #12]
   51:diff_signal/diff_signal_rx.c ****     hadc1.Init.DiscontinuousConvMode = DISABLE;
  185              		.loc 1 51 5 is_stmt 1 view .LVU58
  186              		.loc 1 51 38 is_stmt 0 view .LVU59
- 187 00b8 2C75     		strb	r4, [r5, #20]
+ 187 00b6 2C75     		strb	r4, [r5, #20]
   52:diff_signal/diff_signal_rx.c ****     hadc1.Init.ExternalTrigConv      = ADC_SOFTWARE_START;  // 软件触发
  188              		.loc 1 52 5 is_stmt 1 view .LVU60
  189              		.loc 1 52 38 is_stmt 0 view .LVU61
- 190 00ba 4FF46023 		mov	r3, #917504
- 191 00be EB61     		str	r3, [r5, #28]
+ 190 00b8 4FF46023 		mov	r3, #917504
+ 191 00bc EB61     		str	r3, [r5, #28]
   53:diff_signal/diff_signal_rx.c ****     hadc1.Init.DataAlign             = ADC_DATAALIGN_RIGHT;
  192              		.loc 1 53 5 is_stmt 1 view .LVU62
  193              		.loc 1 53 38 is_stmt 0 view .LVU63
- 194 00c0 6C60     		str	r4, [r5, #4]
+ 194 00be 6C60     		str	r4, [r5, #4]
   54:diff_signal/diff_signal_rx.c ****     hadc1.Init.NbrOfConversion       = 1;
  195              		.loc 1 54 5 is_stmt 1 view .LVU64
  196              		.loc 1 54 38 is_stmt 0 view .LVU65
- 197 00c2 0126     		movs	r6, #1
- 198 00c4 2E61     		str	r6, [r5, #16]
+ 197 00c0 0126     		movs	r6, #1
+ 198 00c2 2E61     		str	r6, [r5, #16]
   55:diff_signal/diff_signal_rx.c ****     HAL_ADC_Init(&hadc1);
  199              		.loc 1 55 5 is_stmt 1 view .LVU66
- 200 00c6 2846     		mov	r0, r5
- 201 00c8 FFF7FEFF 		bl	HAL_ADC_Init
+ 200 00c4 2846     		mov	r0, r5
+ 201 00c6 FFF7FEFF 		bl	HAL_ADC_Init
  202              	.LVL7:
   56:diff_signal/diff_signal_rx.c ****     ADC_ChannelConfTypeDef cfg = {0};
  203              		.loc 1 56 5 view .LVU67
   57:diff_signal/diff_signal_rx.c ****     cfg.Channel      = ADC_CHANNEL_1; // PA1
  204              		.loc 1 57 5 view .LVU68
  205              		.loc 1 57 22 is_stmt 0 view .LVU69
- 206 00cc 0596     		str	r6, [sp, #20]
+ 206 00ca 0596     		str	r6, [sp, #20]
   58:diff_signal/diff_signal_rx.c ****     cfg.Rank         = ADC_REGULAR_RANK_1;
  207              		.loc 1 58 5 is_stmt 1 view .LVU70
  208              		.loc 1 58 22 is_stmt 0 view .LVU71
- 209 00ce 0696     		str	r6, [sp, #24]
+ 209 00cc 0696     		str	r6, [sp, #24]
   59:diff_signal/diff_signal_rx.c ****     cfg.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
  210              		.loc 1 59 5 is_stmt 1 view .LVU72
  211              		.loc 1 59 22 is_stmt 0 view .LVU73
- 212 00d0 0794     		str	r4, [sp, #28]
+ 212 00ce 0794     		str	r4, [sp, #28]
   60:diff_signal/diff_signal_rx.c ****     HAL_ADC_ConfigChannel(&hadc1, &cfg);
  213              		.loc 1 60 5 is_stmt 1 view .LVU74
- 214 00d2 05A9     		add	r1, sp, #20
- 215 00d4 2846     		mov	r0, r5
- 216 00d6 FFF7FEFF 		bl	HAL_ADC_ConfigChannel
+ 214 00d0 05A9     		add	r1, sp, #20
+ 215 00d2 2846     		mov	r0, r5
+ 216 00d4 FFF7FEFF 		bl	HAL_ADC_ConfigChannel
  217              	.LVL8:
   61:diff_signal/diff_signal_rx.c ****     __HAL_ADC_ENABLE_IT(&hadc1, ADC_IT_EOC);
  218              		.loc 1 61 5 view .LVU75
- 219 00da 2A68     		ldr	r2, [r5]
- 220 00dc 5368     		ldr	r3, [r2, #4]
- 221 00de 43F02003 		orr	r3, r3, #32
- 222 00e2 5360     		str	r3, [r2, #4]
+ 219 00d8 2A68     		ldr	r2, [r5]
+ 220 00da 5368     		ldr	r3, [r2, #4]
+ 221 00dc 43F02003 		orr	r3, r3, #32
+ 222 00e0 5360     		str	r3, [r2, #4]
   62:diff_signal/diff_signal_rx.c ****     HAL_NVIC_SetPriority(ADC1_2_IRQn, 1, 0);
  223              		.loc 1 62 5 view .LVU76
- 224 00e4 2246     		mov	r2, r4
-ARM GAS  /tmp/cc0XLlbB.s 			page 6
+ 224 00e2 2246     		mov	r2, r4
+ARM GAS  /tmp/ccB9GRBL.s 			page 6
 
 
- 225 00e6 3146     		mov	r1, r6
- 226 00e8 1220     		movs	r0, #18
- 227 00ea FFF7FEFF 		bl	HAL_NVIC_SetPriority
+ 225 00e4 3146     		mov	r1, r6
+ 226 00e6 1220     		movs	r0, #18
+ 227 00e8 FFF7FEFF 		bl	HAL_NVIC_SetPriority
  228              	.LVL9:
   63:diff_signal/diff_signal_rx.c ****     HAL_NVIC_EnableIRQ(ADC1_2_IRQn);
  229              		.loc 1 63 5 view .LVU77
- 230 00ee 1220     		movs	r0, #18
- 231 00f0 FFF7FEFF 		bl	HAL_NVIC_EnableIRQ
+ 230 00ec 1220     		movs	r0, #18
+ 231 00ee FFF7FEFF 		bl	HAL_NVIC_EnableIRQ
  232              	.LVL10:
   64:diff_signal/diff_signal_rx.c **** }
  233              		.loc 1 64 1 is_stmt 0 view .LVU78
- 234 00f4 0CB0     		add	sp, sp, #48
+ 234 00f2 0CB0     		add	sp, sp, #48
  235              	.LCFI2:
  236              		.cfi_def_cfa_offset 16
  237              		@ sp needed
- 238 00f6 70BD     		pop	{r4, r5, r6, pc}
+ 238 00f4 70BD     		pop	{r4, r5, r6, pc}
  239              	.L4:
- 240              		.align	2
+ 240 00f6 00BF     		.align	2
  241              	.L3:
  242 00f8 00100240 		.word	1073876992
  243 00fc 00002110 		.word	270598144
@@ -358,7 +358,7 @@ ARM GAS  /tmp/cc0XLlbB.s 			page 1
   68:diff_signal/diff_signal_rx.c ****     if (GPIO_Pin != DIFF_PIN) return;
  274              		.loc 1 68 1 view .LVU82
  275 0006 08B5     		push	{r3, lr}
-ARM GAS  /tmp/cc0XLlbB.s 			page 7
+ARM GAS  /tmp/ccB9GRBL.s 			page 7
 
 
  276              	.LCFI3:
@@ -418,7 +418,7 @@ ARM GAS  /tmp/cc0XLlbB.s 			page 1
   81:diff_signal/diff_signal_rx.c **** void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   82:diff_signal/diff_signal_rx.c **** {
  321              		.loc 1 82 1 is_stmt 1 view -0
-ARM GAS  /tmp/cc0XLlbB.s 			page 8
+ARM GAS  /tmp/ccB9GRBL.s 			page 8
 
 
  322              		.cfi_startproc
@@ -478,7 +478,7 @@ ARM GAS  /tmp/cc0XLlbB.s 			page 1
   91:diff_signal/diff_signal_rx.c **** {
  368              		.loc 1 91 1 is_stmt 1 view -0
  369              		.cfi_startproc
-ARM GAS  /tmp/cc0XLlbB.s 			page 9
+ARM GAS  /tmp/ccB9GRBL.s 			page 9
 
 
  370              		@ args = 0, pretend = 0, frame = 0
@@ -538,7 +538,7 @@ ARM GAS  /tmp/cc0XLlbB.s 			page 1
  417 002c DBB2     		uxtb	r3, r3
  418 002e 0B70     		strb	r3, [r1]
   98:diff_signal/diff_signal_rx.c **** 
-ARM GAS  /tmp/cc0XLlbB.s 			page 10
+ARM GAS  /tmp/ccB9GRBL.s 			page 10
 
 
   99:diff_signal/diff_signal_rx.c ****     if (bit_cnt >= 8)
@@ -598,7 +598,7 @@ ARM GAS  /tmp/cc0XLlbB.s 			page 1
  461 0000 7047     		bx	lr
  462              		.cfi_endproc
  463              	.LFE69:
-ARM GAS  /tmp/cc0XLlbB.s 			page 11
+ARM GAS  /tmp/ccB9GRBL.s 			page 11
 
 
  465              		.section	.text.HAL_ADCEx_InjectedConvCpltCallback,"ax",%progbits
@@ -651,33 +651,33 @@ ARM GAS  /tmp/cc0XLlbB.s 			page 1
  513              		.file 13 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h"
  514              		.file 14 "diff_signal/diff_signal_rx.h"
  515              		.file 15 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_cortex.h"
-ARM GAS  /tmp/cc0XLlbB.s 			page 12
+ARM GAS  /tmp/ccB9GRBL.s 			page 12
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 diff_signal_rx.c
-     /tmp/cc0XLlbB.s:16     .text.DiffSignal_RX_Init:0000000000000000 $t
-     /tmp/cc0XLlbB.s:24     .text.DiffSignal_RX_Init:0000000000000000 DiffSignal_RX_Init
-     /tmp/cc0XLlbB.s:242    .text.DiffSignal_RX_Init:00000000000000f8 $d
+     /tmp/ccB9GRBL.s:16     .text.DiffSignal_RX_Init:0000000000000000 $t
+     /tmp/ccB9GRBL.s:24     .text.DiffSignal_RX_Init:0000000000000000 DiffSignal_RX_Init
+     /tmp/ccB9GRBL.s:242    .text.DiffSignal_RX_Init:00000000000000f8 $d
                             *COM*:0000000000000048 htim2
                             *COM*:0000000000000030 hadc1
-     /tmp/cc0XLlbB.s:254    .text.HAL_GPIO_EXTI_Callback:0000000000000000 $t
-     /tmp/cc0XLlbB.s:261    .text.HAL_GPIO_EXTI_Callback:0000000000000000 HAL_GPIO_EXTI_Callback
-     /tmp/cc0XLlbB.s:304    .text.HAL_GPIO_EXTI_Callback:0000000000000024 $d
-     /tmp/cc0XLlbB.s:311    .text.HAL_TIM_PeriodElapsedCallback:0000000000000000 $t
-     /tmp/cc0XLlbB.s:318    .text.HAL_TIM_PeriodElapsedCallback:0000000000000000 HAL_TIM_PeriodElapsedCallback
-     /tmp/cc0XLlbB.s:353    .text.HAL_TIM_PeriodElapsedCallback:0000000000000014 $d
-     /tmp/cc0XLlbB.s:358    .text.HAL_ADC_ConvCpltCallback:0000000000000000 $t
-     /tmp/cc0XLlbB.s:365    .text.HAL_ADC_ConvCpltCallback:0000000000000000 HAL_ADC_ConvCpltCallback
-     /tmp/cc0XLlbB.s:437    .text.HAL_ADC_ConvCpltCallback:0000000000000040 $d
-     /tmp/cc0XLlbB.s:445    .text.DiffSignal_Frame_Handler:0000000000000000 $t
-     /tmp/cc0XLlbB.s:452    .text.DiffSignal_Frame_Handler:0000000000000000 DiffSignal_Frame_Handler
-     /tmp/cc0XLlbB.s:466    .text.HAL_ADCEx_InjectedConvCpltCallback:0000000000000000 $t
-     /tmp/cc0XLlbB.s:473    .text.HAL_ADCEx_InjectedConvCpltCallback:0000000000000000 HAL_ADCEx_InjectedConvCpltCallback
-     /tmp/cc0XLlbB.s:492    .bss.bit_cnt:0000000000000000 bit_cnt
-     /tmp/cc0XLlbB.s:493    .bss.bit_cnt:0000000000000000 $d
-     /tmp/cc0XLlbB.s:498    .bss.recv_byte:0000000000000000 recv_byte
-     /tmp/cc0XLlbB.s:499    .bss.recv_byte:0000000000000000 $d
+     /tmp/ccB9GRBL.s:254    .text.HAL_GPIO_EXTI_Callback:0000000000000000 $t
+     /tmp/ccB9GRBL.s:261    .text.HAL_GPIO_EXTI_Callback:0000000000000000 HAL_GPIO_EXTI_Callback
+     /tmp/ccB9GRBL.s:304    .text.HAL_GPIO_EXTI_Callback:0000000000000024 $d
+     /tmp/ccB9GRBL.s:311    .text.HAL_TIM_PeriodElapsedCallback:0000000000000000 $t
+     /tmp/ccB9GRBL.s:318    .text.HAL_TIM_PeriodElapsedCallback:0000000000000000 HAL_TIM_PeriodElapsedCallback
+     /tmp/ccB9GRBL.s:353    .text.HAL_TIM_PeriodElapsedCallback:0000000000000014 $d
+     /tmp/ccB9GRBL.s:358    .text.HAL_ADC_ConvCpltCallback:0000000000000000 $t
+     /tmp/ccB9GRBL.s:365    .text.HAL_ADC_ConvCpltCallback:0000000000000000 HAL_ADC_ConvCpltCallback
+     /tmp/ccB9GRBL.s:437    .text.HAL_ADC_ConvCpltCallback:0000000000000040 $d
+     /tmp/ccB9GRBL.s:445    .text.DiffSignal_Frame_Handler:0000000000000000 $t
+     /tmp/ccB9GRBL.s:452    .text.DiffSignal_Frame_Handler:0000000000000000 DiffSignal_Frame_Handler
+     /tmp/ccB9GRBL.s:466    .text.HAL_ADCEx_InjectedConvCpltCallback:0000000000000000 $t
+     /tmp/ccB9GRBL.s:473    .text.HAL_ADCEx_InjectedConvCpltCallback:0000000000000000 HAL_ADCEx_InjectedConvCpltCallback
+     /tmp/ccB9GRBL.s:492    .bss.bit_cnt:0000000000000000 bit_cnt
+     /tmp/ccB9GRBL.s:493    .bss.bit_cnt:0000000000000000 $d
+     /tmp/ccB9GRBL.s:498    .bss.recv_byte:0000000000000000 recv_byte
+     /tmp/ccB9GRBL.s:499    .bss.recv_byte:0000000000000000 $d
 
 UNDEFINED SYMBOLS
 DWT_Delay_Init

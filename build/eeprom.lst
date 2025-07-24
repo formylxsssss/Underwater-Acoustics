@@ -1,0 +1,546 @@
+ARM GAS  /tmp/ccgrS7yX.s 			page 1
+
+
+   1              		.cpu cortex-m3
+   2              		.eabi_attribute 20, 1
+   3              		.eabi_attribute 21, 1
+   4              		.eabi_attribute 23, 3
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 1
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"eeprom.c"
+  12              		.text
+  13              	.Ltext0:
+  14              		.cfi_sections	.debug_frame
+  15              		.section	.text.EEPROM_SendCommand,"ax",%progbits
+  16              		.align	1
+  17              		.arch armv7-m
+  18              		.syntax unified
+  19              		.thumb
+  20              		.thumb_func
+  21              		.fpu softvfp
+  23              	EEPROM_SendCommand:
+  24              	.LVL0:
+  25              	.LFB65:
+  26              		.file 1 "sensor_device/eeprom.c"
+   1:sensor_device/eeprom.c **** #include "eeprom.h"
+   2:sensor_device/eeprom.c **** #include "soft_spi.h"
+   3:sensor_device/eeprom.c **** #include "diff_signal.h"
+   4:sensor_device/eeprom.c **** #include "stm32f1xx_hal.h"
+   5:sensor_device/eeprom.c **** 
+   6:sensor_device/eeprom.c **** // 手动生成 Start Bit + 剩余指令（bitlen - 1）
+   7:sensor_device/eeprom.c **** static void EEPROM_SendCommand(uint16_t cmd, uint8_t bitlen)
+   8:sensor_device/eeprom.c **** {
+  27              		.loc 1 8 1 view -0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 0
+  30              		@ frame_needed = 0, uses_anonymous_args = 0
+  31              		.loc 1 8 1 is_stmt 0 view .LVU1
+  32 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+  33              	.LCFI0:
+  34              		.cfi_def_cfa_offset 24
+  35              		.cfi_offset 3, -24
+  36              		.cfi_offset 4, -20
+  37              		.cfi_offset 5, -16
+  38              		.cfi_offset 6, -12
+  39              		.cfi_offset 7, -8
+  40              		.cfi_offset 14, -4
+  41 0002 0646     		mov	r6, r0
+  42 0004 0C46     		mov	r4, r1
+   9:sensor_device/eeprom.c ****     // Start bit: CS = 1, DI = 1, 然后 CLK 上升沿
+  10:sensor_device/eeprom.c ****     HAL_GPIO_WritePin(SPI_SOFT_PORT, SPI_SOFT_CS_PIN, GPIO_PIN_SET);
+  43              		.loc 1 10 5 is_stmt 1 view .LVU2
+  44 0006 1B4D     		ldr	r5, .L3
+  45 0008 0122     		movs	r2, #1
+  46 000a 1021     		movs	r1, #16
+  47              	.LVL1:
+  48              		.loc 1 10 5 is_stmt 0 view .LVU3
+ARM GAS  /tmp/ccgrS7yX.s 			page 2
+
+
+  49 000c 2846     		mov	r0, r5
+  50              	.LVL2:
+  51              		.loc 1 10 5 view .LVU4
+  52 000e FFF7FEFF 		bl	HAL_GPIO_WritePin
+  53              	.LVL3:
+  11:sensor_device/eeprom.c ****     HAL_GPIO_WritePin(SPI_SOFT_MOSI_PORT, SPI_SOFT_MOSI_PIN, GPIO_PIN_SET);
+  54              		.loc 1 11 5 is_stmt 1 view .LVU5
+  55 0012 194F     		ldr	r7, .L3+4
+  56 0014 0122     		movs	r2, #1
+  57 0016 2021     		movs	r1, #32
+  58 0018 3846     		mov	r0, r7
+  59 001a FFF7FEFF 		bl	HAL_GPIO_WritePin
+  60              	.LVL4:
+  12:sensor_device/eeprom.c ****     DWT_Delay_us(1);
+  61              		.loc 1 12 5 view .LVU6
+  62 001e 0120     		movs	r0, #1
+  63 0020 FFF7FEFF 		bl	DWT_Delay_us
+  64              	.LVL5:
+  13:sensor_device/eeprom.c ****     HAL_GPIO_WritePin(SPI_SOFT_PORT, SPI_SOFT_SCK_PIN, GPIO_PIN_SET);
+  65              		.loc 1 13 5 view .LVU7
+  66 0024 0122     		movs	r2, #1
+  67 0026 2021     		movs	r1, #32
+  68 0028 2846     		mov	r0, r5
+  69 002a FFF7FEFF 		bl	HAL_GPIO_WritePin
+  70              	.LVL6:
+  14:sensor_device/eeprom.c ****     DWT_Delay_us(1);
+  71              		.loc 1 14 5 view .LVU8
+  72 002e 0120     		movs	r0, #1
+  73 0030 FFF7FEFF 		bl	DWT_Delay_us
+  74              	.LVL7:
+  15:sensor_device/eeprom.c ****     HAL_GPIO_WritePin(SPI_SOFT_PORT, SPI_SOFT_SCK_PIN, GPIO_PIN_RESET);
+  75              		.loc 1 15 5 view .LVU9
+  76 0034 0022     		movs	r2, #0
+  77 0036 2021     		movs	r1, #32
+  78 0038 2846     		mov	r0, r5
+  79 003a FFF7FEFF 		bl	HAL_GPIO_WritePin
+  80              	.LVL8:
+  16:sensor_device/eeprom.c ****     DWT_Delay_us(1);
+  81              		.loc 1 16 5 view .LVU10
+  82 003e 0120     		movs	r0, #1
+  83 0040 FFF7FEFF 		bl	DWT_Delay_us
+  84              	.LVL9:
+  17:sensor_device/eeprom.c **** 
+  18:sensor_device/eeprom.c ****     // 发送剩余指令位（不含 Start）
+  19:sensor_device/eeprom.c ****     SoftSPI_TransferBits(cmd & ((1 << (bitlen - 1)) - 1), bitlen - 1);
+  85              		.loc 1 19 5 view .LVU11
+  86              		.loc 1 19 47 is_stmt 0 view .LVU12
+  87 0044 611E     		subs	r1, r4, #1
+  88              		.loc 1 19 36 view .LVU13
+  89 0046 0123     		movs	r3, #1
+  90 0048 8B40     		lsls	r3, r3, r1
+  91              		.loc 1 19 53 view .LVU14
+  92 004a 013B     		subs	r3, r3, #1
+  93              		.loc 1 19 5 view .LVU15
+  94 004c C9B2     		uxtb	r1, r1
+  95 004e 06EA0300 		and	r0, r6, r3
+  96 0052 FFF7FEFF 		bl	SoftSPI_TransferBits
+ARM GAS  /tmp/ccgrS7yX.s 			page 3
+
+
+  97              	.LVL10:
+  20:sensor_device/eeprom.c **** 
+  21:sensor_device/eeprom.c ****     // 停止位
+  22:sensor_device/eeprom.c ****     HAL_GPIO_WritePin(SPI_SOFT_PORT, SPI_SOFT_CS_PIN, GPIO_PIN_RESET);
+  98              		.loc 1 22 5 is_stmt 1 view .LVU16
+  99 0056 0022     		movs	r2, #0
+ 100 0058 1021     		movs	r1, #16
+ 101 005a 2846     		mov	r0, r5
+ 102 005c FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 103              	.LVL11:
+  23:sensor_device/eeprom.c ****     HAL_GPIO_WritePin(SPI_SOFT_MOSI_PORT, SPI_SOFT_MOSI_PIN, GPIO_PIN_RESET);
+ 104              		.loc 1 23 5 view .LVU17
+ 105 0060 0022     		movs	r2, #0
+ 106 0062 2021     		movs	r1, #32
+ 107 0064 3846     		mov	r0, r7
+ 108 0066 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 109              	.LVL12:
+  24:sensor_device/eeprom.c ****     DWT_Delay_us(3);
+ 110              		.loc 1 24 5 view .LVU18
+ 111 006a 0320     		movs	r0, #3
+ 112 006c FFF7FEFF 		bl	DWT_Delay_us
+ 113              	.LVL13:
+  25:sensor_device/eeprom.c **** }
+ 114              		.loc 1 25 1 is_stmt 0 view .LVU19
+ 115 0070 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 116              	.L4:
+ 117 0072 00BF     		.align	2
+ 118              	.L3:
+ 119 0074 00080140 		.word	1073809408
+ 120 0078 000C0140 		.word	1073810432
+ 121              		.cfi_endproc
+ 122              	.LFE65:
+ 124              		.section	.text.EEPROM_EWEN,"ax",%progbits
+ 125              		.align	1
+ 126              		.global	EEPROM_EWEN
+ 127              		.syntax unified
+ 128              		.thumb
+ 129              		.thumb_func
+ 130              		.fpu softvfp
+ 132              	EEPROM_EWEN:
+ 133              	.LFB67:
+  26:sensor_device/eeprom.c **** 
+  27:sensor_device/eeprom.c **** void EEPROM_Init(void)
+  28:sensor_device/eeprom.c **** {
+  29:sensor_device/eeprom.c ****     SoftSPI_Init();
+  30:sensor_device/eeprom.c ****     EEPROM_EWEN();
+  31:sensor_device/eeprom.c **** }
+  32:sensor_device/eeprom.c **** 
+  33:sensor_device/eeprom.c **** void EEPROM_EWEN(void)
+  34:sensor_device/eeprom.c **** {
+ 134              		.loc 1 34 1 is_stmt 1 view -0
+ 135              		.cfi_startproc
+ 136              		@ args = 0, pretend = 0, frame = 0
+ 137              		@ frame_needed = 0, uses_anonymous_args = 0
+ 138 0000 08B5     		push	{r3, lr}
+ 139              	.LCFI1:
+ 140              		.cfi_def_cfa_offset 8
+ARM GAS  /tmp/ccgrS7yX.s 			page 4
+
+
+ 141              		.cfi_offset 3, -8
+ 142              		.cfi_offset 14, -4
+  35:sensor_device/eeprom.c ****     // EWEN = Start(1) + 00 + 11 + 000000 = 0x9800，共 10 bit
+  36:sensor_device/eeprom.c ****     EEPROM_SendCommand(0x9800, 10);
+ 143              		.loc 1 36 5 view .LVU21
+ 144 0002 0A21     		movs	r1, #10
+ 145 0004 4FF41840 		mov	r0, #38912
+ 146 0008 FFF7FEFF 		bl	EEPROM_SendCommand
+ 147              	.LVL14:
+  37:sensor_device/eeprom.c **** }
+ 148              		.loc 1 37 1 is_stmt 0 view .LVU22
+ 149 000c 08BD     		pop	{r3, pc}
+ 150              		.cfi_endproc
+ 151              	.LFE67:
+ 153              		.section	.text.EEPROM_Init,"ax",%progbits
+ 154              		.align	1
+ 155              		.global	EEPROM_Init
+ 156              		.syntax unified
+ 157              		.thumb
+ 158              		.thumb_func
+ 159              		.fpu softvfp
+ 161              	EEPROM_Init:
+ 162              	.LFB66:
+  28:sensor_device/eeprom.c ****     SoftSPI_Init();
+ 163              		.loc 1 28 1 is_stmt 1 view -0
+ 164              		.cfi_startproc
+ 165              		@ args = 0, pretend = 0, frame = 0
+ 166              		@ frame_needed = 0, uses_anonymous_args = 0
+ 167 0000 08B5     		push	{r3, lr}
+ 168              	.LCFI2:
+ 169              		.cfi_def_cfa_offset 8
+ 170              		.cfi_offset 3, -8
+ 171              		.cfi_offset 14, -4
+  29:sensor_device/eeprom.c ****     EEPROM_EWEN();
+ 172              		.loc 1 29 5 view .LVU24
+ 173 0002 FFF7FEFF 		bl	SoftSPI_Init
+ 174              	.LVL15:
+  30:sensor_device/eeprom.c **** }
+ 175              		.loc 1 30 5 view .LVU25
+ 176 0006 FFF7FEFF 		bl	EEPROM_EWEN
+ 177              	.LVL16:
+  31:sensor_device/eeprom.c **** 
+ 178              		.loc 1 31 1 is_stmt 0 view .LVU26
+ 179 000a 08BD     		pop	{r3, pc}
+ 180              		.cfi_endproc
+ 181              	.LFE66:
+ 183              		.section	.text.EEPROM_WriteByte,"ax",%progbits
+ 184              		.align	1
+ 185              		.global	EEPROM_WriteByte
+ 186              		.syntax unified
+ 187              		.thumb
+ 188              		.thumb_func
+ 189              		.fpu softvfp
+ 191              	EEPROM_WriteByte:
+ 192              	.LVL17:
+ 193              	.LFB68:
+  38:sensor_device/eeprom.c **** 
+ARM GAS  /tmp/ccgrS7yX.s 			page 5
+
+
+  39:sensor_device/eeprom.c **** void EEPROM_WriteByte(uint8_t address, uint8_t data)
+  40:sensor_device/eeprom.c **** {
+ 194              		.loc 1 40 1 is_stmt 1 view -0
+ 195              		.cfi_startproc
+ 196              		@ args = 0, pretend = 0, frame = 0
+ 197              		@ frame_needed = 0, uses_anonymous_args = 0
+ 198              		.loc 1 40 1 is_stmt 0 view .LVU28
+ 199 0000 70B5     		push	{r4, r5, r6, lr}
+ 200              	.LCFI3:
+ 201              		.cfi_def_cfa_offset 16
+ 202              		.cfi_offset 4, -16
+ 203              		.cfi_offset 5, -12
+ 204              		.cfi_offset 6, -8
+ 205              		.cfi_offset 14, -4
+ 206 0002 0546     		mov	r5, r0
+ 207 0004 0C46     		mov	r4, r1
+  41:sensor_device/eeprom.c ****     // WRITE = Start + 01 + address(6bit) + data(8bit)
+  42:sensor_device/eeprom.c ****     uint16_t cmd = (0b01 << 8) | (address << 2) | (data >> 6); // 高10bit部分
+ 208              		.loc 1 42 5 is_stmt 1 view .LVU29
+ 209              	.LVL18:
+  43:sensor_device/eeprom.c ****     HAL_GPIO_WritePin(SPI_SOFT_PORT, SPI_SOFT_CS_PIN, GPIO_PIN_SET);
+ 210              		.loc 1 43 5 view .LVU30
+ 211 0006 104E     		ldr	r6, .L11
+ 212 0008 0122     		movs	r2, #1
+ 213 000a 1021     		movs	r1, #16
+ 214              	.LVL19:
+ 215              		.loc 1 43 5 is_stmt 0 view .LVU31
+ 216 000c 3046     		mov	r0, r6
+ 217              	.LVL20:
+ 218              		.loc 1 43 5 view .LVU32
+ 219 000e FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 220              	.LVL21:
+  44:sensor_device/eeprom.c ****     SoftSPI_TransferBits(0b1, 1);                      // Start bit
+ 221              		.loc 1 44 5 is_stmt 1 view .LVU33
+ 222 0012 0121     		movs	r1, #1
+ 223 0014 0846     		mov	r0, r1
+ 224 0016 FFF7FEFF 		bl	SoftSPI_TransferBits
+ 225              	.LVL22:
+  45:sensor_device/eeprom.c ****     SoftSPI_TransferBits((0b01 << 6) | address, 8);    // Opcode + Address
+ 226              		.loc 1 45 5 view .LVU34
+ 227 001a 0821     		movs	r1, #8
+ 228 001c 45F04000 		orr	r0, r5, #64
+ 229 0020 FFF7FEFF 		bl	SoftSPI_TransferBits
+ 230              	.LVL23:
+  46:sensor_device/eeprom.c ****     SoftSPI_TransferBits(data, 8);                     // Data
+ 231              		.loc 1 46 5 view .LVU35
+ 232 0024 0821     		movs	r1, #8
+ 233 0026 2046     		mov	r0, r4
+ 234 0028 FFF7FEFF 		bl	SoftSPI_TransferBits
+ 235              	.LVL24:
+  47:sensor_device/eeprom.c ****     HAL_GPIO_WritePin(SPI_SOFT_PORT, SPI_SOFT_CS_PIN, GPIO_PIN_RESET);
+ 236              		.loc 1 47 5 view .LVU36
+ 237 002c 0022     		movs	r2, #0
+ 238 002e 1021     		movs	r1, #16
+ 239 0030 3046     		mov	r0, r6
+ 240 0032 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 241              	.LVL25:
+ARM GAS  /tmp/ccgrS7yX.s 			page 6
+
+
+  48:sensor_device/eeprom.c ****     HAL_GPIO_WritePin(SPI_SOFT_MOSI_PORT, SPI_SOFT_MOSI_PIN, GPIO_PIN_RESET);
+ 242              		.loc 1 48 5 view .LVU37
+ 243 0036 0022     		movs	r2, #0
+ 244 0038 2021     		movs	r1, #32
+ 245 003a 0448     		ldr	r0, .L11+4
+ 246 003c FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 247              	.LVL26:
+  49:sensor_device/eeprom.c ****     DWT_Delay_us(3);
+ 248              		.loc 1 49 5 view .LVU38
+ 249 0040 0320     		movs	r0, #3
+ 250 0042 FFF7FEFF 		bl	DWT_Delay_us
+ 251              	.LVL27:
+  50:sensor_device/eeprom.c **** }
+ 252              		.loc 1 50 1 is_stmt 0 view .LVU39
+ 253 0046 70BD     		pop	{r4, r5, r6, pc}
+ 254              	.LVL28:
+ 255              	.L12:
+ 256              		.loc 1 50 1 view .LVU40
+ 257              		.align	2
+ 258              	.L11:
+ 259 0048 00080140 		.word	1073809408
+ 260 004c 000C0140 		.word	1073810432
+ 261              		.cfi_endproc
+ 262              	.LFE68:
+ 264              		.section	.text.EEPROM_ReadByte,"ax",%progbits
+ 265              		.align	1
+ 266              		.global	EEPROM_ReadByte
+ 267              		.syntax unified
+ 268              		.thumb
+ 269              		.thumb_func
+ 270              		.fpu softvfp
+ 272              	EEPROM_ReadByte:
+ 273              	.LVL29:
+ 274              	.LFB69:
+  51:sensor_device/eeprom.c **** 
+  52:sensor_device/eeprom.c **** uint8_t EEPROM_ReadByte(uint8_t address)
+  53:sensor_device/eeprom.c **** {
+ 275              		.loc 1 53 1 is_stmt 1 view -0
+ 276              		.cfi_startproc
+ 277              		@ args = 0, pretend = 0, frame = 0
+ 278              		@ frame_needed = 0, uses_anonymous_args = 0
+ 279              		.loc 1 53 1 is_stmt 0 view .LVU42
+ 280 0000 38B5     		push	{r3, r4, r5, lr}
+ 281              	.LCFI4:
+ 282              		.cfi_def_cfa_offset 16
+ 283              		.cfi_offset 3, -16
+ 284              		.cfi_offset 4, -12
+ 285              		.cfi_offset 5, -8
+ 286              		.cfi_offset 14, -4
+ 287 0002 0446     		mov	r4, r0
+  54:sensor_device/eeprom.c ****     uint8_t data;
+ 288              		.loc 1 54 5 is_stmt 1 view .LVU43
+  55:sensor_device/eeprom.c ****     HAL_GPIO_WritePin(SPI_SOFT_PORT, SPI_SOFT_CS_PIN, GPIO_PIN_SET);
+ 289              		.loc 1 55 5 view .LVU44
+ 290 0004 114D     		ldr	r5, .L15
+ 291 0006 0122     		movs	r2, #1
+ 292 0008 1021     		movs	r1, #16
+ARM GAS  /tmp/ccgrS7yX.s 			page 7
+
+
+ 293 000a 2846     		mov	r0, r5
+ 294              	.LVL30:
+ 295              		.loc 1 55 5 is_stmt 0 view .LVU45
+ 296 000c FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 297              	.LVL31:
+  56:sensor_device/eeprom.c ****     SoftSPI_TransferBits(0b1, 1);                      // Start bit
+ 298              		.loc 1 56 5 is_stmt 1 view .LVU46
+ 299 0010 0121     		movs	r1, #1
+ 300 0012 0846     		mov	r0, r1
+ 301 0014 FFF7FEFF 		bl	SoftSPI_TransferBits
+ 302              	.LVL32:
+  57:sensor_device/eeprom.c ****     SoftSPI_TransferBits((0b10 << 6) | address, 8);    // READ + Address
+ 303              		.loc 1 57 5 view .LVU47
+ 304 0018 0821     		movs	r1, #8
+ 305 001a 44F08000 		orr	r0, r4, #128
+ 306 001e FFF7FEFF 		bl	SoftSPI_TransferBits
+ 307              	.LVL33:
+  58:sensor_device/eeprom.c ****     data = SoftSPI_TransferBits(0xFF, 8);              // Dummy to clock in data
+ 308              		.loc 1 58 5 view .LVU48
+ 309              		.loc 1 58 12 is_stmt 0 view .LVU49
+ 310 0022 0821     		movs	r1, #8
+ 311 0024 FF20     		movs	r0, #255
+ 312 0026 FFF7FEFF 		bl	SoftSPI_TransferBits
+ 313              	.LVL34:
+ 314              		.loc 1 58 10 view .LVU50
+ 315 002a C4B2     		uxtb	r4, r0
+ 316              	.LVL35:
+  59:sensor_device/eeprom.c ****     HAL_GPIO_WritePin(SPI_SOFT_PORT, SPI_SOFT_CS_PIN, GPIO_PIN_RESET);
+ 317              		.loc 1 59 5 is_stmt 1 view .LVU51
+ 318 002c 0022     		movs	r2, #0
+ 319 002e 1021     		movs	r1, #16
+ 320 0030 2846     		mov	r0, r5
+ 321 0032 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 322              	.LVL36:
+  60:sensor_device/eeprom.c ****     HAL_GPIO_WritePin(SPI_SOFT_MOSI_PORT, SPI_SOFT_MOSI_PIN, GPIO_PIN_RESET);
+ 323              		.loc 1 60 5 view .LVU52
+ 324 0036 0022     		movs	r2, #0
+ 325 0038 2021     		movs	r1, #32
+ 326 003a 0548     		ldr	r0, .L15+4
+ 327 003c FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 328              	.LVL37:
+  61:sensor_device/eeprom.c ****     DWT_Delay_us(3);
+ 329              		.loc 1 61 5 view .LVU53
+ 330 0040 0320     		movs	r0, #3
+ 331 0042 FFF7FEFF 		bl	DWT_Delay_us
+ 332              	.LVL38:
+  62:sensor_device/eeprom.c ****     return data;
+ 333              		.loc 1 62 5 view .LVU54
+  63:sensor_device/eeprom.c **** }
+ 334              		.loc 1 63 1 is_stmt 0 view .LVU55
+ 335 0046 2046     		mov	r0, r4
+ 336 0048 38BD     		pop	{r3, r4, r5, pc}
+ 337              	.LVL39:
+ 338              	.L16:
+ 339              		.loc 1 63 1 view .LVU56
+ 340 004a 00BF     		.align	2
+ 341              	.L15:
+ARM GAS  /tmp/ccgrS7yX.s 			page 8
+
+
+ 342 004c 00080140 		.word	1073809408
+ 343 0050 000C0140 		.word	1073810432
+ 344              		.cfi_endproc
+ 345              	.LFE69:
+ 347              		.section	.text.EEPROM_EraseByte,"ax",%progbits
+ 348              		.align	1
+ 349              		.global	EEPROM_EraseByte
+ 350              		.syntax unified
+ 351              		.thumb
+ 352              		.thumb_func
+ 353              		.fpu softvfp
+ 355              	EEPROM_EraseByte:
+ 356              	.LVL40:
+ 357              	.LFB70:
+  64:sensor_device/eeprom.c **** 
+  65:sensor_device/eeprom.c **** void EEPROM_EraseByte(uint8_t address)
+  66:sensor_device/eeprom.c **** {
+ 358              		.loc 1 66 1 is_stmt 1 view -0
+ 359              		.cfi_startproc
+ 360              		@ args = 0, pretend = 0, frame = 0
+ 361              		@ frame_needed = 0, uses_anonymous_args = 0
+ 362              		.loc 1 66 1 is_stmt 0 view .LVU58
+ 363 0000 38B5     		push	{r3, r4, r5, lr}
+ 364              	.LCFI5:
+ 365              		.cfi_def_cfa_offset 16
+ 366              		.cfi_offset 3, -16
+ 367              		.cfi_offset 4, -12
+ 368              		.cfi_offset 5, -8
+ 369              		.cfi_offset 14, -4
+ 370 0002 0446     		mov	r4, r0
+  67:sensor_device/eeprom.c ****     // ERASE = Start + 11 + address
+  68:sensor_device/eeprom.c ****     HAL_GPIO_WritePin(SPI_SOFT_PORT, SPI_SOFT_CS_PIN, GPIO_PIN_SET);
+ 371              		.loc 1 68 5 is_stmt 1 view .LVU59
+ 372 0004 0D4D     		ldr	r5, .L19
+ 373 0006 0122     		movs	r2, #1
+ 374 0008 1021     		movs	r1, #16
+ 375 000a 2846     		mov	r0, r5
+ 376              	.LVL41:
+ 377              		.loc 1 68 5 is_stmt 0 view .LVU60
+ 378 000c FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 379              	.LVL42:
+  69:sensor_device/eeprom.c ****     SoftSPI_TransferBits(0b1, 1);                      // Start bit
+ 380              		.loc 1 69 5 is_stmt 1 view .LVU61
+ 381 0010 0121     		movs	r1, #1
+ 382 0012 0846     		mov	r0, r1
+ 383 0014 FFF7FEFF 		bl	SoftSPI_TransferBits
+ 384              	.LVL43:
+  70:sensor_device/eeprom.c ****     SoftSPI_TransferBits((0b00 << 6) | address, 8);    // ERASE + Address
+ 385              		.loc 1 70 5 view .LVU62
+ 386 0018 0821     		movs	r1, #8
+ 387 001a 2046     		mov	r0, r4
+ 388 001c FFF7FEFF 		bl	SoftSPI_TransferBits
+ 389              	.LVL44:
+  71:sensor_device/eeprom.c ****     HAL_GPIO_WritePin(SPI_SOFT_PORT, SPI_SOFT_CS_PIN, GPIO_PIN_RESET);
+ 390              		.loc 1 71 5 view .LVU63
+ 391 0020 0022     		movs	r2, #0
+ 392 0022 1021     		movs	r1, #16
+ARM GAS  /tmp/ccgrS7yX.s 			page 9
+
+
+ 393 0024 2846     		mov	r0, r5
+ 394 0026 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 395              	.LVL45:
+  72:sensor_device/eeprom.c ****     HAL_GPIO_WritePin(SPI_SOFT_MOSI_PORT, SPI_SOFT_MOSI_PIN, GPIO_PIN_RESET);
+ 396              		.loc 1 72 5 view .LVU64
+ 397 002a 0022     		movs	r2, #0
+ 398 002c 2021     		movs	r1, #32
+ 399 002e 0448     		ldr	r0, .L19+4
+ 400 0030 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 401              	.LVL46:
+  73:sensor_device/eeprom.c ****     DWT_Delay_us(3);
+ 402              		.loc 1 73 5 view .LVU65
+ 403 0034 0320     		movs	r0, #3
+ 404 0036 FFF7FEFF 		bl	DWT_Delay_us
+ 405              	.LVL47:
+  74:sensor_device/eeprom.c **** }
+ 406              		.loc 1 74 1 is_stmt 0 view .LVU66
+ 407 003a 38BD     		pop	{r3, r4, r5, pc}
+ 408              	.L20:
+ 409              		.align	2
+ 410              	.L19:
+ 411 003c 00080140 		.word	1073809408
+ 412 0040 000C0140 		.word	1073810432
+ 413              		.cfi_endproc
+ 414              	.LFE70:
+ 416              		.text
+ 417              	.Letext0:
+ 418              		.file 2 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/machine/_default_types.h"
+ 419              		.file 3 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/_stdint.h"
+ 420              		.file 4 "Drivers/CMSIS/Include/core_cm3.h"
+ 421              		.file 5 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/system_stm32f1xx.h"
+ 422              		.file 6 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xe.h"
+ 423              		.file 7 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio.h"
+ 424              		.file 8 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h"
+ 425              		.file 9 "Core/Inc/soft_spi.h"
+ 426              		.file 10 "diff_signal/diff_signal.h"
+ARM GAS  /tmp/ccgrS7yX.s 			page 10
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 eeprom.c
+     /tmp/ccgrS7yX.s:16     .text.EEPROM_SendCommand:0000000000000000 $t
+     /tmp/ccgrS7yX.s:23     .text.EEPROM_SendCommand:0000000000000000 EEPROM_SendCommand
+     /tmp/ccgrS7yX.s:119    .text.EEPROM_SendCommand:0000000000000074 $d
+     /tmp/ccgrS7yX.s:125    .text.EEPROM_EWEN:0000000000000000 $t
+     /tmp/ccgrS7yX.s:132    .text.EEPROM_EWEN:0000000000000000 EEPROM_EWEN
+     /tmp/ccgrS7yX.s:154    .text.EEPROM_Init:0000000000000000 $t
+     /tmp/ccgrS7yX.s:161    .text.EEPROM_Init:0000000000000000 EEPROM_Init
+     /tmp/ccgrS7yX.s:184    .text.EEPROM_WriteByte:0000000000000000 $t
+     /tmp/ccgrS7yX.s:191    .text.EEPROM_WriteByte:0000000000000000 EEPROM_WriteByte
+     /tmp/ccgrS7yX.s:259    .text.EEPROM_WriteByte:0000000000000048 $d
+     /tmp/ccgrS7yX.s:265    .text.EEPROM_ReadByte:0000000000000000 $t
+     /tmp/ccgrS7yX.s:272    .text.EEPROM_ReadByte:0000000000000000 EEPROM_ReadByte
+     /tmp/ccgrS7yX.s:342    .text.EEPROM_ReadByte:000000000000004c $d
+     /tmp/ccgrS7yX.s:348    .text.EEPROM_EraseByte:0000000000000000 $t
+     /tmp/ccgrS7yX.s:355    .text.EEPROM_EraseByte:0000000000000000 EEPROM_EraseByte
+     /tmp/ccgrS7yX.s:411    .text.EEPROM_EraseByte:000000000000003c $d
+
+UNDEFINED SYMBOLS
+HAL_GPIO_WritePin
+DWT_Delay_us
+SoftSPI_TransferBits
+SoftSPI_Init

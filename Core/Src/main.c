@@ -26,9 +26,14 @@
 #include "diff_signal.h"
 #include "stdint.h"
 #include "ADXL345.h"
+#include "DHT22.h"
 #include "stm32f1xx_hal_gpio_ex.h"
 #include "diff_signal.h"
 #include "SEGGER_RTT.h"
+#include "Custcom_Pin.h"
+#include "soft_spi.h"
+#include "soft_spi.h"
+#include "eeprom.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -101,22 +106,37 @@ int main(void)
   MX_TIM8_Init();
   ADXL345_Init();
   DiffSignal_Init();
+  EEPROM_Init();
   myprintf("peripheral init success\n");
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
+
+
+
   /* USER CODE BEGIN WHILE */
-  uint8_t data_buf[10] = {0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0A};
+  // float x,y,z = 0;
+  // uint8_t err_code = 0x00;
+  float hum, temp = 0;
   while (1)
   {
-   
-    DiffSignal_Senddata(&data_buf[2],1);
-    // myprintf("send_data_success\n");
-    // HAL_Delay(10);
 
-
+    // HAL_Delay(10); // 给 EEPROM 一点时间写入完成
+    // uint16_t read_val = EEPROM_ReadWord(0x00);
+    EEPROM_EraseByte(0x10);
+HAL_Delay(5);
+EEPROM_WriteByte(0x10, 0xAB);
+HAL_Delay(5);
+uint8_t value = EEPROM_ReadByte(0x10);
+// myprintf("Read value = 0x%02X\n", value);
+    // HAL_Delay(5);
+    // EEPROM_WriteByte(0x10, 0xAB);
+    // HAL_Delay(5);
+    // uint8_t value = EEPROM_ReadByte(0x10);
+    // myprintf("value is %x\n", value);
+    HAL_Delay(1000);
     /* USER CODE END WHILE */
     /* USER CODE BEGIN 3 */
   }
@@ -133,37 +153,42 @@ void SystemClock_Config(void)
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
   RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 
-  /** Initializes the RCC Oscillators according to the specified parameters
-   * in the RCC_OscInitTypeDef structure.
-   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
-  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
-  RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV1;
-  RCC_OscInitStruct.HSIState = RCC_HSI_ON; // 备份
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL4; // 16 MHz × 4 = 64 MHz
+  /** 配置外部晶振 HSE 和 PLL */
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE; // 使用外部晶振
+  RCC_OscInitStruct.HSEState = RCC_HSE_ON;                   // 打开 HSE
+  RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV1;    // HSE不分频
+  RCC_OscInitStruct.HSIState = RCC_HSI_ON;                   // 打开 HSI（备份）
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;               // 打开 PLL
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;       // PLL输入源为HSE
+  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;               // 8 MHz × 9 = 72 MHz
+
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     myprintf("error 1\n");
     Error_Handler();
   }
+
+  /** 初始化系统总线时钟 */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK |
                                 RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK; // 主频来源为 PLL
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;        // HCLK = 64 MHz
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;         // PCLK1 = 32 MHz（≤36MHz，安全）
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;         // PCLK2 = 64 MHz
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK; // SYSCLK = PLL 输出 = 72 MHz
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;        // HCLK = 72 MHz
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;         // PCLK1 = 36 MHz (需 ≤ 36 MHz)
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;         // PCLK2 = 72 MHz
+
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
   {
-     myprintf("error 2\n");
+    myprintf("error 2\n");
     Error_Handler();
   }
+
+  /** 设置 USB 时钟为 48 MHz（需要 SYSCLK = 72 MHz）*/
   PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USB;
-  PeriphClkInit.UsbClockSelection = RCC_USBCLKSOURCE_PLL_DIV1_5;
+  PeriphClkInit.UsbClockSelection = RCC_USBCLKSOURCE_PLL_DIV1_5; // 72 MHz / 1.5 = 48 MHz
+
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {
-     myprintf("error 3\n");
+    myprintf("error 3\n");
     Error_Handler();
   }
 }
@@ -171,22 +196,6 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 
 /* USER CODE END 4 */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /**
  * @brief  This function is executed in case of error occurrence.

@@ -68,28 +68,25 @@ void DiffSignal_Stop(void)
 
 void DiffSignal_Senddata(uint8_t *data, uint16_t length)
 {
-    // for (uint16_t i = 0; i < length; i++)
-    // {
-    //     uint8_t byte = data[i];
+    for (uint16_t i = 0; i < length; i++)
+    {
+        uint8_t byte = data[i];
 
-    //     // 起始位 0
-    //     DWT_Delay_us(BIT_DURATION_US); 
+        // 起始位 0
+        DWT_Delay_us(BIT_DURATION_US); 
  
-    //     for (int bit = 0; bit < 8; bit++)
-    //     {
-    //         if ((byte >> bit) & 0x01)
-    //         {
-    //             DiffSignal_Send(BIT_DURATION_US);
-    //         }
-    //         else
-    //         {
-    //             DWT_Delay_us(BIT_DURATION_US);
-    //         }
-    //     }
-    //     // 停止位 1
-    //     DiffSignal_Send(BIT_DURATION_US);
-    DiffSignal_Send(1000);
-    DWT_Delay_us(100000);
-
-    // }
+        for (int bit = 0; bit < 8; bit++)
+        {
+            if ((byte >> bit) & 0x01)
+            {
+                DiffSignal_Send(BIT_DURATION_US);
+            }
+            else
+            {
+                DWT_Delay_us(BIT_DURATION_US);
+            }
+        }
+        // 停止位 1
+        DiffSignal_Send(BIT_DURATION_US);
+    }
 }

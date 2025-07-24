@@ -3,7 +3,7 @@
 
 #include "main.h"
 
-#define BAUD_RATE 2400
+// #define BAUD_RATE 2400
 
 // #define BIT_DURATION_US (1000000 / BAUD_RATE)
 
