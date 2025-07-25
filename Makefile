@@ -47,7 +47,6 @@ C_SOURCES =  \
 Core/Src/main.c \
 Core/Src/gpio.c \
 Core/Src/spi.c \
-Core/Src/soft_spi.c\
 Core/Src/tim.c \
 Core/Src/usb.c \
 Core/Src/stm32f1xx_it.c \

@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccl7FMRD.s 			page 1
+ARM GAS  /tmp/ccDhf7jq.s 			page 1
 
 
    1              		.cpu cortex-m3
@@ -58,118 +58,118 @@ ARM GAS  /tmp/ccl7FMRD.s 			page 1
   30:Core/Src/main.c **** #include "stm32f1xx_hal_gpio_ex.h"
   31:Core/Src/main.c **** #include "diff_signal.h"
   32:Core/Src/main.c **** #include "SEGGER_RTT.h"
-ARM GAS  /tmp/ccl7FMRD.s 			page 2
+ARM GAS  /tmp/ccDhf7jq.s 			page 2
 
 
   33:Core/Src/main.c **** #include "Custcom_Pin.h"
-  34:Core/Src/main.c **** #include "soft_spi.h"
-  35:Core/Src/main.c **** #include "soft_spi.h"
-  36:Core/Src/main.c **** #include "eeprom.h"
-  37:Core/Src/main.c **** /* Private includes ----------------------------------------------------------*/
-  38:Core/Src/main.c **** /* USER CODE BEGIN Includes */
+  34:Core/Src/main.c **** #include "eeprom.h"
+  35:Core/Src/main.c **** /* Private includes ----------------------------------------------------------*/
+  36:Core/Src/main.c **** /* USER CODE BEGIN Includes */
+  37:Core/Src/main.c **** 
+  38:Core/Src/main.c **** /* USER CODE END Includes */
   39:Core/Src/main.c **** 
-  40:Core/Src/main.c **** /* USER CODE END Includes */
-  41:Core/Src/main.c **** 
-  42:Core/Src/main.c **** /* Private typedef -----------------------------------------------------------*/
-  43:Core/Src/main.c **** /* USER CODE BEGIN PTD */
+  40:Core/Src/main.c **** /* Private typedef -----------------------------------------------------------*/
+  41:Core/Src/main.c **** /* USER CODE BEGIN PTD */
+  42:Core/Src/main.c **** 
+  43:Core/Src/main.c **** /* USER CODE END PTD */
   44:Core/Src/main.c **** 
-  45:Core/Src/main.c **** /* USER CODE END PTD */
-  46:Core/Src/main.c **** 
-  47:Core/Src/main.c **** /* Private define ------------------------------------------------------------*/
-  48:Core/Src/main.c **** /* USER CODE BEGIN PD */
-  49:Core/Src/main.c **** /* USER CODE END PD */
-  50:Core/Src/main.c **** 
-  51:Core/Src/main.c **** /* Private macro -------------------------------------------------------------*/
-  52:Core/Src/main.c **** /* USER CODE BEGIN PM */
+  45:Core/Src/main.c **** /* Private define ------------------------------------------------------------*/
+  46:Core/Src/main.c **** /* USER CODE BEGIN PD */
+  47:Core/Src/main.c **** /* USER CODE END PD */
+  48:Core/Src/main.c **** 
+  49:Core/Src/main.c **** /* Private macro -------------------------------------------------------------*/
+  50:Core/Src/main.c **** /* USER CODE BEGIN PM */
+  51:Core/Src/main.c **** 
+  52:Core/Src/main.c **** /* USER CODE END PM */
   53:Core/Src/main.c **** 
-  54:Core/Src/main.c **** /* USER CODE END PM */
+  54:Core/Src/main.c **** /* Private variables ---------------------------------------------------------*/
   55:Core/Src/main.c **** 
-  56:Core/Src/main.c **** /* Private variables ---------------------------------------------------------*/
+  56:Core/Src/main.c **** /* USER CODE BEGIN PV */
   57:Core/Src/main.c **** 
-  58:Core/Src/main.c **** /* USER CODE BEGIN PV */
+  58:Core/Src/main.c **** /* USER CODE END PV */
   59:Core/Src/main.c **** 
-  60:Core/Src/main.c **** /* USER CODE END PV */
-  61:Core/Src/main.c **** 
-  62:Core/Src/main.c **** /* Private function prototypes -----------------------------------------------*/
-  63:Core/Src/main.c **** void SystemClock_Config(void);
-  64:Core/Src/main.c **** /* USER CODE BEGIN PFP */
+  60:Core/Src/main.c **** /* Private function prototypes -----------------------------------------------*/
+  61:Core/Src/main.c **** void SystemClock_Config(void);
+  62:Core/Src/main.c **** /* USER CODE BEGIN PFP */
+  63:Core/Src/main.c **** 
+  64:Core/Src/main.c **** /* USER CODE END PFP */
   65:Core/Src/main.c **** 
-  66:Core/Src/main.c **** /* USER CODE END PFP */
-  67:Core/Src/main.c **** 
-  68:Core/Src/main.c **** /* Private user code ---------------------------------------------------------*/
-  69:Core/Src/main.c **** /* USER CODE BEGIN 0 */
+  66:Core/Src/main.c **** /* Private user code ---------------------------------------------------------*/
+  67:Core/Src/main.c **** /* USER CODE BEGIN 0 */
+  68:Core/Src/main.c **** 
+  69:Core/Src/main.c **** /* USER CODE END 0 */
   70:Core/Src/main.c **** 
-  71:Core/Src/main.c **** /* USER CODE END 0 */
-  72:Core/Src/main.c **** 
-  73:Core/Src/main.c **** /**
-  74:Core/Src/main.c ****  * @brief  The application entry point.
-  75:Core/Src/main.c ****  * @retval int
-  76:Core/Src/main.c ****  */
-  77:Core/Src/main.c **** int main(void)
-  78:Core/Src/main.c **** {
-  79:Core/Src/main.c ****   /* USER CODE BEGIN 1 */
+  71:Core/Src/main.c **** /**
+  72:Core/Src/main.c ****  * @brief  The application entry point.
+  73:Core/Src/main.c ****  * @retval int
+  74:Core/Src/main.c ****  */
+  75:Core/Src/main.c **** int main(void)
+  76:Core/Src/main.c **** {
+  77:Core/Src/main.c ****   /* USER CODE BEGIN 1 */
+  78:Core/Src/main.c **** 
+  79:Core/Src/main.c ****   /* USER CODE END 1 */
   80:Core/Src/main.c **** 
-  81:Core/Src/main.c ****   /* USER CODE END 1 */
+  81:Core/Src/main.c ****   /* MCU Configuration--------------------------------------------------------*/
   82:Core/Src/main.c **** 
-  83:Core/Src/main.c ****   /* MCU Configuration--------------------------------------------------------*/
-  84:Core/Src/main.c **** 
-  85:Core/Src/main.c ****   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  86:Core/Src/main.c ****   HAL_Init();
-  87:Core/Src/main.c ****   myprintf("hal_init success\n");
-  88:Core/Src/main.c ****   __HAL_AFIO_REMAP_SWJ_NOJTAG();
-  89:Core/Src/main.c ****   SystemClock_Config();
-ARM GAS  /tmp/ccl7FMRD.s 			page 3
+  83:Core/Src/main.c ****   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  84:Core/Src/main.c ****   HAL_Init();
+  85:Core/Src/main.c ****   myprintf("hal_init success\n");
+  86:Core/Src/main.c ****   SystemClock_Config();
+  87:Core/Src/main.c ****   myprintf("systemclock init success\n");
+  88:Core/Src/main.c ****   /* USER CODE BEGIN Init */
+  89:Core/Src/main.c ****   /* USER CODE END Init */
+ARM GAS  /tmp/ccDhf7jq.s 			page 3
 
 
-  90:Core/Src/main.c ****   myprintf("systemclock init success\n");
-  91:Core/Src/main.c ****   /* USER CODE BEGIN Init */
-  92:Core/Src/main.c ****   /* USER CODE END Init */
-  93:Core/Src/main.c **** 
-  94:Core/Src/main.c ****   /* Configure the system clock */
-  95:Core/Src/main.c **** 
-  96:Core/Src/main.c ****   /* USER CODE BEGIN SysInit */
-  97:Core/Src/main.c **** 
-  98:Core/Src/main.c ****   /* USER CODE END SysInit */
-  99:Core/Src/main.c **** 
- 100:Core/Src/main.c ****   /* Initialize all configured peripherals */
- 101:Core/Src/main.c ****   MX_GPIO_Init();
- 102:Core/Src/main.c ****   MX_SPI2_Init();
- 103:Core/Src/main.c ****   MX_TIM1_Init();
- 104:Core/Src/main.c ****   MX_TIM3_Init();
- 105:Core/Src/main.c ****   // MX_USB_PCD_Init();
- 106:Core/Src/main.c ****   MX_TIM8_Init();
- 107:Core/Src/main.c ****   ADXL345_Init();
- 108:Core/Src/main.c ****   DiffSignal_Init();
- 109:Core/Src/main.c ****   EEPROM_Init();
- 110:Core/Src/main.c ****   myprintf("peripheral init success\n");
- 111:Core/Src/main.c ****   /* USER CODE BEGIN 2 */
- 112:Core/Src/main.c **** 
- 113:Core/Src/main.c ****   /* USER CODE END 2 */
+  90:Core/Src/main.c **** 
+  91:Core/Src/main.c ****   /* Configure the system clock */
+  92:Core/Src/main.c **** 
+  93:Core/Src/main.c ****   /* USER CODE BEGIN SysInit */
+  94:Core/Src/main.c **** 
+  95:Core/Src/main.c ****   /* USER CODE END SysInit */
+  96:Core/Src/main.c **** 
+  97:Core/Src/main.c ****   /* Initialize all configured peripherals */
+  98:Core/Src/main.c ****   __HAL_AFIO_REMAP_SWJ_NOJTAG();
+  99:Core/Src/main.c ****   MX_GPIO_Init();
+ 100:Core/Src/main.c ****   MX_SPI2_Init();
+ 101:Core/Src/main.c ****   MX_TIM1_Init();
+ 102:Core/Src/main.c ****   MX_TIM3_Init();
+ 103:Core/Src/main.c ****   // MX_USB_PCD_Init();
+ 104:Core/Src/main.c ****   MX_TIM8_Init();
+ 105:Core/Src/main.c ****   ADXL345_Init();
+ 106:Core/Src/main.c ****   DiffSignal_Init();
+ 107:Core/Src/main.c **** 
+ 108:Core/Src/main.c ****   HAL_Delay(100);
+ 109:Core/Src/main.c ****   DHT22_Init();
+ 110:Core/Src/main.c ****   EEPROM_Init();
+ 111:Core/Src/main.c ****   myprintf("peripheral init success\n");
+ 112:Core/Src/main.c ****   HAL_Delay(2000);
+ 113:Core/Src/main.c ****   /* USER CODE BEGIN 2 */
  114:Core/Src/main.c **** 
- 115:Core/Src/main.c ****   /* Infinite loop */
+ 115:Core/Src/main.c ****   /* USER CODE END 2 */
  116:Core/Src/main.c **** 
- 117:Core/Src/main.c **** 
+ 117:Core/Src/main.c ****   /* Infinite loop */
  118:Core/Src/main.c **** 
  119:Core/Src/main.c ****   /* USER CODE BEGIN WHILE */
  120:Core/Src/main.c ****   // float x,y,z = 0;
  121:Core/Src/main.c ****   // uint8_t err_code = 0x00;
  122:Core/Src/main.c ****   float hum, temp = 0;
- 123:Core/Src/main.c ****   while (1)
- 124:Core/Src/main.c ****   {
- 125:Core/Src/main.c **** 
- 126:Core/Src/main.c ****     // HAL_Delay(10); // 给 EEPROM 一点时间写入完成
- 127:Core/Src/main.c ****     // uint16_t read_val = EEPROM_ReadWord(0x00);
- 128:Core/Src/main.c ****     EEPROM_EraseByte(0x10);
- 129:Core/Src/main.c **** HAL_Delay(5);
- 130:Core/Src/main.c **** EEPROM_WriteByte(0x10, 0xAB);
- 131:Core/Src/main.c **** HAL_Delay(5);
- 132:Core/Src/main.c **** uint8_t value = EEPROM_ReadByte(0x10);
- 133:Core/Src/main.c **** // myprintf("Read value = 0x%02X\n", value);
- 134:Core/Src/main.c ****     // HAL_Delay(5);
- 135:Core/Src/main.c ****     // EEPROM_WriteByte(0x10, 0xAB);
- 136:Core/Src/main.c ****     // HAL_Delay(5);
- 137:Core/Src/main.c ****     // uint8_t value = EEPROM_ReadByte(0x10);
- 138:Core/Src/main.c ****     // myprintf("value is %x\n", value);
+ 123:Core/Src/main.c ****   uint8_t buff[10] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a};
+ 124:Core/Src/main.c ****   uint8_t rev_buf[10] = {0x00};
+ 125:Core/Src/main.c ****   uint8_t dht22_read_error_code = 0x00; 
+ 126:Core/Src/main.c ****   while (1)
+ 127:Core/Src/main.c ****   {
+ 128:Core/Src/main.c ****     
+ 129:Core/Src/main.c ****     dht22_read_error_code = DHT22_ReadData(&temp, &hum);
+ 130:Core/Src/main.c ****     myprintf("dht22_read_code_error is %d\n",dht22_read_error_code);
+ 131:Core/Src/main.c ****     myprintf("temp%fhum%f\n",temp,hum);
+ 132:Core/Src/main.c ****     //     EEPROM_WriteBuffer(0x00,buff,10);
+ 133:Core/Src/main.c **** 
+ 134:Core/Src/main.c ****     // EEPROM_ReadBuffer(0x00,rev_buf,10);
+ 135:Core/Src/main.c ****     // for(int i =0;i<10;i++)
+ 136:Core/Src/main.c ****     // {
+ 137:Core/Src/main.c ****     //   myprintf("buf is %x\n",rev_buf[i]);
+ 138:Core/Src/main.c ****     // }
  139:Core/Src/main.c ****     HAL_Delay(1000);
  140:Core/Src/main.c ****     /* USER CODE END WHILE */
  141:Core/Src/main.c ****     /* USER CODE BEGIN 3 */
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccl7FMRD.s 			page 1
  144:Core/Src/main.c **** }
  145:Core/Src/main.c **** 
  146:Core/Src/main.c **** /**
-ARM GAS  /tmp/ccl7FMRD.s 			page 4
+ARM GAS  /tmp/ccDhf7jq.s 			page 4
 
 
  147:Core/Src/main.c ****  * @brief System Clock Configuration
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccl7FMRD.s 			page 1
  201:Core/Src/main.c ****  * @brief  This function is executed in case of error occurrence.
  202:Core/Src/main.c ****  * @retval None
  203:Core/Src/main.c ****  */
-ARM GAS  /tmp/ccl7FMRD.s 			page 5
+ARM GAS  /tmp/ccDhf7jq.s 			page 5
 
 
  204:Core/Src/main.c **** void Error_Handler(void)
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccl7FMRD.s 			page 1
   40:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __ASM
   41:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __ASM                                  __asm
   42:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
-ARM GAS  /tmp/ccl7FMRD.s 			page 6
+ARM GAS  /tmp/ccDhf7jq.s 			page 6
 
 
   43:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __INLINE
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccl7FMRD.s 			page 1
   97:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic ignored "-Wattributes"
   98:Drivers/CMSIS/Include/cmsis_gcc.h ****   __PACKED_STRUCT T_UINT32_WRITE { uint32_t v; };
   99:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic pop
-ARM GAS  /tmp/ccl7FMRD.s 			page 7
+ARM GAS  /tmp/ccDhf7jq.s 			page 7
 
 
  100:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __UNALIGNED_UINT32_WRITE(addr, val)    (void)((((struct T_UINT32_WRITE *)(void *)(addr))-
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccl7FMRD.s 			page 1
   48              	.LBE4:
  209:Core/Src/main.c ****   while (1)
   49              		.loc 1 209 3 discriminator 1 view .LVU4
-ARM GAS  /tmp/ccl7FMRD.s 			page 8
+ARM GAS  /tmp/ccDhf7jq.s 			page 8
 
 
  210:Core/Src/main.c ****   {
@@ -478,7 +478,7 @@ ARM GAS  /tmp/ccl7FMRD.s 			page 1
   93              		.loc 1 153 3 is_stmt 1 view .LVU10
  153:Core/Src/main.c ****   RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
   94              		.loc 1 153 22 is_stmt 0 view .LVU11
-ARM GAS  /tmp/ccl7FMRD.s 			page 9
+ARM GAS  /tmp/ccDhf7jq.s 			page 9
 
 
   95 000c 0793     		str	r3, [sp, #28]
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccl7FMRD.s 			page 1
  165:Core/Src/main.c ****   {
  133              		.loc 1 165 3 is_stmt 1 view .LVU28
  165:Core/Src/main.c ****   {
-ARM GAS  /tmp/ccl7FMRD.s 			page 10
+ARM GAS  /tmp/ccDhf7jq.s 			page 10
 
 
  134              		.loc 1 165 7 is_stmt 0 view .LVU29
@@ -598,7 +598,7 @@ ARM GAS  /tmp/ccl7FMRD.s 			page 1
  187:Core/Src/main.c **** 
  171              		.loc 1 187 35 is_stmt 0 view .LVU47
  172 0064 0023     		movs	r3, #0
-ARM GAS  /tmp/ccl7FMRD.s 			page 11
+ARM GAS  /tmp/ccDhf7jq.s 			page 11
 
 
  173 0066 0693     		str	r3, [sp, #24]
@@ -658,7 +658,7 @@ ARM GAS  /tmp/ccl7FMRD.s 			page 1
  217              	.L12:
  218 009a 00BF     		.align	2
  219              	.L11:
-ARM GAS  /tmp/ccl7FMRD.s 			page 12
+ARM GAS  /tmp/ccDhf7jq.s 			page 12
 
 
  220 009c 00000000 		.word	.LC0
@@ -688,216 +688,269 @@ ARM GAS  /tmp/ccl7FMRD.s 			page 1
  235      616C2069 
  235      6E697420 
  235      73756363 
- 236              		.section	.text.main,"ax",%progbits
- 237              		.align	1
- 238              		.global	main
- 239              		.syntax unified
- 240              		.thumb
- 241              		.thumb_func
- 242              		.fpu softvfp
- 244              	main:
- 245              	.LFB65:
-  78:Core/Src/main.c ****   /* USER CODE BEGIN 1 */
- 246              		.loc 1 78 1 view -0
- 247              		.cfi_startproc
- 248              		@ args = 0, pretend = 0, frame = 0
- 249              		@ frame_needed = 0, uses_anonymous_args = 0
- 250 0000 08B5     		push	{r3, lr}
- 251              	.LCFI4:
- 252              		.cfi_def_cfa_offset 8
- 253              		.cfi_offset 3, -8
- 254              		.cfi_offset 14, -4
-  86:Core/Src/main.c ****   myprintf("hal_init success\n");
- 255              		.loc 1 86 3 view .LVU59
- 256 0002 FFF7FEFF 		bl	HAL_Init
- 257              	.LVL9:
-  87:Core/Src/main.c ****   __HAL_AFIO_REMAP_SWJ_NOJTAG();
- 258              		.loc 1 87 3 view .LVU60
- 259 0006 1D49     		ldr	r1, .L16
- 260 0008 0020     		movs	r0, #0
- 261 000a FFF7FEFF 		bl	SEGGER_RTT_printf
- 262              	.LVL10:
-  88:Core/Src/main.c ****   SystemClock_Config();
-ARM GAS  /tmp/ccl7FMRD.s 			page 13
+ 236 0049 000000   		.align	2
+ 237              	.LC6:
+ 238 004c 64687432 		.ascii	"dht22_read_code_error is %d\012\000"
+ 238      325F7265 
+ 238      61645F63 
+ 238      6F64655F 
+ 238      6572726F 
+ 239              		.global	__aeabi_f2d
+ 240 0069 000000   		.align	2
+ 241              	.LC7:
+ 242 006c 74656D70 		.ascii	"temp%fhum%f\012\000"
+ 242      25666875 
+ 242      6D25660A 
+ 242      00
+ 243              		.section	.text.main,"ax",%progbits
+ 244              		.align	1
+ 245              		.global	main
+ 246              		.syntax unified
+ 247              		.thumb
+ 248              		.thumb_func
+ 249              		.fpu softvfp
+ 251              	main:
+ 252              	.LFB65:
+  76:Core/Src/main.c ****   /* USER CODE BEGIN 1 */
+ 253              		.loc 1 76 1 view -0
+ 254              		.cfi_startproc
+ 255              		@ args = 0, pretend = 0, frame = 8
+ 256              		@ frame_needed = 0, uses_anonymous_args = 0
+ 257 0000 30B5     		push	{r4, r5, lr}
+ 258              	.LCFI4:
+ARM GAS  /tmp/ccDhf7jq.s 			page 13
 
 
- 263              		.loc 1 88 3 view .LVU61
- 264              	.LBB6:
-  88:Core/Src/main.c ****   SystemClock_Config();
- 265              		.loc 1 88 3 view .LVU62
- 266 000e 1C4A     		ldr	r2, .L16+4
- 267 0010 5368     		ldr	r3, [r2, #4]
- 268              	.LVL11:
-  88:Core/Src/main.c ****   SystemClock_Config();
- 269              		.loc 1 88 3 view .LVU63
- 270 0012 23F0E063 		bic	r3, r3, #117440512
- 271              	.LVL12:
-  88:Core/Src/main.c ****   SystemClock_Config();
- 272              		.loc 1 88 3 view .LVU64
- 273 0016 43F00073 		orr	r3, r3, #33554432
- 274              	.LVL13:
-  88:Core/Src/main.c ****   SystemClock_Config();
- 275              		.loc 1 88 3 view .LVU65
- 276 001a 5360     		str	r3, [r2, #4]
- 277              	.LBE6:
-  88:Core/Src/main.c ****   SystemClock_Config();
- 278              		.loc 1 88 3 view .LVU66
-  89:Core/Src/main.c ****   myprintf("systemclock init success\n");
- 279              		.loc 1 89 3 view .LVU67
- 280 001c FFF7FEFF 		bl	SystemClock_Config
- 281              	.LVL14:
-  90:Core/Src/main.c ****   /* USER CODE BEGIN Init */
- 282              		.loc 1 90 3 view .LVU68
- 283 0020 1849     		ldr	r1, .L16+8
- 284 0022 0020     		movs	r0, #0
- 285 0024 FFF7FEFF 		bl	SEGGER_RTT_printf
- 286              	.LVL15:
- 101:Core/Src/main.c ****   MX_SPI2_Init();
- 287              		.loc 1 101 3 view .LVU69
- 288 0028 FFF7FEFF 		bl	MX_GPIO_Init
- 289              	.LVL16:
- 102:Core/Src/main.c ****   MX_TIM1_Init();
- 290              		.loc 1 102 3 view .LVU70
- 291 002c FFF7FEFF 		bl	MX_SPI2_Init
- 292              	.LVL17:
- 103:Core/Src/main.c ****   MX_TIM3_Init();
- 293              		.loc 1 103 3 view .LVU71
- 294 0030 FFF7FEFF 		bl	MX_TIM1_Init
- 295              	.LVL18:
- 104:Core/Src/main.c ****   // MX_USB_PCD_Init();
- 296              		.loc 1 104 3 view .LVU72
- 297 0034 FFF7FEFF 		bl	MX_TIM3_Init
- 298              	.LVL19:
- 106:Core/Src/main.c ****   ADXL345_Init();
- 299              		.loc 1 106 3 view .LVU73
- 300 0038 FFF7FEFF 		bl	MX_TIM8_Init
- 301              	.LVL20:
- 107:Core/Src/main.c ****   DiffSignal_Init();
- 302              		.loc 1 107 3 view .LVU74
- 303 003c FFF7FEFF 		bl	ADXL345_Init
- 304              	.LVL21:
- 108:Core/Src/main.c ****   EEPROM_Init();
- 305              		.loc 1 108 3 view .LVU75
-ARM GAS  /tmp/ccl7FMRD.s 			page 14
+ 259              		.cfi_def_cfa_offset 12
+ 260              		.cfi_offset 4, -12
+ 261              		.cfi_offset 5, -8
+ 262              		.cfi_offset 14, -4
+ 263 0002 85B0     		sub	sp, sp, #20
+ 264              	.LCFI5:
+ 265              		.cfi_def_cfa_offset 32
+  84:Core/Src/main.c ****   myprintf("hal_init success\n");
+ 266              		.loc 1 84 3 view .LVU59
+ 267 0004 FFF7FEFF 		bl	HAL_Init
+ 268              	.LVL9:
+  85:Core/Src/main.c ****   SystemClock_Config();
+ 269              		.loc 1 85 3 view .LVU60
+ 270 0008 2649     		ldr	r1, .L16
+ 271 000a 0020     		movs	r0, #0
+ 272 000c FFF7FEFF 		bl	SEGGER_RTT_printf
+ 273              	.LVL10:
+  86:Core/Src/main.c ****   myprintf("systemclock init success\n");
+ 274              		.loc 1 86 3 view .LVU61
+ 275 0010 FFF7FEFF 		bl	SystemClock_Config
+ 276              	.LVL11:
+  87:Core/Src/main.c ****   /* USER CODE BEGIN Init */
+ 277              		.loc 1 87 3 view .LVU62
+ 278 0014 2449     		ldr	r1, .L16+4
+ 279 0016 0020     		movs	r0, #0
+ 280 0018 FFF7FEFF 		bl	SEGGER_RTT_printf
+ 281              	.LVL12:
+  98:Core/Src/main.c ****   MX_GPIO_Init();
+ 282              		.loc 1 98 3 view .LVU63
+ 283              	.LBB6:
+  98:Core/Src/main.c ****   MX_GPIO_Init();
+ 284              		.loc 1 98 3 view .LVU64
+ 285 001c 234A     		ldr	r2, .L16+8
+ 286 001e 5368     		ldr	r3, [r2, #4]
+ 287              	.LVL13:
+  98:Core/Src/main.c ****   MX_GPIO_Init();
+ 288              		.loc 1 98 3 view .LVU65
+ 289 0020 23F0E063 		bic	r3, r3, #117440512
+ 290              	.LVL14:
+  98:Core/Src/main.c ****   MX_GPIO_Init();
+ 291              		.loc 1 98 3 view .LVU66
+ 292 0024 43F00073 		orr	r3, r3, #33554432
+ 293              	.LVL15:
+  98:Core/Src/main.c ****   MX_GPIO_Init();
+ 294              		.loc 1 98 3 view .LVU67
+ 295 0028 5360     		str	r3, [r2, #4]
+ 296              	.LBE6:
+  98:Core/Src/main.c ****   MX_GPIO_Init();
+ 297              		.loc 1 98 3 view .LVU68
+  99:Core/Src/main.c ****   MX_SPI2_Init();
+ 298              		.loc 1 99 3 view .LVU69
+ 299 002a FFF7FEFF 		bl	MX_GPIO_Init
+ 300              	.LVL16:
+ 100:Core/Src/main.c ****   MX_TIM1_Init();
+ 301              		.loc 1 100 3 view .LVU70
+ 302 002e FFF7FEFF 		bl	MX_SPI2_Init
+ 303              	.LVL17:
+ARM GAS  /tmp/ccDhf7jq.s 			page 14
 
 
- 306 0040 FFF7FEFF 		bl	DiffSignal_Init
- 307              	.LVL22:
- 109:Core/Src/main.c ****   myprintf("peripheral init success\n");
- 308              		.loc 1 109 3 view .LVU76
- 309 0044 FFF7FEFF 		bl	EEPROM_Init
- 310              	.LVL23:
- 110:Core/Src/main.c ****   /* USER CODE BEGIN 2 */
- 311              		.loc 1 110 3 view .LVU77
- 312 0048 0F49     		ldr	r1, .L16+12
- 313 004a 0020     		movs	r0, #0
- 314 004c FFF7FEFF 		bl	SEGGER_RTT_printf
- 315              	.LVL24:
- 122:Core/Src/main.c ****   while (1)
- 316              		.loc 1 122 3 view .LVU78
- 317              	.L14:
- 123:Core/Src/main.c ****   {
- 318              		.loc 1 123 3 discriminator 1 view .LVU79
- 319              	.LBB7:
- 128:Core/Src/main.c **** HAL_Delay(5);
- 320              		.loc 1 128 5 discriminator 1 view .LVU80
- 321 0050 1020     		movs	r0, #16
- 322 0052 FFF7FEFF 		bl	EEPROM_EraseByte
- 323              	.LVL25:
- 129:Core/Src/main.c **** EEPROM_WriteByte(0x10, 0xAB);
- 324              		.loc 1 129 1 discriminator 1 view .LVU81
- 325 0056 0520     		movs	r0, #5
- 326 0058 FFF7FEFF 		bl	HAL_Delay
- 327              	.LVL26:
- 130:Core/Src/main.c **** HAL_Delay(5);
- 328              		.loc 1 130 1 discriminator 1 view .LVU82
- 329 005c AB21     		movs	r1, #171
- 330 005e 1020     		movs	r0, #16
- 331 0060 FFF7FEFF 		bl	EEPROM_WriteByte
- 332              	.LVL27:
- 131:Core/Src/main.c **** uint8_t value = EEPROM_ReadByte(0x10);
- 333              		.loc 1 131 1 discriminator 1 view .LVU83
- 334 0064 0520     		movs	r0, #5
- 335 0066 FFF7FEFF 		bl	HAL_Delay
- 336              	.LVL28:
- 132:Core/Src/main.c **** // myprintf("Read value = 0x%02X\n", value);
- 337              		.loc 1 132 1 discriminator 1 view .LVU84
- 132:Core/Src/main.c **** // myprintf("Read value = 0x%02X\n", value);
- 338              		.loc 1 132 17 is_stmt 0 discriminator 1 view .LVU85
- 339 006a 1020     		movs	r0, #16
- 340 006c FFF7FEFF 		bl	EEPROM_ReadByte
- 341              	.LVL29:
+ 101:Core/Src/main.c ****   MX_TIM3_Init();
+ 304              		.loc 1 101 3 view .LVU71
+ 305 0032 FFF7FEFF 		bl	MX_TIM1_Init
+ 306              	.LVL18:
+ 102:Core/Src/main.c ****   // MX_USB_PCD_Init();
+ 307              		.loc 1 102 3 view .LVU72
+ 308 0036 FFF7FEFF 		bl	MX_TIM3_Init
+ 309              	.LVL19:
+ 104:Core/Src/main.c ****   ADXL345_Init();
+ 310              		.loc 1 104 3 view .LVU73
+ 311 003a FFF7FEFF 		bl	MX_TIM8_Init
+ 312              	.LVL20:
+ 105:Core/Src/main.c ****   DiffSignal_Init();
+ 313              		.loc 1 105 3 view .LVU74
+ 314 003e FFF7FEFF 		bl	ADXL345_Init
+ 315              	.LVL21:
+ 106:Core/Src/main.c **** 
+ 316              		.loc 1 106 3 view .LVU75
+ 317 0042 FFF7FEFF 		bl	DiffSignal_Init
+ 318              	.LVL22:
+ 108:Core/Src/main.c ****   DHT22_Init();
+ 319              		.loc 1 108 3 view .LVU76
+ 320 0046 6420     		movs	r0, #100
+ 321 0048 FFF7FEFF 		bl	HAL_Delay
+ 322              	.LVL23:
+ 109:Core/Src/main.c ****   EEPROM_Init();
+ 323              		.loc 1 109 3 view .LVU77
+ 324 004c FFF7FEFF 		bl	DHT22_Init
+ 325              	.LVL24:
+ 110:Core/Src/main.c ****   myprintf("peripheral init success\n");
+ 326              		.loc 1 110 3 view .LVU78
+ 327 0050 FFF7FEFF 		bl	EEPROM_Init
+ 328              	.LVL25:
+ 111:Core/Src/main.c ****   HAL_Delay(2000);
+ 329              		.loc 1 111 3 view .LVU79
+ 330 0054 1649     		ldr	r1, .L16+12
+ 331 0056 0020     		movs	r0, #0
+ 332 0058 FFF7FEFF 		bl	SEGGER_RTT_printf
+ 333              	.LVL26:
+ 112:Core/Src/main.c ****   /* USER CODE BEGIN 2 */
+ 334              		.loc 1 112 3 view .LVU80
+ 335 005c 4FF4FA60 		mov	r0, #2000
+ 336 0060 FFF7FEFF 		bl	HAL_Delay
+ 337              	.LVL27:
+ 122:Core/Src/main.c ****   uint8_t buff[10] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a};
+ 338              		.loc 1 122 3 view .LVU81
+ 122:Core/Src/main.c ****   uint8_t buff[10] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a};
+ 339              		.loc 1 122 14 is_stmt 0 view .LVU82
+ 340 0064 0023     		movs	r3, #0
+ 341 0066 0293     		str	r3, [sp, #8]	@ float
+ 123:Core/Src/main.c ****   uint8_t rev_buf[10] = {0x00};
+ 342              		.loc 1 123 3 is_stmt 1 view .LVU83
+ 124:Core/Src/main.c ****   uint8_t dht22_read_error_code = 0x00; 
+ 343              		.loc 1 124 3 view .LVU84
+ 125:Core/Src/main.c ****   while (1)
+ 344              		.loc 1 125 3 view .LVU85
+ 345              	.LVL28:
+ARM GAS  /tmp/ccDhf7jq.s 			page 15
+
+
+ 346              	.L14:
+ 126:Core/Src/main.c ****   {
+ 347              		.loc 1 126 3 discriminator 1 view .LVU86
+ 129:Core/Src/main.c ****     myprintf("dht22_read_code_error is %d\n",dht22_read_error_code);
+ 348              		.loc 1 129 5 discriminator 1 view .LVU87
+ 129:Core/Src/main.c ****     myprintf("dht22_read_code_error is %d\n",dht22_read_error_code);
+ 349              		.loc 1 129 29 is_stmt 0 discriminator 1 view .LVU88
+ 350 0068 03A9     		add	r1, sp, #12
+ 351 006a 02A8     		add	r0, sp, #8
+ 352 006c FFF7FEFF 		bl	DHT22_ReadData
+ 353              	.LVL29:
+ 354 0070 0246     		mov	r2, r0
+ 355              	.LVL30:
+ 130:Core/Src/main.c ****     myprintf("temp%fhum%f\n",temp,hum);
+ 356              		.loc 1 130 5 is_stmt 1 discriminator 1 view .LVU89
+ 357 0072 1049     		ldr	r1, .L16+16
+ 358 0074 0020     		movs	r0, #0
+ 359 0076 FFF7FEFF 		bl	SEGGER_RTT_printf
+ 360              	.LVL31:
+ 131:Core/Src/main.c ****     //     EEPROM_WriteBuffer(0x00,buff,10);
+ 361              		.loc 1 131 5 discriminator 1 view .LVU90
+ 362 007a 0298     		ldr	r0, [sp, #8]	@ float
+ 363 007c FFF7FEFF 		bl	__aeabi_f2d
+ 364              	.LVL32:
+ 365 0080 0446     		mov	r4, r0
+ 366 0082 0D46     		mov	r5, r1
+ 367 0084 0398     		ldr	r0, [sp, #12]	@ float
+ 368 0086 FFF7FEFF 		bl	__aeabi_f2d
+ 369              	.LVL33:
+ 370 008a CDE90001 		strd	r0, [sp]
+ 371 008e 2246     		mov	r2, r4
+ 372 0090 2B46     		mov	r3, r5
+ 373 0092 0949     		ldr	r1, .L16+20
+ 374 0094 0020     		movs	r0, #0
+ 375 0096 FFF7FEFF 		bl	SEGGER_RTT_printf
+ 376              	.LVL34:
  139:Core/Src/main.c ****     /* USER CODE END WHILE */
- 342              		.loc 1 139 5 is_stmt 1 discriminator 1 view .LVU86
- 343 0070 4FF47A70 		mov	r0, #1000
- 344 0074 FFF7FEFF 		bl	HAL_Delay
- 345              	.LVL30:
- 346              	.LBE7:
- 123:Core/Src/main.c ****   {
- 347              		.loc 1 123 9 discriminator 1 view .LVU87
- 348 0078 EAE7     		b	.L14
- 349              	.L17:
- 350 007a 00BF     		.align	2
-ARM GAS  /tmp/ccl7FMRD.s 			page 15
+ 377              		.loc 1 139 5 discriminator 1 view .LVU91
+ 378 009a 4FF47A70 		mov	r0, #1000
+ 379 009e FFF7FEFF 		bl	HAL_Delay
+ 380              	.LVL35:
+ 126:Core/Src/main.c ****   {
+ 381              		.loc 1 126 9 discriminator 1 view .LVU92
+ 382 00a2 E1E7     		b	.L14
+ 383              	.L17:
+ 384              		.align	2
+ 385              	.L16:
+ 386 00a4 00000000 		.word	.LC3
+ 387 00a8 14000000 		.word	.LC4
+ 388 00ac 00000140 		.word	1073807360
+ 389 00b0 30000000 		.word	.LC5
+ 390 00b4 4C000000 		.word	.LC6
+ 391 00b8 6C000000 		.word	.LC7
+ 392              		.cfi_endproc
+ 393              	.LFE65:
+ 395              		.text
+ 396              	.Letext0:
+ARM GAS  /tmp/ccDhf7jq.s 			page 16
 
 
- 351              	.L16:
- 352 007c 00000000 		.word	.LC3
- 353 0080 00000140 		.word	1073807360
- 354 0084 14000000 		.word	.LC4
- 355 0088 30000000 		.word	.LC5
- 356              		.cfi_endproc
- 357              	.LFE65:
- 359              		.text
- 360              	.Letext0:
- 361              		.file 3 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/machine/_default_types.h"
- 362              		.file 4 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/_stdint.h"
- 363              		.file 5 "Drivers/CMSIS/Include/core_cm3.h"
- 364              		.file 6 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/system_stm32f1xx.h"
- 365              		.file 7 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xe.h"
- 366              		.file 8 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_def.h"
- 367              		.file 9 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h"
- 368              		.file 10 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc_ex.h"
- 369              		.file 11 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma.h"
- 370              		.file 12 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h"
- 371              		.file 13 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h"
- 372              		.file 14 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h"
- 373              		.file 15 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd.h"
- 374              		.file 16 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h"
- 375              		.file 17 "Core/Inc/spi.h"
- 376              		.file 18 "Core/Inc/tim.h"
- 377              		.file 19 "Core/Inc/usb.h"
- 378              		.file 20 "/opt/gcc-arm-none-eabi-9-2020-q2-update/lib/gcc/arm-none-eabi/9.3.1/include/stddef.h"
- 379              		.file 21 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/_types.h"
- 380              		.file 22 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/reent.h"
- 381              		.file 23 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/lock.h"
- 382              		.file 24 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/stdlib.h"
- 383              		.file 25 "ARM_SEGGER_RTT/SEGGER_RTT.h"
- 384              		.file 26 "sensor_device/eeprom.h"
- 385              		.file 27 "Core/Inc/gpio.h"
- 386              		.file 28 "sensor_device/ADXL345.h"
- 387              		.file 29 "diff_signal/diff_signal.h"
-ARM GAS  /tmp/ccl7FMRD.s 			page 16
+ 397              		.file 3 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/machine/_default_types.h"
+ 398              		.file 4 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/_stdint.h"
+ 399              		.file 5 "Drivers/CMSIS/Include/core_cm3.h"
+ 400              		.file 6 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/system_stm32f1xx.h"
+ 401              		.file 7 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xe.h"
+ 402              		.file 8 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_def.h"
+ 403              		.file 9 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h"
+ 404              		.file 10 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc_ex.h"
+ 405              		.file 11 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma.h"
+ 406              		.file 12 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h"
+ 407              		.file 13 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h"
+ 408              		.file 14 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h"
+ 409              		.file 15 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd.h"
+ 410              		.file 16 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h"
+ 411              		.file 17 "Core/Inc/spi.h"
+ 412              		.file 18 "Core/Inc/tim.h"
+ 413              		.file 19 "Core/Inc/usb.h"
+ 414              		.file 20 "/opt/gcc-arm-none-eabi-9-2020-q2-update/lib/gcc/arm-none-eabi/9.3.1/include/stddef.h"
+ 415              		.file 21 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/_types.h"
+ 416              		.file 22 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/reent.h"
+ 417              		.file 23 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/lock.h"
+ 418              		.file 24 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/stdlib.h"
+ 419              		.file 25 "ARM_SEGGER_RTT/SEGGER_RTT.h"
+ 420              		.file 26 "Core/Inc/gpio.h"
+ 421              		.file 27 "sensor_device/ADXL345.h"
+ 422              		.file 28 "diff_signal/diff_signal.h"
+ 423              		.file 29 "sensor_device/DHT22.h"
+ 424              		.file 30 "sensor_device/eeprom.h"
+ARM GAS  /tmp/ccDhf7jq.s 			page 17
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 main.c
-     /tmp/ccl7FMRD.s:16     .text.Error_Handler:0000000000000000 $t
-     /tmp/ccl7FMRD.s:24     .text.Error_Handler:0000000000000000 Error_Handler
-     /tmp/ccl7FMRD.s:57     .rodata.SystemClock_Config.str1.4:0000000000000000 $d
-     /tmp/ccl7FMRD.s:67     .text.SystemClock_Config:0000000000000000 $t
-     /tmp/ccl7FMRD.s:74     .text.SystemClock_Config:0000000000000000 SystemClock_Config
-     /tmp/ccl7FMRD.s:220    .text.SystemClock_Config:000000000000009c $d
-     /tmp/ccl7FMRD.s:227    .rodata.main.str1.4:0000000000000000 $d
-     /tmp/ccl7FMRD.s:237    .text.main:0000000000000000 $t
-     /tmp/ccl7FMRD.s:244    .text.main:0000000000000000 main
-     /tmp/ccl7FMRD.s:352    .text.main:000000000000007c $d
+     /tmp/ccDhf7jq.s:16     .text.Error_Handler:0000000000000000 $t
+     /tmp/ccDhf7jq.s:24     .text.Error_Handler:0000000000000000 Error_Handler
+     /tmp/ccDhf7jq.s:57     .rodata.SystemClock_Config.str1.4:0000000000000000 $d
+     /tmp/ccDhf7jq.s:67     .text.SystemClock_Config:0000000000000000 $t
+     /tmp/ccDhf7jq.s:74     .text.SystemClock_Config:0000000000000000 SystemClock_Config
+     /tmp/ccDhf7jq.s:220    .text.SystemClock_Config:000000000000009c $d
+     /tmp/ccDhf7jq.s:227    .rodata.main.str1.4:0000000000000000 $d
+     /tmp/ccDhf7jq.s:244    .text.main:0000000000000000 $t
+     /tmp/ccDhf7jq.s:251    .text.main:0000000000000000 main
+     /tmp/ccDhf7jq.s:386    .text.main:00000000000000a4 $d
 
 UNDEFINED SYMBOLS
 HAL_RCC_OscConfig
 HAL_RCC_ClockConfig
 HAL_RCCEx_PeriphCLKConfig
 SEGGER_RTT_printf
+__aeabi_f2d
 HAL_Init
 MX_GPIO_Init
 MX_SPI2_Init
@@ -906,8 +959,7 @@ MX_TIM3_Init
 MX_TIM8_Init
 ADXL345_Init
 DiffSignal_Init
-EEPROM_Init
-EEPROM_EraseByte
 HAL_Delay
-EEPROM_WriteByte
-EEPROM_ReadByte
+DHT22_Init
+EEPROM_Init
+DHT22_ReadData

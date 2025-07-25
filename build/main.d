@@ -32,7 +32,7 @@ build/main.o: Core/Src/main.c Core/Inc/main.h \
  ARM_SEGGER_RTT/SEGGER_RTT.h ARM_SEGGER_RTT/SEGGER_RTT_Conf.h \
  sensor_device/DHT22.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio_ex.h Custcom_Pin.h \
- Core/Inc/soft_spi.h sensor_device/eeprom.h
+ sensor_device/eeprom.h
 
 Core/Inc/main.h:
 
@@ -119,7 +119,5 @@ sensor_device/DHT22.h:
 Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio_ex.h:
 
 Custcom_Pin.h:
-
-Core/Inc/soft_spi.h:
 
 sensor_device/eeprom.h:

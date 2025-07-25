@@ -1,5 +1,5 @@
 build/eeprom.o: sensor_device/eeprom.c sensor_device/eeprom.h \
- Core/Inc/soft_spi.h Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h \
+ Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h \
  Core/Inc/stm32f1xx_hal_conf.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_def.h \
@@ -27,11 +27,10 @@ build/eeprom.o: sensor_device/eeprom.c sensor_device/eeprom.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h \
- diff_signal/diff_signal.h Core/Inc/main.h
+ diff_signal/diff_signal.h Core/Inc/main.h ARM_SEGGER_RTT/SEGGER_RTT.h \
+ ARM_SEGGER_RTT/SEGGER_RTT_Conf.h
 
 sensor_device/eeprom.h:
-
-Core/Inc/soft_spi.h:
 
 Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h:
 
@@ -96,3 +95,7 @@ Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h:
 diff_signal/diff_signal.h:
 
 Core/Inc/main.h:
+
+ARM_SEGGER_RTT/SEGGER_RTT.h:
+
+ARM_SEGGER_RTT/SEGGER_RTT_Conf.h:

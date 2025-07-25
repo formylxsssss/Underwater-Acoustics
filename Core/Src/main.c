@@ -31,8 +31,6 @@
 #include "diff_signal.h"
 #include "SEGGER_RTT.h"
 #include "Custcom_Pin.h"
-#include "soft_spi.h"
-#include "soft_spi.h"
 #include "eeprom.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -85,7 +83,6 @@ int main(void)
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
   myprintf("hal_init success\n");
-  __HAL_AFIO_REMAP_SWJ_NOJTAG();
   SystemClock_Config();
   myprintf("systemclock init success\n");
   /* USER CODE BEGIN Init */
@@ -98,6 +95,7 @@ int main(void)
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
+  __HAL_AFIO_REMAP_SWJ_NOJTAG();
   MX_GPIO_Init();
   MX_SPI2_Init();
   MX_TIM1_Init();
@@ -106,36 +104,38 @@ int main(void)
   MX_TIM8_Init();
   ADXL345_Init();
   DiffSignal_Init();
+
+  HAL_Delay(100);
+  DHT22_Init();
   EEPROM_Init();
   myprintf("peripheral init success\n");
+  HAL_Delay(2000);
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
 
-
-
   /* USER CODE BEGIN WHILE */
   // float x,y,z = 0;
   // uint8_t err_code = 0x00;
   float hum, temp = 0;
+  uint8_t buff[10] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a};
+  uint8_t rev_buf[10] = {0x00};
+  uint8_t dht22_read_error_code = 0x00; 
   while (1)
   {
+    
+    dht22_read_error_code = DHT22_ReadData(&temp, &hum);
+    myprintf("dht22_read_code_error is %d\n",dht22_read_error_code);
+    myprintf("temp%fhum%f\n",temp,hum);
+    //     EEPROM_WriteBuffer(0x00,buff,10);
 
-    // HAL_Delay(10); // 给 EEPROM 一点时间写入完成
-    // uint16_t read_val = EEPROM_ReadWord(0x00);
-    EEPROM_EraseByte(0x10);
-HAL_Delay(5);
-EEPROM_WriteByte(0x10, 0xAB);
-HAL_Delay(5);
-uint8_t value = EEPROM_ReadByte(0x10);
-// myprintf("Read value = 0x%02X\n", value);
-    // HAL_Delay(5);
-    // EEPROM_WriteByte(0x10, 0xAB);
-    // HAL_Delay(5);
-    // uint8_t value = EEPROM_ReadByte(0x10);
-    // myprintf("value is %x\n", value);
+    // EEPROM_ReadBuffer(0x00,rev_buf,10);
+    // for(int i =0;i<10;i++)
+    // {
+    //   myprintf("buf is %x\n",rev_buf[i]);
+    // }
     HAL_Delay(1000);
     /* USER CODE END WHILE */
     /* USER CODE BEGIN 3 */
