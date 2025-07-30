@@ -136,7 +136,7 @@ int main(void)
     // {
     //   myprintf("buf is %x\n",rev_buf[i]);
     // }
-    HAL_Delay(1000);
+    HAL_Delay(3000);
     /* USER CODE END WHILE */
     /* USER CODE BEGIN 3 */
   }

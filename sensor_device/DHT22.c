@@ -71,6 +71,7 @@ static uint8_t DHT22_CheckResponse(void)
         if (++t > 100) return 0;
         Delay_us(1);
     }
+    myprintf("tsssss is %d\n",t);
     return 1;
 }
 
@@ -93,7 +94,6 @@ static uint8_t DHT22_ReadBit(void)
     }
     // 高电平持续时间 > 40us 判为“1”
     if (t > 20) bit = 1;
-    myprintf("t is %d\n",t);
     return bit;
 }
 
@@ -120,6 +120,7 @@ uint8_t DHT22_ReadData(float *temperature, float *humidity)
 
     DHT22_StartSignal();
     if (!DHT22_CheckResponse()) return 1;
+    DWT_Delay_us(50);
 
     // 依次读取 5 个字节：湿度高、湿度低、温度高、温度低、校验
     for (uint8_t i = 0; i < 5; i++)

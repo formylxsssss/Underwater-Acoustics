@@ -1,4 +1,4 @@
-ARM GAS  /tmp/cc9Te01Q.s 			page 1
+ARM GAS  /tmp/ccZHhLG5.s 			page 1
 
 
    1              		.cpu cortex-m3
@@ -58,7 +58,7 @@ ARM GAS  /tmp/cc9Te01Q.s 			page 1
   41 0006 0093     		str	r3, [sp]
   16:sensor_device/DHT22.c ****     GPIO_Init.Mode  = GPIO_MODE_OUTPUT_OD;
   42              		.loc 1 16 5 is_stmt 1 view .LVU4
-ARM GAS  /tmp/cc9Te01Q.s 			page 2
+ARM GAS  /tmp/ccZHhLG5.s 			page 2
 
 
   43              		.loc 1 16 21 is_stmt 0 view .LVU5
@@ -118,7 +118,7 @@ ARM GAS  /tmp/cc9Te01Q.s 			page 1
   24:sensor_device/DHT22.c ****     GPIO_InitTypeDef GPIO_Init = {0};
   92              		.loc 1 24 5 view .LVU13
   93              		.loc 1 24 22 is_stmt 0 view .LVU14
-ARM GAS  /tmp/cc9Te01Q.s 			page 3
+ARM GAS  /tmp/ccZHhLG5.s 			page 3
 
 
   94 0004 0023     		movs	r3, #0
@@ -178,7 +178,7 @@ ARM GAS  /tmp/cc9Te01Q.s 			page 1
  143              		.cfi_offset 14, -4
    8:sensor_device/DHT22.c **** }
  144              		.loc 1 8 5 is_stmt 1 view .LVU25
-ARM GAS  /tmp/cc9Te01Q.s 			page 4
+ARM GAS  /tmp/ccZHhLG5.s 			page 4
 
 
  145 0002 FFF7FEFF 		bl	DWT_Delay_us
@@ -238,7 +238,7 @@ ARM GAS  /tmp/cc9Te01Q.s 			page 1
  181 0012 4FF44870 		mov	r0, #800
  182 0016 FFF7FEFF 		bl	Delay_us
  183              	.LVL6:
-ARM GAS  /tmp/cc9Te01Q.s 			page 5
+ARM GAS  /tmp/ccZHhLG5.s 			page 5
 
 
   49:sensor_device/DHT22.c ****     HAL_GPIO_WritePin(DHT22_GPIO_Port, DHT22_Pin, GPIO_PIN_SET);
@@ -266,14 +266,14 @@ ARM GAS  /tmp/cc9Te01Q.s 			page 1
  202 0030 00100140 		.word	1073811456
  203              		.cfi_endproc
  204              	.LFE69:
- 206              		.section	.text.DHT22_CheckResponse,"ax",%progbits
+ 206              		.section	.text.DHT22_ReadBit,"ax",%progbits
  207              		.align	1
  208              		.syntax unified
  209              		.thumb
  210              		.thumb_func
  211              		.fpu softvfp
- 213              	DHT22_CheckResponse:
- 214              	.LFB70:
+ 213              	DHT22_ReadBit:
+ 214              	.LFB71:
   53:sensor_device/DHT22.c **** 
   54:sensor_device/DHT22.c **** /**
   55:sensor_device/DHT22.c ****  * @brief  检测传感器应答信号
@@ -281,7 +281,33 @@ ARM GAS  /tmp/cc9Te01Q.s 			page 1
   57:sensor_device/DHT22.c ****  */
   58:sensor_device/DHT22.c **** static uint8_t DHT22_CheckResponse(void)
   59:sensor_device/DHT22.c **** {
- 215              		.loc 1 59 1 is_stmt 1 view -0
+  60:sensor_device/DHT22.c ****     uint32_t t = 0;
+  61:sensor_device/DHT22.c ****     // 等待拉低（≈80us）
+  62:sensor_device/DHT22.c ****     while (HAL_GPIO_ReadPin(DHT22_GPIO_Port, DHT22_Pin) == GPIO_PIN_SET)
+  63:sensor_device/DHT22.c ****     {
+  64:sensor_device/DHT22.c ****         if (++t > 100) return 0;
+  65:sensor_device/DHT22.c ****         Delay_us(1);
+  66:sensor_device/DHT22.c ****     }
+  67:sensor_device/DHT22.c ****     t = 0;
+  68:sensor_device/DHT22.c ****     // 等待拉高（≈80us）
+  69:sensor_device/DHT22.c ****     while (HAL_GPIO_ReadPin(DHT22_GPIO_Port, DHT22_Pin) == GPIO_PIN_RESET)
+  70:sensor_device/DHT22.c ****     {
+  71:sensor_device/DHT22.c ****         if (++t > 100) return 0;
+  72:sensor_device/DHT22.c ****         Delay_us(1);
+  73:sensor_device/DHT22.c ****     }
+  74:sensor_device/DHT22.c ****     myprintf("tsssss is %d\n",t);
+  75:sensor_device/DHT22.c ****     return 1;
+  76:sensor_device/DHT22.c **** }
+ARM GAS  /tmp/ccZHhLG5.s 			page 6
+
+
+  77:sensor_device/DHT22.c **** 
+  78:sensor_device/DHT22.c **** /**
+  79:sensor_device/DHT22.c ****  * @brief  读取 1 bit
+  80:sensor_device/DHT22.c ****  */
+  81:sensor_device/DHT22.c **** static uint8_t DHT22_ReadBit(void)
+  82:sensor_device/DHT22.c **** {
+ 215              		.loc 1 82 1 is_stmt 1 view -0
  216              		.cfi_startproc
  217              		@ args = 0, pretend = 0, frame = 0
  218              		@ frame_needed = 0, uses_anonymous_args = 0
@@ -290,679 +316,718 @@ ARM GAS  /tmp/cc9Te01Q.s 			page 1
  221              		.cfi_def_cfa_offset 8
  222              		.cfi_offset 4, -8
  223              		.cfi_offset 14, -4
-  60:sensor_device/DHT22.c ****     uint32_t t = 0;
- 224              		.loc 1 60 5 view .LVU36
- 225              	.LVL10:
-  61:sensor_device/DHT22.c ****     // 等待拉低（≈80us）
-  62:sensor_device/DHT22.c ****     while (HAL_GPIO_ReadPin(DHT22_GPIO_Port, DHT22_Pin) == GPIO_PIN_SET)
- 226              		.loc 1 62 5 view .LVU37
-  60:sensor_device/DHT22.c ****     uint32_t t = 0;
- 227              		.loc 1 60 14 is_stmt 0 view .LVU38
-ARM GAS  /tmp/cc9Te01Q.s 			page 6
-
-
- 228 0002 0024     		movs	r4, #0
- 229              	.LVL11:
- 230              	.L16:
- 231              		.loc 1 62 11 is_stmt 1 view .LVU39
- 232              		.loc 1 62 12 is_stmt 0 view .LVU40
- 233 0004 0421     		movs	r1, #4
- 234 0006 0F48     		ldr	r0, .L25
- 235 0008 FFF7FEFF 		bl	HAL_GPIO_ReadPin
- 236              	.LVL12:
- 237              		.loc 1 62 11 view .LVU41
- 238 000c 0128     		cmp	r0, #1
- 239 000e 06D1     		bne	.L23
-  63:sensor_device/DHT22.c ****     {
-  64:sensor_device/DHT22.c ****         if (++t > 100) return 0;
- 240              		.loc 1 64 9 is_stmt 1 view .LVU42
- 241              		.loc 1 64 12 is_stmt 0 view .LVU43
- 242 0010 0134     		adds	r4, r4, #1
- 243              	.LVL13:
- 244              		.loc 1 64 12 view .LVU44
- 245 0012 642C     		cmp	r4, #100
- 246 0014 14D8     		bhi	.L21
-  65:sensor_device/DHT22.c ****         Delay_us(1);
- 247              		.loc 1 65 9 is_stmt 1 view .LVU45
- 248 0016 0120     		movs	r0, #1
- 249 0018 FFF7FEFF 		bl	Delay_us
- 250              	.LVL14:
- 251 001c F2E7     		b	.L16
- 252              	.L23:
-  66:sensor_device/DHT22.c ****     }
-  67:sensor_device/DHT22.c ****     t = 0;
- 253              		.loc 1 67 7 is_stmt 0 view .LVU46
- 254 001e 0024     		movs	r4, #0
- 255              	.LVL15:
- 256              	.L19:
-  68:sensor_device/DHT22.c ****     // 等待拉高（≈80us）
-  69:sensor_device/DHT22.c ****     while (HAL_GPIO_ReadPin(DHT22_GPIO_Port, DHT22_Pin) == GPIO_PIN_RESET)
- 257              		.loc 1 69 11 is_stmt 1 view .LVU47
- 258              		.loc 1 69 12 is_stmt 0 view .LVU48
- 259 0020 0421     		movs	r1, #4
- 260 0022 0848     		ldr	r0, .L25
- 261 0024 FFF7FEFF 		bl	HAL_GPIO_ReadPin
- 262              	.LVL16:
- 263              		.loc 1 69 11 view .LVU49
- 264 0028 0346     		mov	r3, r0
- 265 002a 30B9     		cbnz	r0, .L24
-  70:sensor_device/DHT22.c ****     {
-  71:sensor_device/DHT22.c ****         if (++t > 100) return 0;
- 266              		.loc 1 71 9 is_stmt 1 view .LVU50
- 267              		.loc 1 71 12 is_stmt 0 view .LVU51
- 268 002c 0134     		adds	r4, r4, #1
- 269              	.LVL17:
- 270              		.loc 1 71 12 view .LVU52
- 271 002e 642C     		cmp	r4, #100
- 272 0030 04D8     		bhi	.L17
-  72:sensor_device/DHT22.c ****         Delay_us(1);
- 273              		.loc 1 72 9 is_stmt 1 view .LVU53
- 274 0032 0120     		movs	r0, #1
-ARM GAS  /tmp/cc9Te01Q.s 			page 7
-
-
- 275 0034 FFF7FEFF 		bl	Delay_us
- 276              	.LVL18:
- 277 0038 F2E7     		b	.L19
- 278              	.L24:
-  73:sensor_device/DHT22.c ****     }
-  74:sensor_device/DHT22.c ****     return 1;
- 279              		.loc 1 74 12 is_stmt 0 view .LVU54
- 280 003a 0123     		movs	r3, #1
- 281              	.L17:
-  75:sensor_device/DHT22.c **** }
- 282              		.loc 1 75 1 view .LVU55
- 283 003c 1846     		mov	r0, r3
- 284 003e 10BD     		pop	{r4, pc}
- 285              	.LVL19:
- 286              	.L21:
-  64:sensor_device/DHT22.c ****         Delay_us(1);
- 287              		.loc 1 64 31 view .LVU56
- 288 0040 0023     		movs	r3, #0
- 289 0042 FBE7     		b	.L17
- 290              	.L26:
- 291              		.align	2
- 292              	.L25:
- 293 0044 00100140 		.word	1073811456
- 294              		.cfi_endproc
- 295              	.LFE70:
- 297              		.section	.rodata.DHT22_ReadBit.str1.4,"aMS",%progbits,1
- 298              		.align	2
- 299              	.LC0:
- 300 0000 74206973 		.ascii	"t is %d\012\000"
- 300      2025640A 
- 300      00
- 301              		.section	.text.DHT22_ReadBit,"ax",%progbits
- 302              		.align	1
- 303              		.syntax unified
- 304              		.thumb
- 305              		.thumb_func
- 306              		.fpu softvfp
- 308              	DHT22_ReadBit:
- 309              	.LFB71:
-  76:sensor_device/DHT22.c **** 
-  77:sensor_device/DHT22.c **** /**
-  78:sensor_device/DHT22.c ****  * @brief  读取 1 bit
-  79:sensor_device/DHT22.c ****  */
-  80:sensor_device/DHT22.c **** static uint8_t DHT22_ReadBit(void)
-  81:sensor_device/DHT22.c **** {
- 310              		.loc 1 81 1 is_stmt 1 view -0
- 311              		.cfi_startproc
- 312              		@ args = 0, pretend = 0, frame = 0
- 313              		@ frame_needed = 0, uses_anonymous_args = 0
- 314 0000 38B5     		push	{r3, r4, r5, lr}
- 315              	.LCFI9:
- 316              		.cfi_def_cfa_offset 16
- 317              		.cfi_offset 3, -16
- 318              		.cfi_offset 4, -12
- 319              		.cfi_offset 5, -8
- 320              		.cfi_offset 14, -4
- 321              	.L28:
-ARM GAS  /tmp/cc9Te01Q.s 			page 8
-
-
-  82:sensor_device/DHT22.c ****     uint8_t bit = 0;
-  83:sensor_device/DHT22.c ****     uint32_t t = 0;
-  84:sensor_device/DHT22.c **** 
-  85:sensor_device/DHT22.c ****     // 等待低电平结束 (~50us)
-  86:sensor_device/DHT22.c ****     while (HAL_GPIO_ReadPin(DHT22_GPIO_Port, DHT22_Pin) == GPIO_PIN_RESET)
+ 224              	.L16:
+  83:sensor_device/DHT22.c ****     uint8_t bit = 0;
+  84:sensor_device/DHT22.c ****     uint32_t t = 0;
+  85:sensor_device/DHT22.c **** 
+  86:sensor_device/DHT22.c ****     // 等待低电平结束 (~50us)
+  87:sensor_device/DHT22.c ****     while (HAL_GPIO_ReadPin(DHT22_GPIO_Port, DHT22_Pin) == GPIO_PIN_RESET)
+  88:sensor_device/DHT22.c ****         ;
+ 225              		.loc 1 88 9 discriminator 1 view .LVU36
   87:sensor_device/DHT22.c ****         ;
- 322              		.loc 1 87 9 discriminator 1 view .LVU58
-  86:sensor_device/DHT22.c ****         ;
- 323              		.loc 1 86 11 discriminator 1 view .LVU59
-  86:sensor_device/DHT22.c ****         ;
- 324              		.loc 1 86 12 is_stmt 0 discriminator 1 view .LVU60
- 325 0002 0421     		movs	r1, #4
- 326 0004 0F48     		ldr	r0, .L35
- 327 0006 FFF7FEFF 		bl	HAL_GPIO_ReadPin
- 328              	.LVL20:
-  86:sensor_device/DHT22.c ****         ;
- 329              		.loc 1 86 11 discriminator 1 view .LVU61
- 330 000a 0028     		cmp	r0, #0
- 331 000c F9D0     		beq	.L28
-  83:sensor_device/DHT22.c **** 
- 332              		.loc 1 83 14 view .LVU62
- 333 000e 0024     		movs	r4, #0
- 334              	.L29:
- 335              	.LVL21:
-  88:sensor_device/DHT22.c ****     // 计时高电平长度
-  89:sensor_device/DHT22.c ****     while (HAL_GPIO_ReadPin(DHT22_GPIO_Port, DHT22_Pin) == GPIO_PIN_SET)
- 336              		.loc 1 89 11 is_stmt 1 view .LVU63
- 337              		.loc 1 89 12 is_stmt 0 view .LVU64
- 338 0010 0421     		movs	r1, #4
- 339 0012 0C48     		ldr	r0, .L35
- 340 0014 FFF7FEFF 		bl	HAL_GPIO_ReadPin
- 341              	.LVL22:
- 342              		.loc 1 89 11 view .LVU65
- 343 0018 0128     		cmp	r0, #1
- 344 001a 06D1     		bne	.L30
-  90:sensor_device/DHT22.c ****     {
-  91:sensor_device/DHT22.c ****         if (++t > 100) break;
- 345              		.loc 1 91 9 is_stmt 1 view .LVU66
- 346              		.loc 1 91 12 is_stmt 0 view .LVU67
- 347 001c 0134     		adds	r4, r4, #1
- 348              	.LVL23:
- 349              		.loc 1 91 12 view .LVU68
- 350 001e 642C     		cmp	r4, #100
- 351 0020 03D8     		bhi	.L30
-  92:sensor_device/DHT22.c ****         Delay_us(1);
- 352              		.loc 1 92 9 is_stmt 1 view .LVU69
- 353 0022 0120     		movs	r0, #1
- 354 0024 FFF7FEFF 		bl	Delay_us
- 355              	.LVL24:
- 356 0028 F2E7     		b	.L29
- 357              	.L30:
-  93:sensor_device/DHT22.c ****     }
-  94:sensor_device/DHT22.c ****     // 高电平持续时间 > 40us 判为“1”
-  95:sensor_device/DHT22.c ****     if (t > 20) bit = 1;
- 358              		.loc 1 95 5 view .LVU70
- 359              		.loc 1 95 8 is_stmt 0 view .LVU71
- 360 002a 142C     		cmp	r4, #20
-ARM GAS  /tmp/cc9Te01Q.s 			page 9
+ 226              		.loc 1 87 11 discriminator 1 view .LVU37
+  87:sensor_device/DHT22.c ****         ;
+ 227              		.loc 1 87 12 is_stmt 0 discriminator 1 view .LVU38
+ 228 0002 0421     		movs	r1, #4
+ 229 0004 0C48     		ldr	r0, .L23
+ 230 0006 FFF7FEFF 		bl	HAL_GPIO_ReadPin
+ 231              	.LVL10:
+  87:sensor_device/DHT22.c ****         ;
+ 232              		.loc 1 87 11 discriminator 1 view .LVU39
+ 233 000a 0028     		cmp	r0, #0
+ 234 000c F9D0     		beq	.L16
+  84:sensor_device/DHT22.c **** 
+ 235              		.loc 1 84 14 view .LVU40
+ 236 000e 0024     		movs	r4, #0
+ 237              	.L17:
+ 238              	.LVL11:
+  89:sensor_device/DHT22.c ****     // 计时高电平长度
+  90:sensor_device/DHT22.c ****     while (HAL_GPIO_ReadPin(DHT22_GPIO_Port, DHT22_Pin) == GPIO_PIN_SET)
+ 239              		.loc 1 90 11 is_stmt 1 view .LVU41
+ 240              		.loc 1 90 12 is_stmt 0 view .LVU42
+ 241 0010 0421     		movs	r1, #4
+ 242 0012 0948     		ldr	r0, .L23
+ 243 0014 FFF7FEFF 		bl	HAL_GPIO_ReadPin
+ 244              	.LVL12:
+ 245              		.loc 1 90 11 view .LVU43
+ 246 0018 0128     		cmp	r0, #1
+ 247 001a 06D1     		bne	.L18
+  91:sensor_device/DHT22.c ****     {
+  92:sensor_device/DHT22.c ****         if (++t > 100) break;
+ 248              		.loc 1 92 9 is_stmt 1 view .LVU44
+ 249              		.loc 1 92 12 is_stmt 0 view .LVU45
+ 250 001c 0134     		adds	r4, r4, #1
+ 251              	.LVL13:
+ARM GAS  /tmp/ccZHhLG5.s 			page 7
 
 
- 361 002c 07D8     		bhi	.L33
-  82:sensor_device/DHT22.c ****     uint32_t t = 0;
- 362              		.loc 1 82 13 view .LVU72
- 363 002e 0025     		movs	r5, #0
- 364              	.L32:
- 365              	.LVL25:
-  96:sensor_device/DHT22.c ****     myprintf("t is %d\n",t);
- 366              		.loc 1 96 5 is_stmt 1 view .LVU73
- 367 0030 2246     		mov	r2, r4
- 368 0032 0549     		ldr	r1, .L35+4
- 369 0034 0020     		movs	r0, #0
- 370 0036 FFF7FEFF 		bl	SEGGER_RTT_printf
- 371              	.LVL26:
+ 252              		.loc 1 92 12 view .LVU46
+ 253 001e 642C     		cmp	r4, #100
+ 254 0020 03D8     		bhi	.L18
+  93:sensor_device/DHT22.c ****         Delay_us(1);
+ 255              		.loc 1 93 9 is_stmt 1 view .LVU47
+ 256 0022 0120     		movs	r0, #1
+ 257 0024 FFF7FEFF 		bl	Delay_us
+ 258              	.LVL14:
+ 259 0028 F2E7     		b	.L17
+ 260              	.L18:
+  94:sensor_device/DHT22.c ****     }
+  95:sensor_device/DHT22.c ****     // 高电平持续时间 > 40us 判为“1”
+  96:sensor_device/DHT22.c ****     if (t > 20) bit = 1;
+ 261              		.loc 1 96 5 view .LVU48
+ 262              		.loc 1 96 8 is_stmt 0 view .LVU49
+ 263 002a 142C     		cmp	r4, #20
+ 264 002c 01D8     		bhi	.L21
+  83:sensor_device/DHT22.c ****     uint32_t t = 0;
+ 265              		.loc 1 83 13 view .LVU50
+ 266 002e 0020     		movs	r0, #0
+ 267              	.L20:
+ 268              	.LVL15:
   97:sensor_device/DHT22.c ****     return bit;
- 372              		.loc 1 97 5 view .LVU74
+ 269              		.loc 1 97 5 is_stmt 1 view .LVU51
   98:sensor_device/DHT22.c **** }
- 373              		.loc 1 98 1 is_stmt 0 view .LVU75
- 374 003a 2846     		mov	r0, r5
- 375 003c 38BD     		pop	{r3, r4, r5, pc}
- 376              	.LVL27:
- 377              	.L33:
-  95:sensor_device/DHT22.c ****     myprintf("t is %d\n",t);
- 378              		.loc 1 95 21 view .LVU76
- 379 003e 0125     		movs	r5, #1
- 380 0040 F6E7     		b	.L32
- 381              	.L36:
- 382 0042 00BF     		.align	2
- 383              	.L35:
- 384 0044 00100140 		.word	1073811456
- 385 0048 00000000 		.word	.LC0
- 386              		.cfi_endproc
- 387              	.LFE71:
- 389              		.section	.text.DHT22_ReadByte,"ax",%progbits
- 390              		.align	1
- 391              		.syntax unified
- 392              		.thumb
- 393              		.thumb_func
- 394              		.fpu softvfp
- 396              	DHT22_ReadByte:
- 397              	.LFB72:
+ 270              		.loc 1 98 1 is_stmt 0 view .LVU52
+ 271 0030 10BD     		pop	{r4, pc}
+ 272              	.LVL16:
+ 273              	.L21:
+  96:sensor_device/DHT22.c ****     return bit;
+ 274              		.loc 1 96 21 view .LVU53
+ 275 0032 0120     		movs	r0, #1
+ 276 0034 FCE7     		b	.L20
+ 277              	.L24:
+ 278 0036 00BF     		.align	2
+ 279              	.L23:
+ 280 0038 00100140 		.word	1073811456
+ 281              		.cfi_endproc
+ 282              	.LFE71:
+ 284              		.section	.text.DHT22_ReadByte,"ax",%progbits
+ 285              		.align	1
+ 286              		.syntax unified
+ 287              		.thumb
+ 288              		.thumb_func
+ 289              		.fpu softvfp
+ 291              	DHT22_ReadByte:
+ 292              	.LFB72:
   99:sensor_device/DHT22.c **** 
  100:sensor_device/DHT22.c **** /**
  101:sensor_device/DHT22.c ****  * @brief  读取 1 字节
  102:sensor_device/DHT22.c ****  */
  103:sensor_device/DHT22.c **** static uint8_t DHT22_ReadByte(void)
  104:sensor_device/DHT22.c **** {
- 398              		.loc 1 104 1 is_stmt 1 view -0
- 399              		.cfi_startproc
- 400              		@ args = 0, pretend = 0, frame = 0
- 401              		@ frame_needed = 0, uses_anonymous_args = 0
- 402 0000 38B5     		push	{r3, r4, r5, lr}
- 403              	.LCFI10:
- 404              		.cfi_def_cfa_offset 16
- 405              		.cfi_offset 3, -16
- 406              		.cfi_offset 4, -12
- 407              		.cfi_offset 5, -8
- 408              		.cfi_offset 14, -4
-ARM GAS  /tmp/cc9Te01Q.s 			page 10
+ 293              		.loc 1 104 1 is_stmt 1 view -0
+ 294              		.cfi_startproc
+ 295              		@ args = 0, pretend = 0, frame = 0
+ 296              		@ frame_needed = 0, uses_anonymous_args = 0
+ARM GAS  /tmp/ccZHhLG5.s 			page 8
 
 
+ 297 0000 38B5     		push	{r3, r4, r5, lr}
+ 298              	.LCFI9:
+ 299              		.cfi_def_cfa_offset 16
+ 300              		.cfi_offset 3, -16
+ 301              		.cfi_offset 4, -12
+ 302              		.cfi_offset 5, -8
+ 303              		.cfi_offset 14, -4
  105:sensor_device/DHT22.c ****     uint8_t byte = 0;
- 409              		.loc 1 105 5 view .LVU78
- 410              	.LVL28:
+ 304              		.loc 1 105 5 view .LVU55
+ 305              	.LVL17:
  106:sensor_device/DHT22.c ****     for (int8_t i = 7; i >= 0; i--)
- 411              		.loc 1 106 5 view .LVU79
- 412              	.LBB2:
- 413              		.loc 1 106 10 view .LVU80
- 414              		.loc 1 106 17 is_stmt 0 view .LVU81
- 415 0002 0725     		movs	r5, #7
- 416              	.LBE2:
+ 306              		.loc 1 106 5 view .LVU56
+ 307              	.LBB2:
+ 308              		.loc 1 106 10 view .LVU57
+ 309              		.loc 1 106 17 is_stmt 0 view .LVU58
+ 310 0002 0725     		movs	r5, #7
+ 311              	.LBE2:
  105:sensor_device/DHT22.c ****     uint8_t byte = 0;
- 417              		.loc 1 105 13 view .LVU82
- 418 0004 0020     		movs	r0, #0
- 419              	.LBB3:
- 420              		.loc 1 106 5 view .LVU83
- 421 0006 07E0     		b	.L38
- 422              	.LVL29:
- 423              	.L39:
+ 312              		.loc 1 105 13 view .LVU59
+ 313 0004 0020     		movs	r0, #0
+ 314              	.LBB3:
+ 315              		.loc 1 106 5 view .LVU60
+ 316 0006 07E0     		b	.L26
+ 317              	.LVL18:
+ 318              	.L27:
  107:sensor_device/DHT22.c ****     {
  108:sensor_device/DHT22.c ****         byte <<= 1;
- 424              		.loc 1 108 9 is_stmt 1 discriminator 3 view .LVU84
- 425              		.loc 1 108 14 is_stmt 0 discriminator 3 view .LVU85
- 426 0008 4000     		lsls	r0, r0, #1
- 427              	.LVL30:
- 428              		.loc 1 108 14 discriminator 3 view .LVU86
- 429 000a C4B2     		uxtb	r4, r0
- 430              	.LVL31:
+ 319              		.loc 1 108 9 is_stmt 1 discriminator 3 view .LVU61
+ 320              		.loc 1 108 14 is_stmt 0 discriminator 3 view .LVU62
+ 321 0008 4000     		lsls	r0, r0, #1
+ 322              	.LVL19:
+ 323              		.loc 1 108 14 discriminator 3 view .LVU63
+ 324 000a C4B2     		uxtb	r4, r0
+ 325              	.LVL20:
  109:sensor_device/DHT22.c ****         byte |= DHT22_ReadBit();
- 431              		.loc 1 109 9 is_stmt 1 discriminator 3 view .LVU87
- 432              		.loc 1 109 17 is_stmt 0 discriminator 3 view .LVU88
- 433 000c FFF7FEFF 		bl	DHT22_ReadBit
- 434              	.LVL32:
- 435              		.loc 1 109 14 discriminator 3 view .LVU89
- 436 0010 2043     		orrs	r0, r0, r4
- 437 0012 C0B2     		uxtb	r0, r0
- 438              	.LVL33:
+ 326              		.loc 1 109 9 is_stmt 1 discriminator 3 view .LVU64
+ 327              		.loc 1 109 17 is_stmt 0 discriminator 3 view .LVU65
+ 328 000c FFF7FEFF 		bl	DHT22_ReadBit
+ 329              	.LVL21:
+ 330              		.loc 1 109 14 discriminator 3 view .LVU66
+ 331 0010 2043     		orrs	r0, r0, r4
+ 332 0012 C0B2     		uxtb	r0, r0
+ 333              	.LVL22:
  106:sensor_device/DHT22.c ****     for (int8_t i = 7; i >= 0; i--)
- 439              		.loc 1 106 32 is_stmt 1 discriminator 3 view .LVU90
+ 334              		.loc 1 106 32 is_stmt 1 discriminator 3 view .LVU67
  106:sensor_device/DHT22.c ****     for (int8_t i = 7; i >= 0; i--)
- 440              		.loc 1 106 33 is_stmt 0 discriminator 3 view .LVU91
- 441 0014 013D     		subs	r5, r5, #1
- 442              	.LVL34:
+ 335              		.loc 1 106 33 is_stmt 0 discriminator 3 view .LVU68
+ 336 0014 013D     		subs	r5, r5, #1
+ 337              	.LVL23:
  106:sensor_device/DHT22.c ****     for (int8_t i = 7; i >= 0; i--)
- 443              		.loc 1 106 33 discriminator 3 view .LVU92
- 444 0016 6DB2     		sxtb	r5, r5
- 445              	.LVL35:
- 446              	.L38:
+ 338              		.loc 1 106 33 discriminator 3 view .LVU69
+ 339 0016 6DB2     		sxtb	r5, r5
+ 340              	.LVL24:
+ 341              	.L26:
  106:sensor_device/DHT22.c ****     for (int8_t i = 7; i >= 0; i--)
- 447              		.loc 1 106 24 is_stmt 1 discriminator 1 view .LVU93
+ 342              		.loc 1 106 24 is_stmt 1 discriminator 1 view .LVU70
  106:sensor_device/DHT22.c ****     for (int8_t i = 7; i >= 0; i--)
- 448              		.loc 1 106 5 is_stmt 0 discriminator 1 view .LVU94
- 449 0018 002D     		cmp	r5, #0
- 450 001a F5DA     		bge	.L39
- 451              	.LBE3:
+ARM GAS  /tmp/ccZHhLG5.s 			page 9
+
+
+ 343              		.loc 1 106 5 is_stmt 0 discriminator 1 view .LVU71
+ 344 0018 002D     		cmp	r5, #0
+ 345 001a F5DA     		bge	.L27
+ 346              	.LBE3:
  110:sensor_device/DHT22.c ****     }
  111:sensor_device/DHT22.c ****     return byte;
  112:sensor_device/DHT22.c **** }
-ARM GAS  /tmp/cc9Te01Q.s 			page 11
+ 347              		.loc 1 112 1 view .LVU72
+ 348 001c 38BD     		pop	{r3, r4, r5, pc}
+ 349              		.loc 1 112 1 view .LVU73
+ 350              		.cfi_endproc
+ 351              	.LFE72:
+ 353              		.section	.rodata.DHT22_CheckResponse.str1.4,"aMS",%progbits,1
+ 354              		.align	2
+ 355              	.LC0:
+ 356 0000 74737373 		.ascii	"tsssss is %d\012\000"
+ 356      73732069 
+ 356      73202564 
+ 356      0A00
+ 357              		.section	.text.DHT22_CheckResponse,"ax",%progbits
+ 358              		.align	1
+ 359              		.syntax unified
+ 360              		.thumb
+ 361              		.thumb_func
+ 362              		.fpu softvfp
+ 364              	DHT22_CheckResponse:
+ 365              	.LFB70:
+  59:sensor_device/DHT22.c ****     uint32_t t = 0;
+ 366              		.loc 1 59 1 is_stmt 1 view -0
+ 367              		.cfi_startproc
+ 368              		@ args = 0, pretend = 0, frame = 0
+ 369              		@ frame_needed = 0, uses_anonymous_args = 0
+ 370 0000 10B5     		push	{r4, lr}
+ 371              	.LCFI10:
+ 372              		.cfi_def_cfa_offset 8
+ 373              		.cfi_offset 4, -8
+ 374              		.cfi_offset 14, -4
+  60:sensor_device/DHT22.c ****     // 等待拉低（≈80us）
+ 375              		.loc 1 60 5 view .LVU75
+ 376              	.LVL25:
+  62:sensor_device/DHT22.c ****     {
+ 377              		.loc 1 62 5 view .LVU76
+  60:sensor_device/DHT22.c ****     // 等待拉低（≈80us）
+ 378              		.loc 1 60 14 is_stmt 0 view .LVU77
+ 379 0002 0024     		movs	r4, #0
+ 380              	.LVL26:
+ 381              	.L30:
+  62:sensor_device/DHT22.c ****     {
+ 382              		.loc 1 62 11 is_stmt 1 view .LVU78
+  62:sensor_device/DHT22.c ****     {
+ 383              		.loc 1 62 12 is_stmt 0 view .LVU79
+ 384 0004 0421     		movs	r1, #4
+ 385 0006 1248     		ldr	r0, .L39
+ 386 0008 FFF7FEFF 		bl	HAL_GPIO_ReadPin
+ 387              	.LVL27:
+  62:sensor_device/DHT22.c ****     {
+ 388              		.loc 1 62 11 view .LVU80
+ARM GAS  /tmp/ccZHhLG5.s 			page 10
 
 
- 452              		.loc 1 112 1 view .LVU95
- 453 001c 38BD     		pop	{r3, r4, r5, pc}
- 454              		.loc 1 112 1 view .LVU96
- 455              		.cfi_endproc
- 456              	.LFE72:
- 458              		.section	.text.DHT22_Init,"ax",%progbits
- 459              		.align	1
- 460              		.global	DHT22_Init
- 461              		.syntax unified
- 462              		.thumb
- 463              		.thumb_func
- 464              		.fpu softvfp
- 466              	DHT22_Init:
- 467              	.LFB68:
+ 389 000c 0128     		cmp	r0, #1
+ 390 000e 06D1     		bne	.L37
+  64:sensor_device/DHT22.c ****         Delay_us(1);
+ 391              		.loc 1 64 9 is_stmt 1 view .LVU81
+  64:sensor_device/DHT22.c ****         Delay_us(1);
+ 392              		.loc 1 64 12 is_stmt 0 view .LVU82
+ 393 0010 0134     		adds	r4, r4, #1
+ 394              	.LVL28:
+  64:sensor_device/DHT22.c ****         Delay_us(1);
+ 395              		.loc 1 64 12 view .LVU83
+ 396 0012 642C     		cmp	r4, #100
+ 397 0014 19D8     		bhi	.L35
+  65:sensor_device/DHT22.c ****     }
+ 398              		.loc 1 65 9 is_stmt 1 view .LVU84
+ 399 0016 0120     		movs	r0, #1
+ 400 0018 FFF7FEFF 		bl	Delay_us
+ 401              	.LVL29:
+ 402 001c F2E7     		b	.L30
+ 403              	.L37:
+  67:sensor_device/DHT22.c ****     // 等待拉高（≈80us）
+ 404              		.loc 1 67 7 is_stmt 0 view .LVU85
+ 405 001e 0024     		movs	r4, #0
+ 406              	.LVL30:
+ 407              	.L33:
+  69:sensor_device/DHT22.c ****     {
+ 408              		.loc 1 69 11 is_stmt 1 view .LVU86
+  69:sensor_device/DHT22.c ****     {
+ 409              		.loc 1 69 12 is_stmt 0 view .LVU87
+ 410 0020 0421     		movs	r1, #4
+ 411 0022 0B48     		ldr	r0, .L39
+ 412 0024 FFF7FEFF 		bl	HAL_GPIO_ReadPin
+ 413              	.LVL31:
+  69:sensor_device/DHT22.c ****     {
+ 414              		.loc 1 69 11 view .LVU88
+ 415 0028 0346     		mov	r3, r0
+ 416 002a 30B9     		cbnz	r0, .L38
+  71:sensor_device/DHT22.c ****         Delay_us(1);
+ 417              		.loc 1 71 9 is_stmt 1 view .LVU89
+  71:sensor_device/DHT22.c ****         Delay_us(1);
+ 418              		.loc 1 71 12 is_stmt 0 view .LVU90
+ 419 002c 0134     		adds	r4, r4, #1
+ 420              	.LVL32:
+  71:sensor_device/DHT22.c ****         Delay_us(1);
+ 421              		.loc 1 71 12 view .LVU91
+ 422 002e 642C     		cmp	r4, #100
+ 423 0030 09D8     		bhi	.L31
+  72:sensor_device/DHT22.c ****     }
+ 424              		.loc 1 72 9 is_stmt 1 view .LVU92
+ 425 0032 0120     		movs	r0, #1
+ 426 0034 FFF7FEFF 		bl	Delay_us
+ 427              	.LVL33:
+ 428 0038 F2E7     		b	.L33
+ 429              	.L38:
+  74:sensor_device/DHT22.c ****     return 1;
+ 430              		.loc 1 74 5 view .LVU93
+ 431 003a 2246     		mov	r2, r4
+ 432 003c 0549     		ldr	r1, .L39+4
+ARM GAS  /tmp/ccZHhLG5.s 			page 11
+
+
+ 433 003e 0020     		movs	r0, #0
+ 434 0040 FFF7FEFF 		bl	SEGGER_RTT_printf
+ 435              	.LVL34:
+  75:sensor_device/DHT22.c **** }
+ 436              		.loc 1 75 5 view .LVU94
+  75:sensor_device/DHT22.c **** }
+ 437              		.loc 1 75 12 is_stmt 0 view .LVU95
+ 438 0044 0123     		movs	r3, #1
+ 439              	.L31:
+  76:sensor_device/DHT22.c **** 
+ 440              		.loc 1 76 1 view .LVU96
+ 441 0046 1846     		mov	r0, r3
+ 442 0048 10BD     		pop	{r4, pc}
+ 443              	.LVL35:
+ 444              	.L35:
+  64:sensor_device/DHT22.c ****         Delay_us(1);
+ 445              		.loc 1 64 31 view .LVU97
+ 446 004a 0023     		movs	r3, #0
+ 447 004c FBE7     		b	.L31
+ 448              	.L40:
+ 449 004e 00BF     		.align	2
+ 450              	.L39:
+ 451 0050 00100140 		.word	1073811456
+ 452 0054 00000000 		.word	.LC0
+ 453              		.cfi_endproc
+ 454              	.LFE70:
+ 456              		.section	.text.DHT22_Init,"ax",%progbits
+ 457              		.align	1
+ 458              		.global	DHT22_Init
+ 459              		.syntax unified
+ 460              		.thumb
+ 461              		.thumb_func
+ 462              		.fpu softvfp
+ 464              	DHT22_Init:
+ 465              	.LFB68:
   35:sensor_device/DHT22.c ****     __HAL_RCC_GPIOC_CLK_ENABLE();
- 468              		.loc 1 35 1 is_stmt 1 view -0
- 469              		.cfi_startproc
- 470              		@ args = 0, pretend = 0, frame = 8
- 471              		@ frame_needed = 0, uses_anonymous_args = 0
- 472 0000 00B5     		push	{lr}
- 473              	.LCFI11:
- 474              		.cfi_def_cfa_offset 4
- 475              		.cfi_offset 14, -4
- 476 0002 83B0     		sub	sp, sp, #12
- 477              	.LCFI12:
- 478              		.cfi_def_cfa_offset 16
+ 466              		.loc 1 35 1 is_stmt 1 view -0
+ 467              		.cfi_startproc
+ 468              		@ args = 0, pretend = 0, frame = 8
+ 469              		@ frame_needed = 0, uses_anonymous_args = 0
+ 470 0000 00B5     		push	{lr}
+ 471              	.LCFI11:
+ 472              		.cfi_def_cfa_offset 4
+ 473              		.cfi_offset 14, -4
+ 474 0002 83B0     		sub	sp, sp, #12
+ 475              	.LCFI12:
+ 476              		.cfi_def_cfa_offset 16
   36:sensor_device/DHT22.c ****     DHT22_Pin_Output();
- 479              		.loc 1 36 5 view .LVU98
- 480              	.LBB4:
+ 477              		.loc 1 36 5 view .LVU99
+ 478              	.LBB4:
   36:sensor_device/DHT22.c ****     DHT22_Pin_Output();
- 481              		.loc 1 36 5 view .LVU99
+ 479              		.loc 1 36 5 view .LVU100
   36:sensor_device/DHT22.c ****     DHT22_Pin_Output();
- 482              		.loc 1 36 5 view .LVU100
- 483 0004 094B     		ldr	r3, .L43
- 484 0006 9A69     		ldr	r2, [r3, #24]
- 485 0008 42F01002 		orr	r2, r2, #16
- 486 000c 9A61     		str	r2, [r3, #24]
+ 480              		.loc 1 36 5 view .LVU101
+ 481 0004 094B     		ldr	r3, .L43
+ 482 0006 9A69     		ldr	r2, [r3, #24]
+ 483 0008 42F01002 		orr	r2, r2, #16
+ARM GAS  /tmp/ccZHhLG5.s 			page 12
+
+
+ 484 000c 9A61     		str	r2, [r3, #24]
   36:sensor_device/DHT22.c ****     DHT22_Pin_Output();
- 487              		.loc 1 36 5 view .LVU101
- 488 000e 9B69     		ldr	r3, [r3, #24]
- 489 0010 03F01003 		and	r3, r3, #16
- 490 0014 0193     		str	r3, [sp, #4]
+ 485              		.loc 1 36 5 view .LVU102
+ 486 000e 9B69     		ldr	r3, [r3, #24]
+ 487 0010 03F01003 		and	r3, r3, #16
+ 488 0014 0193     		str	r3, [sp, #4]
   36:sensor_device/DHT22.c ****     DHT22_Pin_Output();
- 491              		.loc 1 36 5 view .LVU102
- 492 0016 019B     		ldr	r3, [sp, #4]
- 493              	.LBE4:
+ 489              		.loc 1 36 5 view .LVU103
+ 490 0016 019B     		ldr	r3, [sp, #4]
+ 491              	.LBE4:
   36:sensor_device/DHT22.c ****     DHT22_Pin_Output();
- 494              		.loc 1 36 5 view .LVU103
+ 492              		.loc 1 36 5 view .LVU104
   37:sensor_device/DHT22.c ****     HAL_GPIO_WritePin(DHT22_GPIO_Port, DHT22_Pin, GPIO_PIN_SET);
- 495              		.loc 1 37 5 view .LVU104
- 496 0018 FFF7FEFF 		bl	DHT22_Pin_Output
- 497              	.LVL36:
+ 493              		.loc 1 37 5 view .LVU105
+ 494 0018 FFF7FEFF 		bl	DHT22_Pin_Output
+ 495              	.LVL36:
   38:sensor_device/DHT22.c **** }
- 498              		.loc 1 38 5 view .LVU105
- 499 001c 0122     		movs	r2, #1
- 500 001e 0421     		movs	r1, #4
- 501 0020 0348     		ldr	r0, .L43+4
-ARM GAS  /tmp/cc9Te01Q.s 			page 12
-
-
- 502 0022 FFF7FEFF 		bl	HAL_GPIO_WritePin
- 503              	.LVL37:
+ 496              		.loc 1 38 5 view .LVU106
+ 497 001c 0122     		movs	r2, #1
+ 498 001e 0421     		movs	r1, #4
+ 499 0020 0348     		ldr	r0, .L43+4
+ 500 0022 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 501              	.LVL37:
   39:sensor_device/DHT22.c **** 
- 504              		.loc 1 39 1 is_stmt 0 view .LVU106
- 505 0026 03B0     		add	sp, sp, #12
- 506              	.LCFI13:
- 507              		.cfi_def_cfa_offset 4
- 508              		@ sp needed
- 509 0028 5DF804FB 		ldr	pc, [sp], #4
- 510              	.L44:
- 511              		.align	2
- 512              	.L43:
- 513 002c 00100240 		.word	1073876992
- 514 0030 00100140 		.word	1073811456
- 515              		.cfi_endproc
- 516              	.LFE68:
- 518              		.global	__aeabi_i2f
- 519              		.global	__aeabi_fmul
- 520              		.section	.text.DHT22_ReadData,"ax",%progbits
- 521              		.align	1
- 522              		.global	DHT22_ReadData
- 523              		.syntax unified
- 524              		.thumb
- 525              		.thumb_func
- 526              		.fpu softvfp
- 528              	DHT22_ReadData:
- 529              	.LVL38:
- 530              	.LFB73:
+ 502              		.loc 1 39 1 is_stmt 0 view .LVU107
+ 503 0026 03B0     		add	sp, sp, #12
+ 504              	.LCFI13:
+ 505              		.cfi_def_cfa_offset 4
+ 506              		@ sp needed
+ 507 0028 5DF804FB 		ldr	pc, [sp], #4
+ 508              	.L44:
+ 509              		.align	2
+ 510              	.L43:
+ 511 002c 00100240 		.word	1073876992
+ 512 0030 00100140 		.word	1073811456
+ 513              		.cfi_endproc
+ 514              	.LFE68:
+ 516              		.global	__aeabi_i2f
+ 517              		.global	__aeabi_fmul
+ 518              		.section	.text.DHT22_ReadData,"ax",%progbits
+ 519              		.align	1
+ 520              		.global	DHT22_ReadData
+ 521              		.syntax unified
+ 522              		.thumb
+ 523              		.thumb_func
+ 524              		.fpu softvfp
+ 526              	DHT22_ReadData:
+ 527              	.LVL38:
+ 528              	.LFB73:
  113:sensor_device/DHT22.c **** 
  114:sensor_device/DHT22.c **** /**
  115:sensor_device/DHT22.c ****  * @brief  公有接口：读取温度和湿度
  116:sensor_device/DHT22.c ****  */
  117:sensor_device/DHT22.c **** uint8_t DHT22_ReadData(float *temperature, float *humidity)
  118:sensor_device/DHT22.c **** {
- 531              		.loc 1 118 1 is_stmt 1 view -0
- 532              		.cfi_startproc
- 533              		@ args = 0, pretend = 0, frame = 8
- 534              		@ frame_needed = 0, uses_anonymous_args = 0
- 535              		.loc 1 118 1 is_stmt 0 view .LVU108
- 536 0000 F0B5     		push	{r4, r5, r6, r7, lr}
- 537              	.LCFI14:
- 538              		.cfi_def_cfa_offset 20
- 539              		.cfi_offset 4, -20
- 540              		.cfi_offset 5, -16
- 541              		.cfi_offset 6, -12
- 542              		.cfi_offset 7, -8
- 543              		.cfi_offset 14, -4
- 544 0002 83B0     		sub	sp, sp, #12
- 545              	.LCFI15:
- 546              		.cfi_def_cfa_offset 32
- 547 0004 0646     		mov	r6, r0
- 548 0006 0D46     		mov	r5, r1
+ 529              		.loc 1 118 1 is_stmt 1 view -0
+ 530              		.cfi_startproc
+ARM GAS  /tmp/ccZHhLG5.s 			page 13
+
+
+ 531              		@ args = 0, pretend = 0, frame = 8
+ 532              		@ frame_needed = 0, uses_anonymous_args = 0
+ 533              		.loc 1 118 1 is_stmt 0 view .LVU109
+ 534 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+ 535              	.LCFI14:
+ 536              		.cfi_def_cfa_offset 20
+ 537              		.cfi_offset 4, -20
+ 538              		.cfi_offset 5, -16
+ 539              		.cfi_offset 6, -12
+ 540              		.cfi_offset 7, -8
+ 541              		.cfi_offset 14, -4
+ 542 0002 83B0     		sub	sp, sp, #12
+ 543              	.LCFI15:
+ 544              		.cfi_def_cfa_offset 32
+ 545 0004 0646     		mov	r6, r0
+ 546 0006 0D46     		mov	r5, r1
  119:sensor_device/DHT22.c ****     uint8_t data[5] = {0};
- 549              		.loc 1 119 5 is_stmt 1 view .LVU109
- 550              		.loc 1 119 13 is_stmt 0 view .LVU110
- 551 0008 0023     		movs	r3, #0
- 552 000a 0093     		str	r3, [sp]
-ARM GAS  /tmp/cc9Te01Q.s 			page 13
-
-
- 553 000c 8DF80430 		strb	r3, [sp, #4]
+ 547              		.loc 1 119 5 is_stmt 1 view .LVU110
+ 548              		.loc 1 119 13 is_stmt 0 view .LVU111
+ 549 0008 0023     		movs	r3, #0
+ 550 000a 0093     		str	r3, [sp]
+ 551 000c 8DF80430 		strb	r3, [sp, #4]
  120:sensor_device/DHT22.c **** 
  121:sensor_device/DHT22.c ****     DHT22_StartSignal();
- 554              		.loc 1 121 5 is_stmt 1 view .LVU111
- 555 0010 FFF7FEFF 		bl	DHT22_StartSignal
- 556              	.LVL39:
+ 552              		.loc 1 121 5 is_stmt 1 view .LVU112
+ 553 0010 FFF7FEFF 		bl	DHT22_StartSignal
+ 554              	.LVL39:
  122:sensor_device/DHT22.c ****     if (!DHT22_CheckResponse()) return 1;
- 557              		.loc 1 122 5 view .LVU112
- 558              		.loc 1 122 10 is_stmt 0 view .LVU113
- 559 0014 FFF7FEFF 		bl	DHT22_CheckResponse
- 560              	.LVL40:
- 561              		.loc 1 122 8 view .LVU114
- 562 0018 0028     		cmp	r0, #0
- 563 001a 3DD0     		beq	.L50
- 564              	.LBB5:
- 123:sensor_device/DHT22.c **** 
- 124:sensor_device/DHT22.c ****     // 依次读取 5 个字节：湿度高、湿度低、温度高、温度低、校验
- 125:sensor_device/DHT22.c ****     for (uint8_t i = 0; i < 5; i++)
- 565              		.loc 1 125 18 view .LVU115
- 566 001c 0024     		movs	r4, #0
- 567              	.L47:
- 568              	.LVL41:
- 569              		.loc 1 125 25 is_stmt 1 discriminator 1 view .LVU116
- 570              		.loc 1 125 5 is_stmt 0 discriminator 1 view .LVU117
- 571 001e 042C     		cmp	r4, #4
- 572 0020 08D8     		bhi	.L53
+ 555              		.loc 1 122 5 view .LVU113
+ 556              		.loc 1 122 10 is_stmt 0 view .LVU114
+ 557 0014 FFF7FEFF 		bl	DHT22_CheckResponse
+ 558              	.LVL40:
+ 559              		.loc 1 122 8 view .LVU115
+ 560 0018 10B9     		cbnz	r0, .L53
+ 561              		.loc 1 122 40 view .LVU116
+ 562 001a 0120     		movs	r0, #1
+ 563              	.L46:
+ 123:sensor_device/DHT22.c ****     DWT_Delay_us(50);
+ 124:sensor_device/DHT22.c **** 
+ 125:sensor_device/DHT22.c ****     // 依次读取 5 个字节：湿度高、湿度低、温度高、温度低、校验
+ 126:sensor_device/DHT22.c ****     for (uint8_t i = 0; i < 5; i++)
+ 127:sensor_device/DHT22.c ****     {
+ 128:sensor_device/DHT22.c ****         data[i] = DHT22_ReadByte();
+ 129:sensor_device/DHT22.c ****         // myprintf("read data %x\n",data[i]);
+ 130:sensor_device/DHT22.c ****     }
+ 131:sensor_device/DHT22.c **** 
+ 132:sensor_device/DHT22.c ****     // CRC 校验
+ 133:sensor_device/DHT22.c ****     if (data[4] != ((data[0] + data[1] + data[2] + data[3]) & 0xFF))
+ 134:sensor_device/DHT22.c ****         return 2;
+ 135:sensor_device/DHT22.c **** 
+ 136:sensor_device/DHT22.c ****     // 解析湿度（16-bit -> 10×%RH）
+ 137:sensor_device/DHT22.c ****     uint16_t rawH = (data[0] << 8) | data[1];
+ 138:sensor_device/DHT22.c ****     *humidity    = rawH * 0.1f;
+ 139:sensor_device/DHT22.c **** 
+ 140:sensor_device/DHT22.c ****     // 解析温度（16-bit，最高位符号）
+ 141:sensor_device/DHT22.c ****     uint16_t rawT = (data[2] << 8) | data[3];
+ 142:sensor_device/DHT22.c ****     if (rawT & 0x8000)
+ARM GAS  /tmp/ccZHhLG5.s 			page 14
+
+
+ 143:sensor_device/DHT22.c ****     {
+ 144:sensor_device/DHT22.c ****         rawT &= 0x7FFF;
+ 145:sensor_device/DHT22.c ****         *temperature = -(rawT * 0.1f);
+ 146:sensor_device/DHT22.c ****     }
+ 147:sensor_device/DHT22.c ****     else
+ 148:sensor_device/DHT22.c ****     {
+ 149:sensor_device/DHT22.c ****         *temperature = rawT * 0.1f;
+ 150:sensor_device/DHT22.c ****     }
+ 151:sensor_device/DHT22.c **** 
+ 152:sensor_device/DHT22.c ****     return 0;
+ 153:sensor_device/DHT22.c **** }
+ 564              		.loc 1 153 1 view .LVU117
+ 565 001c 03B0     		add	sp, sp, #12
+ 566              	.LCFI16:
+ 567              		.cfi_remember_state
+ 568              		.cfi_def_cfa_offset 20
+ 569              		@ sp needed
+ 570 001e F0BD     		pop	{r4, r5, r6, r7, pc}
+ 571              	.LVL41:
+ 572              	.L53:
+ 573              	.LCFI17:
+ 574              		.cfi_restore_state
+ 123:sensor_device/DHT22.c ****     DWT_Delay_us(50);
+ 575              		.loc 1 123 5 is_stmt 1 view .LVU118
+ 576 0020 3220     		movs	r0, #50
+ 577 0022 FFF7FEFF 		bl	DWT_Delay_us
+ 578              	.LVL42:
  126:sensor_device/DHT22.c ****     {
- 127:sensor_device/DHT22.c ****         data[i] = DHT22_ReadByte();
- 573              		.loc 1 127 9 is_stmt 1 discriminator 3 view .LVU118
- 574              		.loc 1 127 19 is_stmt 0 discriminator 3 view .LVU119
- 575 0022 FFF7FEFF 		bl	DHT22_ReadByte
- 576              	.LVL42:
- 577              		.loc 1 127 17 discriminator 3 view .LVU120
- 578 0026 02AB     		add	r3, sp, #8
- 579 0028 2344     		add	r3, r3, r4
- 580 002a 03F8080C 		strb	r0, [r3, #-8]
- 125:sensor_device/DHT22.c ****     {
- 581              		.loc 1 125 32 is_stmt 1 discriminator 3 view .LVU121
- 125:sensor_device/DHT22.c ****     {
- 582              		.loc 1 125 33 is_stmt 0 discriminator 3 view .LVU122
- 583 002e 0134     		adds	r4, r4, #1
+ 579              		.loc 1 126 5 view .LVU119
+ 580              	.LBB5:
+ 126:sensor_device/DHT22.c ****     {
+ 581              		.loc 1 126 10 view .LVU120
+ 126:sensor_device/DHT22.c ****     {
+ 582              		.loc 1 126 18 is_stmt 0 view .LVU121
+ 583 0026 0024     		movs	r4, #0
  584              	.LVL43:
- 125:sensor_device/DHT22.c ****     {
- 585              		.loc 1 125 33 discriminator 3 view .LVU123
- 586 0030 E4B2     		uxtb	r4, r4
- 587              	.LVL44:
- 125:sensor_device/DHT22.c ****     {
- 588              		.loc 1 125 33 discriminator 3 view .LVU124
- 589 0032 F4E7     		b	.L47
- 590              	.L53:
- 125:sensor_device/DHT22.c ****     {
- 591              		.loc 1 125 33 discriminator 3 view .LVU125
- 592              	.LBE5:
+ 585              	.L47:
+ 126:sensor_device/DHT22.c ****     {
+ 586              		.loc 1 126 25 is_stmt 1 discriminator 1 view .LVU122
+ 126:sensor_device/DHT22.c ****     {
+ 587              		.loc 1 126 5 is_stmt 0 discriminator 1 view .LVU123
+ 588 0028 042C     		cmp	r4, #4
+ 589 002a 08D8     		bhi	.L54
  128:sensor_device/DHT22.c ****         // myprintf("read data %x\n",data[i]);
- 129:sensor_device/DHT22.c ****     }
- 130:sensor_device/DHT22.c **** 
- 131:sensor_device/DHT22.c ****     // CRC 校验
-ARM GAS  /tmp/cc9Te01Q.s 			page 14
+ 590              		.loc 1 128 9 is_stmt 1 discriminator 3 view .LVU124
+ 128:sensor_device/DHT22.c ****         // myprintf("read data %x\n",data[i]);
+ 591              		.loc 1 128 19 is_stmt 0 discriminator 3 view .LVU125
+ 592 002c FFF7FEFF 		bl	DHT22_ReadByte
+ 593              	.LVL44:
+ 128:sensor_device/DHT22.c ****         // myprintf("read data %x\n",data[i]);
+ 594              		.loc 1 128 17 discriminator 3 view .LVU126
+ 595 0030 02AB     		add	r3, sp, #8
+ 596 0032 2344     		add	r3, r3, r4
+ 597 0034 03F8080C 		strb	r0, [r3, #-8]
+ 126:sensor_device/DHT22.c ****     {
+ 598              		.loc 1 126 32 is_stmt 1 discriminator 3 view .LVU127
+ 126:sensor_device/DHT22.c ****     {
+ARM GAS  /tmp/ccZHhLG5.s 			page 15
 
 
- 132:sensor_device/DHT22.c ****     if (data[4] != ((data[0] + data[1] + data[2] + data[3]) & 0xFF))
- 593              		.loc 1 132 5 is_stmt 1 view .LVU126
- 594              		.loc 1 132 13 is_stmt 0 view .LVU127
- 595 0034 9DF80410 		ldrb	r1, [sp, #4]	@ zero_extendqisi2
- 596              		.loc 1 132 26 view .LVU128
- 597 0038 9DF80000 		ldrb	r0, [sp]	@ zero_extendqisi2
- 598              		.loc 1 132 36 view .LVU129
- 599 003c 9DF80120 		ldrb	r2, [sp, #1]	@ zero_extendqisi2
- 600              		.loc 1 132 30 view .LVU130
- 601 0040 8318     		adds	r3, r0, r2
- 602              		.loc 1 132 46 view .LVU131
- 603 0042 9DF80270 		ldrb	r7, [sp, #2]	@ zero_extendqisi2
- 604              		.loc 1 132 40 view .LVU132
- 605 0046 3B44     		add	r3, r3, r7
- 606              		.loc 1 132 56 view .LVU133
- 607 0048 9DF80340 		ldrb	r4, [sp, #3]	@ zero_extendqisi2
- 608              	.LVL45:
- 609              		.loc 1 132 50 view .LVU134
- 610 004c 2344     		add	r3, r3, r4
- 611              		.loc 1 132 61 view .LVU135
- 612 004e DBB2     		uxtb	r3, r3
- 613              		.loc 1 132 8 view .LVU136
- 614 0050 9942     		cmp	r1, r3
- 615 0052 24D1     		bne	.L51
+ 599              		.loc 1 126 33 is_stmt 0 discriminator 3 view .LVU128
+ 600 0038 0134     		adds	r4, r4, #1
+ 601              	.LVL45:
+ 126:sensor_device/DHT22.c ****     {
+ 602              		.loc 1 126 33 discriminator 3 view .LVU129
+ 603 003a E4B2     		uxtb	r4, r4
+ 604              	.LVL46:
+ 126:sensor_device/DHT22.c ****     {
+ 605              		.loc 1 126 33 discriminator 3 view .LVU130
+ 606 003c F4E7     		b	.L47
+ 607              	.L54:
+ 126:sensor_device/DHT22.c ****     {
+ 608              		.loc 1 126 33 discriminator 3 view .LVU131
+ 609              	.LBE5:
  133:sensor_device/DHT22.c ****         return 2;
- 134:sensor_device/DHT22.c **** 
- 135:sensor_device/DHT22.c ****     // 解析湿度（16-bit -> 10×%RH）
- 136:sensor_device/DHT22.c ****     uint16_t rawH = (data[0] << 8) | data[1];
- 616              		.loc 1 136 5 is_stmt 1 view .LVU137
- 617              	.LVL46:
+ 610              		.loc 1 133 5 is_stmt 1 view .LVU132
+ 133:sensor_device/DHT22.c ****         return 2;
+ 611              		.loc 1 133 13 is_stmt 0 view .LVU133
+ 612 003e 9DF80410 		ldrb	r1, [sp, #4]	@ zero_extendqisi2
+ 133:sensor_device/DHT22.c ****         return 2;
+ 613              		.loc 1 133 26 view .LVU134
+ 614 0042 9DF80000 		ldrb	r0, [sp]	@ zero_extendqisi2
+ 133:sensor_device/DHT22.c ****         return 2;
+ 615              		.loc 1 133 36 view .LVU135
+ 616 0046 9DF80120 		ldrb	r2, [sp, #1]	@ zero_extendqisi2
+ 133:sensor_device/DHT22.c ****         return 2;
+ 617              		.loc 1 133 30 view .LVU136
+ 618 004a 8318     		adds	r3, r0, r2
+ 133:sensor_device/DHT22.c ****         return 2;
+ 619              		.loc 1 133 46 view .LVU137
+ 620 004c 9DF80270 		ldrb	r7, [sp, #2]	@ zero_extendqisi2
+ 133:sensor_device/DHT22.c ****         return 2;
+ 621              		.loc 1 133 40 view .LVU138
+ 622 0050 3B44     		add	r3, r3, r7
+ 133:sensor_device/DHT22.c ****         return 2;
+ 623              		.loc 1 133 56 view .LVU139
+ 624 0052 9DF80340 		ldrb	r4, [sp, #3]	@ zero_extendqisi2
+ 625              	.LVL47:
+ 133:sensor_device/DHT22.c ****         return 2;
+ 626              		.loc 1 133 50 view .LVU140
+ 627 0056 2344     		add	r3, r3, r4
+ 133:sensor_device/DHT22.c ****         return 2;
+ 628              		.loc 1 133 61 view .LVU141
+ 629 0058 DBB2     		uxtb	r3, r3
+ 133:sensor_device/DHT22.c ****         return 2;
+ 630              		.loc 1 133 8 view .LVU142
+ 631 005a 9942     		cmp	r1, r3
+ 632 005c 21D1     		bne	.L51
  137:sensor_device/DHT22.c ****     *humidity    = rawH * 0.1f;
- 618              		.loc 1 137 5 view .LVU138
- 619              		.loc 1 137 25 is_stmt 0 view .LVU139
- 620 0054 42EA0020 		orr	r0, r2, r0, lsl #8
- 621              	.LVL47:
- 622              		.loc 1 137 25 view .LVU140
- 623 0058 FFF7FEFF 		bl	__aeabi_i2f
- 624              	.LVL48:
- 625              		.loc 1 137 25 view .LVU141
- 626 005c 1149     		ldr	r1, .L55
- 627 005e FFF7FEFF 		bl	__aeabi_fmul
- 628              	.LVL49:
- 629              		.loc 1 137 18 view .LVU142
- 630 0062 2860     		str	r0, [r5]	@ float
+ 633              		.loc 1 137 5 is_stmt 1 view .LVU143
+ 634              	.LVL48:
  138:sensor_device/DHT22.c **** 
- 139:sensor_device/DHT22.c ****     // 解析温度（16-bit，最高位符号）
- 140:sensor_device/DHT22.c ****     uint16_t rawT = (data[2] << 8) | data[3];
- 631              		.loc 1 140 5 is_stmt 1 view .LVU143
- 632              		.loc 1 140 36 is_stmt 0 view .LVU144
- 633 0064 44EA0724 		orr	r4, r4, r7, lsl #8
- 634              		.loc 1 140 14 view .LVU145
- 635 0068 2046     		mov	r0, r4
- 636              	.LVL50:
+ 635              		.loc 1 138 5 view .LVU144
+ 138:sensor_device/DHT22.c **** 
+ 636              		.loc 1 138 25 is_stmt 0 view .LVU145
+ 637 005e 42EA0020 		orr	r0, r2, r0, lsl #8
+ 638              	.LVL49:
+ARM GAS  /tmp/ccZHhLG5.s 			page 16
+
+
+ 138:sensor_device/DHT22.c **** 
+ 639              		.loc 1 138 25 view .LVU146
+ 640 0062 FFF7FEFF 		bl	__aeabi_i2f
+ 641              	.LVL50:
+ 138:sensor_device/DHT22.c **** 
+ 642              		.loc 1 138 25 view .LVU147
+ 643 0066 1049     		ldr	r1, .L56
+ 644 0068 FFF7FEFF 		bl	__aeabi_fmul
+ 645              	.LVL51:
+ 138:sensor_device/DHT22.c **** 
+ 646              		.loc 1 138 18 view .LVU148
+ 647 006c 2860     		str	r0, [r5]	@ float
  141:sensor_device/DHT22.c ****     if (rawT & 0x8000)
- 637              		.loc 1 141 5 is_stmt 1 view .LVU146
- 638              		.loc 1 141 8 is_stmt 0 view .LVU147
- 639 006a 14F4004F 		tst	r4, #32768
-ARM GAS  /tmp/cc9Te01Q.s 			page 15
-
-
- 640 006e 07D1     		bne	.L54
+ 648              		.loc 1 141 5 is_stmt 1 view .LVU149
+ 141:sensor_device/DHT22.c ****     if (rawT & 0x8000)
+ 649              		.loc 1 141 36 is_stmt 0 view .LVU150
+ 650 006e 44EA0724 		orr	r4, r4, r7, lsl #8
+ 141:sensor_device/DHT22.c ****     if (rawT & 0x8000)
+ 651              		.loc 1 141 14 view .LVU151
+ 652 0072 2046     		mov	r0, r4
+ 653              	.LVL52:
  142:sensor_device/DHT22.c ****     {
- 143:sensor_device/DHT22.c ****         rawT &= 0x7FFF;
- 144:sensor_device/DHT22.c ****         *temperature = -(rawT * 0.1f);
- 145:sensor_device/DHT22.c ****     }
- 146:sensor_device/DHT22.c ****     else
- 147:sensor_device/DHT22.c ****     {
- 148:sensor_device/DHT22.c ****         *temperature = rawT * 0.1f;
- 641              		.loc 1 148 9 is_stmt 1 view .LVU148
- 642              		.loc 1 148 29 is_stmt 0 view .LVU149
- 643 0070 FFF7FEFF 		bl	__aeabi_i2f
- 644              	.LVL51:
- 645 0074 0B49     		ldr	r1, .L55
- 646 0076 FFF7FEFF 		bl	__aeabi_fmul
- 647              	.LVL52:
- 648              		.loc 1 148 22 view .LVU150
- 649 007a 3060     		str	r0, [r6]	@ float
+ 654              		.loc 1 142 5 is_stmt 1 view .LVU152
+ 142:sensor_device/DHT22.c ****     {
+ 655              		.loc 1 142 8 is_stmt 0 view .LVU153
+ 656 0074 14F4004F 		tst	r4, #32768
+ 657 0078 07D1     		bne	.L55
  149:sensor_device/DHT22.c ****     }
- 150:sensor_device/DHT22.c **** 
- 151:sensor_device/DHT22.c ****     return 0;
- 650              		.loc 1 151 12 view .LVU151
- 651 007c 0020     		movs	r0, #0
- 652 007e 0CE0     		b	.L46
- 653              	.L54:
- 143:sensor_device/DHT22.c ****         *temperature = -(rawT * 0.1f);
- 654              		.loc 1 143 9 is_stmt 1 view .LVU152
- 655              	.LVL53:
- 144:sensor_device/DHT22.c ****     }
- 656              		.loc 1 144 9 view .LVU153
- 144:sensor_device/DHT22.c ****     }
- 657              		.loc 1 144 31 is_stmt 0 view .LVU154
- 658 0080 C4F30E00 		ubfx	r0, r4, #0, #15
- 659              	.LVL54:
- 144:sensor_device/DHT22.c ****     }
- 660              		.loc 1 144 31 view .LVU155
- 661 0084 FFF7FEFF 		bl	__aeabi_i2f
- 662              	.LVL55:
- 663 0088 0649     		ldr	r1, .L55
- 664 008a FFF7FEFF 		bl	__aeabi_fmul
- 665              	.LVL56:
- 144:sensor_device/DHT22.c ****     }
- 666              		.loc 1 144 24 view .LVU156
- 667 008e 00F10040 		add	r0, r0, #-2147483648
- 144:sensor_device/DHT22.c ****     }
- 668              		.loc 1 144 22 view .LVU157
- 669 0092 3060     		str	r0, [r6]	@ float
- 670              		.loc 1 151 12 view .LVU158
- 671 0094 0020     		movs	r0, #0
- 672 0096 00E0     		b	.L46
- 673              	.LVL57:
- 674              	.L50:
- 122:sensor_device/DHT22.c **** 
- 675              		.loc 1 122 40 view .LVU159
- 676 0098 0120     		movs	r0, #1
- 677              	.L46:
+ 658              		.loc 1 149 9 is_stmt 1 view .LVU154
+ 149:sensor_device/DHT22.c ****     }
+ 659              		.loc 1 149 29 is_stmt 0 view .LVU155
+ 660 007a FFF7FEFF 		bl	__aeabi_i2f
+ 661              	.LVL53:
+ 662 007e 0A49     		ldr	r1, .L56
+ 663 0080 FFF7FEFF 		bl	__aeabi_fmul
+ 664              	.LVL54:
+ 149:sensor_device/DHT22.c ****     }
+ 665              		.loc 1 149 22 view .LVU156
+ 666 0084 3060     		str	r0, [r6]	@ float
  152:sensor_device/DHT22.c **** }
- 678              		.loc 1 152 1 view .LVU160
-ARM GAS  /tmp/cc9Te01Q.s 			page 16
+ 667              		.loc 1 152 12 view .LVU157
+ 668 0086 0020     		movs	r0, #0
+ 669 0088 C8E7     		b	.L46
+ 670              	.L55:
+ 144:sensor_device/DHT22.c ****         *temperature = -(rawT * 0.1f);
+ 671              		.loc 1 144 9 is_stmt 1 view .LVU158
+ 672              	.LVL55:
+ 145:sensor_device/DHT22.c ****     }
+ 673              		.loc 1 145 9 view .LVU159
+ 145:sensor_device/DHT22.c ****     }
+ 674              		.loc 1 145 31 is_stmt 0 view .LVU160
+ 675 008a C4F30E00 		ubfx	r0, r4, #0, #15
+ 676              	.LVL56:
+ 145:sensor_device/DHT22.c ****     }
+ 677              		.loc 1 145 31 view .LVU161
+ 678 008e FFF7FEFF 		bl	__aeabi_i2f
+ 679              	.LVL57:
+ARM GAS  /tmp/ccZHhLG5.s 			page 17
 
 
- 679 009a 03B0     		add	sp, sp, #12
- 680              	.LCFI16:
- 681              		.cfi_remember_state
- 682              		.cfi_def_cfa_offset 20
- 683              		@ sp needed
- 684 009c F0BD     		pop	{r4, r5, r6, r7, pc}
- 685              	.LVL58:
- 686              	.L51:
- 687              	.LCFI17:
- 688              		.cfi_restore_state
- 133:sensor_device/DHT22.c **** 
- 689              		.loc 1 133 16 view .LVU161
- 690 009e 0220     		movs	r0, #2
- 691 00a0 FBE7     		b	.L46
- 692              	.L56:
- 693 00a2 00BF     		.align	2
- 694              	.L55:
- 695 00a4 CDCCCC3D 		.word	1036831949
- 696              		.cfi_endproc
- 697              	.LFE73:
- 699              		.text
- 700              	.Letext0:
- 701              		.file 2 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/machine/_default_types.h"
- 702              		.file 3 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/_stdint.h"
- 703              		.file 4 "Drivers/CMSIS/Include/core_cm3.h"
- 704              		.file 5 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/system_stm32f1xx.h"
- 705              		.file 6 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xe.h"
- 706              		.file 7 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio.h"
- 707              		.file 8 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h"
- 708              		.file 9 "ARM_SEGGER_RTT/SEGGER_RTT.h"
- 709              		.file 10 "diff_signal/diff_signal.h"
-ARM GAS  /tmp/cc9Te01Q.s 			page 17
+ 680 0092 0549     		ldr	r1, .L56
+ 681 0094 FFF7FEFF 		bl	__aeabi_fmul
+ 682              	.LVL58:
+ 145:sensor_device/DHT22.c ****     }
+ 683              		.loc 1 145 24 view .LVU162
+ 684 0098 00F10040 		add	r0, r0, #-2147483648
+ 145:sensor_device/DHT22.c ****     }
+ 685              		.loc 1 145 22 view .LVU163
+ 686 009c 3060     		str	r0, [r6]	@ float
+ 152:sensor_device/DHT22.c **** }
+ 687              		.loc 1 152 12 view .LVU164
+ 688 009e 0020     		movs	r0, #0
+ 689 00a0 BCE7     		b	.L46
+ 690              	.LVL59:
+ 691              	.L51:
+ 134:sensor_device/DHT22.c **** 
+ 692              		.loc 1 134 16 view .LVU165
+ 693 00a2 0220     		movs	r0, #2
+ 694 00a4 BAE7     		b	.L46
+ 695              	.L57:
+ 696 00a6 00BF     		.align	2
+ 697              	.L56:
+ 698 00a8 CDCCCC3D 		.word	1036831949
+ 699              		.cfi_endproc
+ 700              	.LFE73:
+ 702              		.text
+ 703              	.Letext0:
+ 704              		.file 2 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/machine/_default_types.h"
+ 705              		.file 3 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/_stdint.h"
+ 706              		.file 4 "Drivers/CMSIS/Include/core_cm3.h"
+ 707              		.file 5 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/system_stm32f1xx.h"
+ 708              		.file 6 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xe.h"
+ 709              		.file 7 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio.h"
+ 710              		.file 8 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h"
+ 711              		.file 9 "diff_signal/diff_signal.h"
+ 712              		.file 10 "ARM_SEGGER_RTT/SEGGER_RTT.h"
+ARM GAS  /tmp/ccZHhLG5.s 			page 18
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 DHT22.c
-     /tmp/cc9Te01Q.s:16     .text.DHT22_Pin_Output:0000000000000000 $t
-     /tmp/cc9Te01Q.s:23     .text.DHT22_Pin_Output:0000000000000000 DHT22_Pin_Output
-     /tmp/cc9Te01Q.s:68     .text.DHT22_Pin_Output:0000000000000024 $d
-     /tmp/cc9Te01Q.s:73     .text.DHT22_Pin_Input:0000000000000000 $t
-     /tmp/cc9Te01Q.s:79     .text.DHT22_Pin_Input:0000000000000000 DHT22_Pin_Input
-     /tmp/cc9Te01Q.s:120    .text.DHT22_Pin_Input:0000000000000020 $d
-     /tmp/cc9Te01Q.s:125    .text.Delay_us:0000000000000000 $t
-     /tmp/cc9Te01Q.s:131    .text.Delay_us:0000000000000000 Delay_us
-     /tmp/cc9Te01Q.s:153    .text.DHT22_StartSignal:0000000000000000 $t
-     /tmp/cc9Te01Q.s:159    .text.DHT22_StartSignal:0000000000000000 DHT22_StartSignal
-     /tmp/cc9Te01Q.s:202    .text.DHT22_StartSignal:0000000000000030 $d
-     /tmp/cc9Te01Q.s:207    .text.DHT22_CheckResponse:0000000000000000 $t
-     /tmp/cc9Te01Q.s:213    .text.DHT22_CheckResponse:0000000000000000 DHT22_CheckResponse
-     /tmp/cc9Te01Q.s:293    .text.DHT22_CheckResponse:0000000000000044 $d
-     /tmp/cc9Te01Q.s:298    .rodata.DHT22_ReadBit.str1.4:0000000000000000 $d
-     /tmp/cc9Te01Q.s:302    .text.DHT22_ReadBit:0000000000000000 $t
-     /tmp/cc9Te01Q.s:308    .text.DHT22_ReadBit:0000000000000000 DHT22_ReadBit
-     /tmp/cc9Te01Q.s:384    .text.DHT22_ReadBit:0000000000000044 $d
-     /tmp/cc9Te01Q.s:390    .text.DHT22_ReadByte:0000000000000000 $t
-     /tmp/cc9Te01Q.s:396    .text.DHT22_ReadByte:0000000000000000 DHT22_ReadByte
-     /tmp/cc9Te01Q.s:459    .text.DHT22_Init:0000000000000000 $t
-     /tmp/cc9Te01Q.s:466    .text.DHT22_Init:0000000000000000 DHT22_Init
-     /tmp/cc9Te01Q.s:513    .text.DHT22_Init:000000000000002c $d
-     /tmp/cc9Te01Q.s:521    .text.DHT22_ReadData:0000000000000000 $t
-     /tmp/cc9Te01Q.s:528    .text.DHT22_ReadData:0000000000000000 DHT22_ReadData
-     /tmp/cc9Te01Q.s:695    .text.DHT22_ReadData:00000000000000a4 $d
+     /tmp/ccZHhLG5.s:16     .text.DHT22_Pin_Output:0000000000000000 $t
+     /tmp/ccZHhLG5.s:23     .text.DHT22_Pin_Output:0000000000000000 DHT22_Pin_Output
+     /tmp/ccZHhLG5.s:68     .text.DHT22_Pin_Output:0000000000000024 $d
+     /tmp/ccZHhLG5.s:73     .text.DHT22_Pin_Input:0000000000000000 $t
+     /tmp/ccZHhLG5.s:79     .text.DHT22_Pin_Input:0000000000000000 DHT22_Pin_Input
+     /tmp/ccZHhLG5.s:120    .text.DHT22_Pin_Input:0000000000000020 $d
+     /tmp/ccZHhLG5.s:125    .text.Delay_us:0000000000000000 $t
+     /tmp/ccZHhLG5.s:131    .text.Delay_us:0000000000000000 Delay_us
+     /tmp/ccZHhLG5.s:153    .text.DHT22_StartSignal:0000000000000000 $t
+     /tmp/ccZHhLG5.s:159    .text.DHT22_StartSignal:0000000000000000 DHT22_StartSignal
+     /tmp/ccZHhLG5.s:202    .text.DHT22_StartSignal:0000000000000030 $d
+     /tmp/ccZHhLG5.s:207    .text.DHT22_ReadBit:0000000000000000 $t
+     /tmp/ccZHhLG5.s:213    .text.DHT22_ReadBit:0000000000000000 DHT22_ReadBit
+     /tmp/ccZHhLG5.s:280    .text.DHT22_ReadBit:0000000000000038 $d
+     /tmp/ccZHhLG5.s:285    .text.DHT22_ReadByte:0000000000000000 $t
+     /tmp/ccZHhLG5.s:291    .text.DHT22_ReadByte:0000000000000000 DHT22_ReadByte
+     /tmp/ccZHhLG5.s:354    .rodata.DHT22_CheckResponse.str1.4:0000000000000000 $d
+     /tmp/ccZHhLG5.s:358    .text.DHT22_CheckResponse:0000000000000000 $t
+     /tmp/ccZHhLG5.s:364    .text.DHT22_CheckResponse:0000000000000000 DHT22_CheckResponse
+     /tmp/ccZHhLG5.s:451    .text.DHT22_CheckResponse:0000000000000050 $d
+     /tmp/ccZHhLG5.s:457    .text.DHT22_Init:0000000000000000 $t
+     /tmp/ccZHhLG5.s:464    .text.DHT22_Init:0000000000000000 DHT22_Init
+     /tmp/ccZHhLG5.s:511    .text.DHT22_Init:000000000000002c $d
+     /tmp/ccZHhLG5.s:519    .text.DHT22_ReadData:0000000000000000 $t
+     /tmp/ccZHhLG5.s:526    .text.DHT22_ReadData:0000000000000000 DHT22_ReadData
+     /tmp/ccZHhLG5.s:698    .text.DHT22_ReadData:00000000000000a8 $d
 
 UNDEFINED SYMBOLS
 HAL_GPIO_Init

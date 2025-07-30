@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccDhf7jq.s 			page 1
+ARM GAS  /tmp/ccRuehTO.s 			page 1
 
 
    1              		.cpu cortex-m3
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccDhf7jq.s 			page 1
   30:Core/Src/main.c **** #include "stm32f1xx_hal_gpio_ex.h"
   31:Core/Src/main.c **** #include "diff_signal.h"
   32:Core/Src/main.c **** #include "SEGGER_RTT.h"
-ARM GAS  /tmp/ccDhf7jq.s 			page 2
+ARM GAS  /tmp/ccRuehTO.s 			page 2
 
 
   33:Core/Src/main.c **** #include "Custcom_Pin.h"
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccDhf7jq.s 			page 1
   87:Core/Src/main.c ****   myprintf("systemclock init success\n");
   88:Core/Src/main.c ****   /* USER CODE BEGIN Init */
   89:Core/Src/main.c ****   /* USER CODE END Init */
-ARM GAS  /tmp/ccDhf7jq.s 			page 3
+ARM GAS  /tmp/ccRuehTO.s 			page 3
 
 
   90:Core/Src/main.c **** 
@@ -170,7 +170,7 @@ ARM GAS  /tmp/ccDhf7jq.s 			page 1
  136:Core/Src/main.c ****     // {
  137:Core/Src/main.c ****     //   myprintf("buf is %x\n",rev_buf[i]);
  138:Core/Src/main.c ****     // }
- 139:Core/Src/main.c ****     HAL_Delay(1000);
+ 139:Core/Src/main.c ****     HAL_Delay(3000);
  140:Core/Src/main.c ****     /* USER CODE END WHILE */
  141:Core/Src/main.c ****     /* USER CODE BEGIN 3 */
  142:Core/Src/main.c ****   }
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccDhf7jq.s 			page 1
  144:Core/Src/main.c **** }
  145:Core/Src/main.c **** 
  146:Core/Src/main.c **** /**
-ARM GAS  /tmp/ccDhf7jq.s 			page 4
+ARM GAS  /tmp/ccRuehTO.s 			page 4
 
 
  147:Core/Src/main.c ****  * @brief System Clock Configuration
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccDhf7jq.s 			page 1
  201:Core/Src/main.c ****  * @brief  This function is executed in case of error occurrence.
  202:Core/Src/main.c ****  * @retval None
  203:Core/Src/main.c ****  */
-ARM GAS  /tmp/ccDhf7jq.s 			page 5
+ARM GAS  /tmp/ccRuehTO.s 			page 5
 
 
  204:Core/Src/main.c **** void Error_Handler(void)
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccDhf7jq.s 			page 1
   40:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __ASM
   41:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __ASM                                  __asm
   42:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
-ARM GAS  /tmp/ccDhf7jq.s 			page 6
+ARM GAS  /tmp/ccRuehTO.s 			page 6
 
 
   43:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __INLINE
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccDhf7jq.s 			page 1
   97:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic ignored "-Wattributes"
   98:Drivers/CMSIS/Include/cmsis_gcc.h ****   __PACKED_STRUCT T_UINT32_WRITE { uint32_t v; };
   99:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic pop
-ARM GAS  /tmp/ccDhf7jq.s 			page 7
+ARM GAS  /tmp/ccRuehTO.s 			page 7
 
 
  100:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __UNALIGNED_UINT32_WRITE(addr, val)    (void)((((struct T_UINT32_WRITE *)(void *)(addr))-
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccDhf7jq.s 			page 1
   48              	.LBE4:
  209:Core/Src/main.c ****   while (1)
   49              		.loc 1 209 3 discriminator 1 view .LVU4
-ARM GAS  /tmp/ccDhf7jq.s 			page 8
+ARM GAS  /tmp/ccRuehTO.s 			page 8
 
 
  210:Core/Src/main.c ****   {
@@ -478,7 +478,7 @@ ARM GAS  /tmp/ccDhf7jq.s 			page 1
   93              		.loc 1 153 3 is_stmt 1 view .LVU10
  153:Core/Src/main.c ****   RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
   94              		.loc 1 153 22 is_stmt 0 view .LVU11
-ARM GAS  /tmp/ccDhf7jq.s 			page 9
+ARM GAS  /tmp/ccRuehTO.s 			page 9
 
 
   95 000c 0793     		str	r3, [sp, #28]
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccDhf7jq.s 			page 1
  165:Core/Src/main.c ****   {
  133              		.loc 1 165 3 is_stmt 1 view .LVU28
  165:Core/Src/main.c ****   {
-ARM GAS  /tmp/ccDhf7jq.s 			page 10
+ARM GAS  /tmp/ccRuehTO.s 			page 10
 
 
  134              		.loc 1 165 7 is_stmt 0 view .LVU29
@@ -598,7 +598,7 @@ ARM GAS  /tmp/ccDhf7jq.s 			page 1
  187:Core/Src/main.c **** 
  171              		.loc 1 187 35 is_stmt 0 view .LVU47
  172 0064 0023     		movs	r3, #0
-ARM GAS  /tmp/ccDhf7jq.s 			page 11
+ARM GAS  /tmp/ccRuehTO.s 			page 11
 
 
  173 0066 0693     		str	r3, [sp, #24]
@@ -658,7 +658,7 @@ ARM GAS  /tmp/ccDhf7jq.s 			page 1
  217              	.L12:
  218 009a 00BF     		.align	2
  219              	.L11:
-ARM GAS  /tmp/ccDhf7jq.s 			page 12
+ARM GAS  /tmp/ccRuehTO.s 			page 12
 
 
  220 009c 00000000 		.word	.LC0
@@ -718,7 +718,7 @@ ARM GAS  /tmp/ccDhf7jq.s 			page 1
  256              		@ frame_needed = 0, uses_anonymous_args = 0
  257 0000 30B5     		push	{r4, r5, lr}
  258              	.LCFI4:
-ARM GAS  /tmp/ccDhf7jq.s 			page 13
+ARM GAS  /tmp/ccRuehTO.s 			page 13
 
 
  259              		.cfi_def_cfa_offset 12
@@ -778,7 +778,7 @@ ARM GAS  /tmp/ccDhf7jq.s 			page 1
  301              		.loc 1 100 3 view .LVU70
  302 002e FFF7FEFF 		bl	MX_SPI2_Init
  303              	.LVL17:
-ARM GAS  /tmp/ccDhf7jq.s 			page 14
+ARM GAS  /tmp/ccRuehTO.s 			page 14
 
 
  101:Core/Src/main.c ****   MX_TIM3_Init();
@@ -838,7 +838,7 @@ ARM GAS  /tmp/ccDhf7jq.s 			page 1
  125:Core/Src/main.c ****   while (1)
  344              		.loc 1 125 3 view .LVU85
  345              	.LVL28:
-ARM GAS  /tmp/ccDhf7jq.s 			page 15
+ARM GAS  /tmp/ccRuehTO.s 			page 15
 
 
  346              	.L14:
@@ -879,7 +879,7 @@ ARM GAS  /tmp/ccDhf7jq.s 			page 1
  376              	.LVL34:
  139:Core/Src/main.c ****     /* USER CODE END WHILE */
  377              		.loc 1 139 5 discriminator 1 view .LVU91
- 378 009a 4FF47A70 		mov	r0, #1000
+ 378 009a 40F6B830 		movw	r0, #3000
  379 009e FFF7FEFF 		bl	HAL_Delay
  380              	.LVL35:
  126:Core/Src/main.c ****   {
@@ -898,7 +898,7 @@ ARM GAS  /tmp/ccDhf7jq.s 			page 1
  393              	.LFE65:
  395              		.text
  396              	.Letext0:
-ARM GAS  /tmp/ccDhf7jq.s 			page 16
+ARM GAS  /tmp/ccRuehTO.s 			page 16
 
 
  397              		.file 3 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/machine/_default_types.h"
@@ -929,21 +929,21 @@ ARM GAS  /tmp/ccDhf7jq.s 			page 1
  422              		.file 28 "diff_signal/diff_signal.h"
  423              		.file 29 "sensor_device/DHT22.h"
  424              		.file 30 "sensor_device/eeprom.h"
-ARM GAS  /tmp/ccDhf7jq.s 			page 17
+ARM GAS  /tmp/ccRuehTO.s 			page 17
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 main.c
-     /tmp/ccDhf7jq.s:16     .text.Error_Handler:0000000000000000 $t
-     /tmp/ccDhf7jq.s:24     .text.Error_Handler:0000000000000000 Error_Handler
-     /tmp/ccDhf7jq.s:57     .rodata.SystemClock_Config.str1.4:0000000000000000 $d
-     /tmp/ccDhf7jq.s:67     .text.SystemClock_Config:0000000000000000 $t
-     /tmp/ccDhf7jq.s:74     .text.SystemClock_Config:0000000000000000 SystemClock_Config
-     /tmp/ccDhf7jq.s:220    .text.SystemClock_Config:000000000000009c $d
-     /tmp/ccDhf7jq.s:227    .rodata.main.str1.4:0000000000000000 $d
-     /tmp/ccDhf7jq.s:244    .text.main:0000000000000000 $t
-     /tmp/ccDhf7jq.s:251    .text.main:0000000000000000 main
-     /tmp/ccDhf7jq.s:386    .text.main:00000000000000a4 $d
+     /tmp/ccRuehTO.s:16     .text.Error_Handler:0000000000000000 $t
+     /tmp/ccRuehTO.s:24     .text.Error_Handler:0000000000000000 Error_Handler
+     /tmp/ccRuehTO.s:57     .rodata.SystemClock_Config.str1.4:0000000000000000 $d
+     /tmp/ccRuehTO.s:67     .text.SystemClock_Config:0000000000000000 $t
+     /tmp/ccRuehTO.s:74     .text.SystemClock_Config:0000000000000000 SystemClock_Config
+     /tmp/ccRuehTO.s:220    .text.SystemClock_Config:000000000000009c $d
+     /tmp/ccRuehTO.s:227    .rodata.main.str1.4:0000000000000000 $d
+     /tmp/ccRuehTO.s:244    .text.main:0000000000000000 $t
+     /tmp/ccRuehTO.s:251    .text.main:0000000000000000 main
+     /tmp/ccRuehTO.s:386    .text.main:00000000000000a4 $d
 
 UNDEFINED SYMBOLS
 HAL_RCC_OscConfig

@@ -1317,7 +1317,7 @@ LOAD /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/
                 0x0000000008000000                g_pfnVectors
                 0x00000000080001e4                . = ALIGN (0x4)
 
-.text           0x00000000080001e4     0x3464
+.text           0x00000000080001e4     0x3468
                 0x00000000080001e4                . = ALIGN (0x4)
  *(.text)
  .text          0x00000000080001e4       0x40 /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/thumb/v7-m/nofp/crtbegin.o
@@ -1652,183 +1652,183 @@ LOAD /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/
                 0x0000000008003310        0x8 build/DHT22.o
  .text.DHT22_StartSignal
                 0x0000000008003318       0x34 build/DHT22.o
- .text.DHT22_CheckResponse
-                0x000000000800334c       0x48 build/DHT22.o
  .text.DHT22_ReadBit
-                0x0000000008003394       0x4c build/DHT22.o
+                0x000000000800334c       0x3c build/DHT22.o
  .text.DHT22_ReadByte
-                0x00000000080033e0       0x1e build/DHT22.o
- *fill*         0x00000000080033fe        0x2 
+                0x0000000008003388       0x1e build/DHT22.o
+ *fill*         0x00000000080033a6        0x2 
+ .text.DHT22_CheckResponse
+                0x00000000080033a8       0x58 build/DHT22.o
  .text.DHT22_Init
                 0x0000000008003400       0x34 build/DHT22.o
                 0x0000000008003400                DHT22_Init
  .text.DHT22_ReadData
-                0x0000000008003434       0xa8 build/DHT22.o
+                0x0000000008003434       0xac build/DHT22.o
                 0x0000000008003434                DHT22_ReadData
  .text.EEPROM_Init
-                0x00000000080034dc       0x94 build/eeprom.o
-                0x00000000080034dc                EEPROM_Init
+                0x00000000080034e0       0x94 build/eeprom.o
+                0x00000000080034e0                EEPROM_Init
  .text.Reset_Handler
-                0x0000000008003570       0x48 build/startup_stm32f103xe.o
-                0x0000000008003570                Reset_Handler
+                0x0000000008003574       0x48 build/startup_stm32f103xe.o
+                0x0000000008003574                Reset_Handler
  .text.Default_Handler
-                0x00000000080035b8        0x2 build/startup_stm32f103xe.o
-                0x00000000080035b8                RTC_Alarm_IRQHandler
-                0x00000000080035b8                EXTI2_IRQHandler
-                0x00000000080035b8                TIM8_TRG_COM_IRQHandler
-                0x00000000080035b8                TIM8_CC_IRQHandler
-                0x00000000080035b8                TIM1_CC_IRQHandler
-                0x00000000080035b8                TIM6_IRQHandler
-                0x00000000080035b8                PVD_IRQHandler
-                0x00000000080035b8                SDIO_IRQHandler
-                0x00000000080035b8                EXTI3_IRQHandler
-                0x00000000080035b8                EXTI0_IRQHandler
-                0x00000000080035b8                I2C2_EV_IRQHandler
-                0x00000000080035b8                SPI1_IRQHandler
-                0x00000000080035b8                TAMPER_IRQHandler
-                0x00000000080035b8                TIM8_UP_IRQHandler
-                0x00000000080035b8                DMA2_Channel2_IRQHandler
-                0x00000000080035b8                DMA1_Channel4_IRQHandler
-                0x00000000080035b8                USART3_IRQHandler
-                0x00000000080035b8                RTC_IRQHandler
-                0x00000000080035b8                DMA1_Channel7_IRQHandler
-                0x00000000080035b8                CAN1_RX1_IRQHandler
-                0x00000000080035b8                UART5_IRQHandler
-                0x00000000080035b8                ADC3_IRQHandler
-                0x00000000080035b8                TIM4_IRQHandler
-                0x00000000080035b8                DMA2_Channel1_IRQHandler
-                0x00000000080035b8                I2C1_EV_IRQHandler
-                0x00000000080035b8                DMA1_Channel6_IRQHandler
-                0x00000000080035b8                UART4_IRQHandler
-                0x00000000080035b8                TIM3_IRQHandler
-                0x00000000080035b8                RCC_IRQHandler
-                0x00000000080035b8                TIM1_TRG_COM_IRQHandler
-                0x00000000080035b8                DMA1_Channel1_IRQHandler
-                0x00000000080035b8                Default_Handler
-                0x00000000080035b8                EXTI15_10_IRQHandler
-                0x00000000080035b8                TIM7_IRQHandler
-                0x00000000080035b8                TIM5_IRQHandler
-                0x00000000080035b8                EXTI9_5_IRQHandler
-                0x00000000080035b8                SPI2_IRQHandler
-                0x00000000080035b8                DMA1_Channel5_IRQHandler
-                0x00000000080035b8                EXTI4_IRQHandler
-                0x00000000080035b8                USB_LP_CAN1_RX0_IRQHandler
-                0x00000000080035b8                USB_HP_CAN1_TX_IRQHandler
-                0x00000000080035b8                DMA1_Channel3_IRQHandler
-                0x00000000080035b8                FSMC_IRQHandler
-                0x00000000080035b8                TIM1_UP_IRQHandler
-                0x00000000080035b8                WWDG_IRQHandler
-                0x00000000080035b8                TIM1_BRK_IRQHandler
-                0x00000000080035b8                DMA2_Channel4_5_IRQHandler
-                0x00000000080035b8                USART2_IRQHandler
-                0x00000000080035b8                I2C2_ER_IRQHandler
-                0x00000000080035b8                DMA1_Channel2_IRQHandler
-                0x00000000080035b8                TIM8_BRK_IRQHandler
-                0x00000000080035b8                CAN1_SCE_IRQHandler
-                0x00000000080035b8                FLASH_IRQHandler
-                0x00000000080035b8                USART1_IRQHandler
-                0x00000000080035b8                SPI3_IRQHandler
-                0x00000000080035b8                I2C1_ER_IRQHandler
-                0x00000000080035b8                USBWakeUp_IRQHandler
-                0x00000000080035b8                DMA2_Channel3_IRQHandler
- *fill*         0x00000000080035ba        0x2 
+                0x00000000080035bc        0x2 build/startup_stm32f103xe.o
+                0x00000000080035bc                RTC_Alarm_IRQHandler
+                0x00000000080035bc                EXTI2_IRQHandler
+                0x00000000080035bc                TIM8_TRG_COM_IRQHandler
+                0x00000000080035bc                TIM8_CC_IRQHandler
+                0x00000000080035bc                TIM1_CC_IRQHandler
+                0x00000000080035bc                TIM6_IRQHandler
+                0x00000000080035bc                PVD_IRQHandler
+                0x00000000080035bc                SDIO_IRQHandler
+                0x00000000080035bc                EXTI3_IRQHandler
+                0x00000000080035bc                EXTI0_IRQHandler
+                0x00000000080035bc                I2C2_EV_IRQHandler
+                0x00000000080035bc                SPI1_IRQHandler
+                0x00000000080035bc                TAMPER_IRQHandler
+                0x00000000080035bc                TIM8_UP_IRQHandler
+                0x00000000080035bc                DMA2_Channel2_IRQHandler
+                0x00000000080035bc                DMA1_Channel4_IRQHandler
+                0x00000000080035bc                USART3_IRQHandler
+                0x00000000080035bc                RTC_IRQHandler
+                0x00000000080035bc                DMA1_Channel7_IRQHandler
+                0x00000000080035bc                CAN1_RX1_IRQHandler
+                0x00000000080035bc                UART5_IRQHandler
+                0x00000000080035bc                ADC3_IRQHandler
+                0x00000000080035bc                TIM4_IRQHandler
+                0x00000000080035bc                DMA2_Channel1_IRQHandler
+                0x00000000080035bc                I2C1_EV_IRQHandler
+                0x00000000080035bc                DMA1_Channel6_IRQHandler
+                0x00000000080035bc                UART4_IRQHandler
+                0x00000000080035bc                TIM3_IRQHandler
+                0x00000000080035bc                RCC_IRQHandler
+                0x00000000080035bc                TIM1_TRG_COM_IRQHandler
+                0x00000000080035bc                DMA1_Channel1_IRQHandler
+                0x00000000080035bc                Default_Handler
+                0x00000000080035bc                EXTI15_10_IRQHandler
+                0x00000000080035bc                TIM7_IRQHandler
+                0x00000000080035bc                TIM5_IRQHandler
+                0x00000000080035bc                EXTI9_5_IRQHandler
+                0x00000000080035bc                SPI2_IRQHandler
+                0x00000000080035bc                DMA1_Channel5_IRQHandler
+                0x00000000080035bc                EXTI4_IRQHandler
+                0x00000000080035bc                USB_LP_CAN1_RX0_IRQHandler
+                0x00000000080035bc                USB_HP_CAN1_TX_IRQHandler
+                0x00000000080035bc                DMA1_Channel3_IRQHandler
+                0x00000000080035bc                FSMC_IRQHandler
+                0x00000000080035bc                TIM1_UP_IRQHandler
+                0x00000000080035bc                WWDG_IRQHandler
+                0x00000000080035bc                TIM1_BRK_IRQHandler
+                0x00000000080035bc                DMA2_Channel4_5_IRQHandler
+                0x00000000080035bc                USART2_IRQHandler
+                0x00000000080035bc                I2C2_ER_IRQHandler
+                0x00000000080035bc                DMA1_Channel2_IRQHandler
+                0x00000000080035bc                TIM8_BRK_IRQHandler
+                0x00000000080035bc                CAN1_SCE_IRQHandler
+                0x00000000080035bc                FLASH_IRQHandler
+                0x00000000080035bc                USART1_IRQHandler
+                0x00000000080035bc                SPI3_IRQHandler
+                0x00000000080035bc                I2C1_ER_IRQHandler
+                0x00000000080035bc                USBWakeUp_IRQHandler
+                0x00000000080035bc                DMA2_Channel3_IRQHandler
+ *fill*         0x00000000080035be        0x2 
  .text.__libc_init_array
-                0x00000000080035bc       0x48 /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc_nano.a(lib_a-init.o)
-                0x00000000080035bc                __libc_init_array
- .text.memcpy   0x0000000008003604       0x1c /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc_nano.a(lib_a-memcpy-stub.o)
-                0x0000000008003604                memcpy
- .text.memset   0x0000000008003620       0x10 /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc_nano.a(lib_a-memset.o)
-                0x0000000008003620                memset
+                0x00000000080035c0       0x48 /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc_nano.a(lib_a-init.o)
+                0x00000000080035c0                __libc_init_array
+ .text.memcpy   0x0000000008003608       0x1c /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc_nano.a(lib_a-memcpy-stub.o)
+                0x0000000008003608                memcpy
+ .text.memset   0x0000000008003624       0x10 /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc_nano.a(lib_a-memset.o)
+                0x0000000008003624                memset
  *(.glue_7)
- .glue_7        0x0000000008003630        0x0 linker stubs
+ .glue_7        0x0000000008003634        0x0 linker stubs
  *(.glue_7t)
- .glue_7t       0x0000000008003630        0x0 linker stubs
+ .glue_7t       0x0000000008003634        0x0 linker stubs
  *(.eh_frame)
- .eh_frame      0x0000000008003630        0x0 /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/thumb/v7-m/nofp/crtbegin.o
+ .eh_frame      0x0000000008003634        0x0 /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/thumb/v7-m/nofp/crtbegin.o
  *(.init)
- .init          0x0000000008003630        0x4 /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/thumb/v7-m/nofp/crti.o
-                0x0000000008003630                _init
- .init          0x0000000008003634        0x8 /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/thumb/v7-m/nofp/crtn.o
+ .init          0x0000000008003634        0x4 /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/thumb/v7-m/nofp/crti.o
+                0x0000000008003634                _init
+ .init          0x0000000008003638        0x8 /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/thumb/v7-m/nofp/crtn.o
  *(.fini)
- .fini          0x000000000800363c        0x4 /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/thumb/v7-m/nofp/crti.o
-                0x000000000800363c                _fini
- .fini          0x0000000008003640        0x8 /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/thumb/v7-m/nofp/crtn.o
-                0x0000000008003648                . = ALIGN (0x4)
-                0x0000000008003648                _etext = .
+ .fini          0x0000000008003640        0x4 /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/thumb/v7-m/nofp/crti.o
+                0x0000000008003640                _fini
+ .fini          0x0000000008003644        0x8 /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/thumb/v7-m/nofp/crtn.o
+                0x000000000800364c                . = ALIGN (0x4)
+                0x000000000800364c                _etext = .
 
-.vfp11_veneer   0x0000000008003648        0x0
- .vfp11_veneer  0x0000000008003648        0x0 linker stubs
+.vfp11_veneer   0x000000000800364c        0x0
+ .vfp11_veneer  0x000000000800364c        0x0 linker stubs
 
-.v4_bx          0x0000000008003648        0x0
- .v4_bx         0x0000000008003648        0x0 linker stubs
+.v4_bx          0x000000000800364c        0x0
+ .v4_bx         0x000000000800364c        0x0 linker stubs
 
-.iplt           0x0000000008003648        0x0
- .iplt          0x0000000008003648        0x0 /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/thumb/v7-m/nofp/crtbegin.o
+.iplt           0x000000000800364c        0x0
+ .iplt          0x000000000800364c        0x0 /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/thumb/v7-m/nofp/crtbegin.o
 
-.rodata         0x0000000008003648      0x148
-                0x0000000008003648                . = ALIGN (0x4)
+.rodata         0x000000000800364c      0x14c
+                0x000000000800364c                . = ALIGN (0x4)
  *(.rodata)
  *(.rodata*)
  .rodata.SystemClock_Config.str1.4
-                0x0000000008003648       0x21 build/main.o
- *fill*         0x0000000008003669        0x3 
+                0x000000000800364c       0x21 build/main.o
+ *fill*         0x000000000800366d        0x3 
  .rodata.main.str1.4
-                0x000000000800366c       0x79 build/main.o
- *fill*         0x00000000080036e5        0x3 
+                0x0000000008003670       0x79 build/main.o
+ *fill*         0x00000000080036e9        0x3 
  .rodata.HAL_RCC_GetSysClockFreq.str1.4
-                0x00000000080036e8       0x11 build/stm32f1xx_hal_rcc.o
- *fill*         0x00000000080036f9        0x3 
+                0x00000000080036ec       0x11 build/stm32f1xx_hal_rcc.o
+ *fill*         0x00000000080036fd        0x3 
  .rodata.AHBPrescTable
-                0x00000000080036fc       0x10 build/system_stm32f1xx.o
-                0x00000000080036fc                AHBPrescTable
+                0x0000000008003700       0x10 build/system_stm32f1xx.o
+                0x0000000008003700                AHBPrescTable
  .rodata._DoInit.str1.4
-                0x000000000800370c       0x17 build/SEGGER_RTT.o
- *fill*         0x0000000008003723        0x1 
+                0x0000000008003710       0x17 build/SEGGER_RTT.o
+ *fill*         0x0000000008003727        0x1 
  .rodata._aV2C.4908
-                0x0000000008003724       0x10 build/SEGGER_RTT_printf.o
+                0x0000000008003728       0x10 build/SEGGER_RTT_printf.o
  .rodata.DiffSignal_Init.str1.4
-                0x0000000008003734       0x2f build/diff_signal.o
- *fill*         0x0000000008003763        0x1 
+                0x0000000008003738       0x2f build/diff_signal.o
+ *fill*         0x0000000008003767        0x1 
  .rodata.ADXL345_WriteReg.str1.4
-                0x0000000008003764       0x1e build/ADXL345.o
- *fill*         0x0000000008003782        0x2 
- .rodata.DHT22_ReadBit.str1.4
-                0x0000000008003784        0x9 build/DHT22.o
-                0x0000000008003790                . = ALIGN (0x4)
- *fill*         0x000000000800378d        0x3 
+                0x0000000008003768       0x1e build/ADXL345.o
+ *fill*         0x0000000008003786        0x2 
+ .rodata.DHT22_CheckResponse.str1.4
+                0x0000000008003788        0xe build/DHT22.o
+                0x0000000008003798                . = ALIGN (0x4)
+ *fill*         0x0000000008003796        0x2 
 
-.rel.dyn        0x0000000008003790        0x0
- .rel.iplt      0x0000000008003790        0x0 /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/thumb/v7-m/nofp/crtbegin.o
+.rel.dyn        0x0000000008003798        0x0
+ .rel.iplt      0x0000000008003798        0x0 /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/thumb/v7-m/nofp/crtbegin.o
 
 .ARM.extab
  *(.ARM.extab* .gnu.linkonce.armextab.*)
 
-.ARM            0x0000000008003790        0x0
-                0x0000000008003790                __exidx_start = .
+.ARM            0x0000000008003798        0x0
+                0x0000000008003798                __exidx_start = .
  *(.ARM.exidx*)
-                0x0000000008003790                __exidx_end = .
+                0x0000000008003798                __exidx_end = .
 
-.preinit_array  0x0000000008003790        0x0
-                0x0000000008003790                PROVIDE (__preinit_array_start = .)
+.preinit_array  0x0000000008003798        0x0
+                0x0000000008003798                PROVIDE (__preinit_array_start = .)
  *(.preinit_array*)
-                0x0000000008003790                PROVIDE (__preinit_array_end = .)
+                0x0000000008003798                PROVIDE (__preinit_array_end = .)
 
-.init_array     0x0000000008003790        0x4
-                0x0000000008003790                PROVIDE (__init_array_start = .)
+.init_array     0x0000000008003798        0x4
+                0x0000000008003798                PROVIDE (__init_array_start = .)
  *(SORT_BY_NAME(.init_array.*))
  *(.init_array*)
- .init_array    0x0000000008003790        0x4 /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/thumb/v7-m/nofp/crtbegin.o
-                0x0000000008003794                PROVIDE (__init_array_end = .)
+ .init_array    0x0000000008003798        0x4 /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/thumb/v7-m/nofp/crtbegin.o
+                0x000000000800379c                PROVIDE (__init_array_end = .)
 
-.fini_array     0x0000000008003794        0x4
+.fini_array     0x000000000800379c        0x4
                 [!provide]                        PROVIDE (__fini_array_start = .)
  *(SORT_BY_NAME(.fini_array.*))
  *(.fini_array*)
- .fini_array    0x0000000008003794        0x4 /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/thumb/v7-m/nofp/crtbegin.o
+ .fini_array    0x000000000800379c        0x4 /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/thumb/v7-m/nofp/crtbegin.o
                 [!provide]                        PROVIDE (__fini_array_end = .)
-                0x0000000008003798                _sidata = LOADADDR (.data)
+                0x00000000080037a0                _sidata = LOADADDR (.data)
 
-.data           0x0000000020000000        0xc load address 0x0000000008003798
+.data           0x0000000020000000        0xc load address 0x00000000080037a0
                 0x0000000020000000                . = ALIGN (0x4)
                 0x0000000020000000                _sdata = .
  *(.data)
@@ -1846,11 +1846,11 @@ LOAD /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/
                 0x000000002000000c                . = ALIGN (0x4)
                 0x000000002000000c                _edata = .
 
-.igot.plt       0x000000002000000c        0x0 load address 0x00000000080037a4
+.igot.plt       0x000000002000000c        0x0 load address 0x00000000080037ac
  .igot.plt      0x000000002000000c        0x0 /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/thumb/v7-m/nofp/crtbegin.o
                 0x000000002000000c                . = ALIGN (0x4)
 
-.bss            0x000000002000000c      0x684 load address 0x00000000080037a4
+.bss            0x000000002000000c      0x684 load address 0x00000000080037ac
                 0x000000002000000c                _sbss = .
                 0x000000002000000c                __bss_start__ = _sbss
  *(.bss)
@@ -1883,7 +1883,7 @@ LOAD /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/
                 0x0000000020000690                __bss_end__ = _ebss
 
 ._user_heap_stack
-                0x0000000020000690      0x600 load address 0x00000000080037a4
+                0x0000000020000690      0x600 load address 0x00000000080037ac
                 0x0000000020000690                . = ALIGN (0x8)
                 [!provide]                        PROVIDE (end = .)
                 [!provide]                        PROVIDE (_end = .)
@@ -1979,7 +1979,7 @@ LOAD /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/
 LOAD /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a
 LOAD /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/thumb/v7-m/nofp/libgcc.a
 
-.debug_info     0x0000000000000000    0x19320
+.debug_info     0x0000000000000000    0x19330
  .debug_info    0x0000000000000000     0x1fa1 build/main.o
  .debug_info    0x0000000000001fa1      0x504 build/gpio.o
  .debug_info    0x00000000000024a5      0xa20 build/spi.o
@@ -2001,9 +2001,9 @@ LOAD /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/
  .debug_info    0x0000000000013db3     0x1868 build/diff_signal.o
  .debug_info    0x000000000001561b     0x116a build/diff_signal_rx.o
  .debug_info    0x0000000000016785     0x15d9 build/ADXL345.o
- .debug_info    0x0000000000017d5e      0x7d0 build/DHT22.o
- .debug_info    0x000000000001852e      0xdd0 build/eeprom.o
- .debug_info    0x00000000000192fe       0x22 build/startup_stm32f103xe.o
+ .debug_info    0x0000000000017d5e      0x7e0 build/DHT22.o
+ .debug_info    0x000000000001853e      0xdd0 build/eeprom.o
+ .debug_info    0x000000000001930e       0x22 build/startup_stm32f103xe.o
 
 .debug_abbrev   0x0000000000000000     0x3818
  .debug_abbrev  0x0000000000000000      0x30f build/main.o
@@ -2031,7 +2031,7 @@ LOAD /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/
  .debug_abbrev  0x00000000000035ac      0x25a build/eeprom.o
  .debug_abbrev  0x0000000000003806       0x12 build/startup_stm32f103xe.o
 
-.debug_loc      0x0000000000000000     0xfa11
+.debug_loc      0x0000000000000000     0xfa1f
  .debug_loc     0x0000000000000000       0x9c build/main.o
  .debug_loc     0x000000000000009c       0x39 build/gpio.o
  .debug_loc     0x00000000000000d5      0x108 build/spi.o
@@ -2053,8 +2053,8 @@ LOAD /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/
  .debug_loc     0x000000000000ea70      0x1e1 build/diff_signal.o
  .debug_loc     0x000000000000ec51      0x14f build/diff_signal_rx.o
  .debug_loc     0x000000000000eda0      0x315 build/ADXL345.o
- .debug_loc     0x000000000000f0b5      0x353 build/DHT22.o
- .debug_loc     0x000000000000f408      0x609 build/eeprom.o
+ .debug_loc     0x000000000000f0b5      0x361 build/DHT22.o
+ .debug_loc     0x000000000000f416      0x609 build/eeprom.o
 
 .debug_aranges  0x0000000000000000      0xf08
  .debug_aranges
@@ -2132,7 +2132,7 @@ LOAD /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/
  .debug_ranges  0x0000000000000e78       0xf0 build/eeprom.o
  .debug_ranges  0x0000000000000f68       0x20 build/startup_stm32f103xe.o
 
-.debug_line     0x0000000000000000    0x1018a
+.debug_line     0x0000000000000000    0x10196
  .debug_line    0x0000000000000000      0x514 build/main.o
  .debug_line    0x0000000000000514      0x286 build/gpio.o
  .debug_line    0x000000000000079a      0x325 build/spi.o
@@ -2154,9 +2154,9 @@ LOAD /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/
  .debug_line    0x000000000000e877      0x4ae build/diff_signal.o
  .debug_line    0x000000000000ed25      0x3f7 build/diff_signal_rx.o
  .debug_line    0x000000000000f11c      0x450 build/ADXL345.o
- .debug_line    0x000000000000f56c      0x4bc build/DHT22.o
- .debug_line    0x000000000000fa28      0x6ed build/eeprom.o
- .debug_line    0x0000000000010115       0x75 build/startup_stm32f103xe.o
+ .debug_line    0x000000000000f56c      0x4c8 build/DHT22.o
+ .debug_line    0x000000000000fa34      0x6ed build/eeprom.o
+ .debug_line    0x0000000000010121       0x75 build/startup_stm32f103xe.o
 
 .debug_str      0x0000000000000000     0x4948
  .debug_str     0x0000000000000000     0x123b build/main.o
@@ -2234,7 +2234,7 @@ LOAD /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/
  .comment       0x000000000000004c       0x4d build/DHT22.o
  .comment       0x000000000000004c       0x4d build/eeprom.o
 
-.debug_frame    0x0000000000000000     0x2b68
+.debug_frame    0x0000000000000000     0x2b64
  .debug_frame   0x0000000000000000       0x5c build/main.o
  .debug_frame   0x000000000000005c       0x3c build/gpio.o
  .debug_frame   0x0000000000000098       0x60 build/spi.o
@@ -2256,17 +2256,17 @@ LOAD /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/
  .debug_frame   0x0000000000002490       0x90 build/diff_signal.o
  .debug_frame   0x0000000000002520       0x9c build/diff_signal_rx.o
  .debug_frame   0x00000000000025bc       0xc0 build/ADXL345.o
- .debug_frame   0x000000000000267c      0x10c build/DHT22.o
- .debug_frame   0x0000000000002788      0x140 build/eeprom.o
- .debug_frame   0x00000000000028c8       0x2c /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc_nano.a(lib_a-init.o)
- .debug_frame   0x00000000000028f4       0x28 /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc_nano.a(lib_a-memcpy-stub.o)
- .debug_frame   0x000000000000291c       0x20 /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc_nano.a(lib_a-memset.o)
- .debug_frame   0x000000000000293c       0x24 /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/thumb/v7-m/nofp/libgcc.a(_arm_mulsf3.o)
- .debug_frame   0x0000000000002960       0xac /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/thumb/v7-m/nofp/libgcc.a(_arm_addsubdf3.o)
- .debug_frame   0x0000000000002a0c       0x24 /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/thumb/v7-m/nofp/libgcc.a(_arm_truncdfsf2.o)
- .debug_frame   0x0000000000002a30       0x4c /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/thumb/v7-m/nofp/libgcc.a(_arm_addsubsf3.o)
- .debug_frame   0x0000000000002a7c       0xc8 /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/thumb/v7-m/nofp/libgcc.a(_arm_cmpsf2.o)
- .debug_frame   0x0000000000002b44       0x24 /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/thumb/v7-m/nofp/libgcc.a(_arm_fixsfsi.o)
+ .debug_frame   0x000000000000267c      0x108 build/DHT22.o
+ .debug_frame   0x0000000000002784      0x140 build/eeprom.o
+ .debug_frame   0x00000000000028c4       0x2c /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc_nano.a(lib_a-init.o)
+ .debug_frame   0x00000000000028f0       0x28 /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc_nano.a(lib_a-memcpy-stub.o)
+ .debug_frame   0x0000000000002918       0x20 /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc_nano.a(lib_a-memset.o)
+ .debug_frame   0x0000000000002938       0x24 /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/thumb/v7-m/nofp/libgcc.a(_arm_mulsf3.o)
+ .debug_frame   0x000000000000295c       0xac /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/thumb/v7-m/nofp/libgcc.a(_arm_addsubdf3.o)
+ .debug_frame   0x0000000000002a08       0x24 /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/thumb/v7-m/nofp/libgcc.a(_arm_truncdfsf2.o)
+ .debug_frame   0x0000000000002a2c       0x4c /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/thumb/v7-m/nofp/libgcc.a(_arm_addsubsf3.o)
+ .debug_frame   0x0000000000002a78       0xc8 /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/thumb/v7-m/nofp/libgcc.a(_arm_cmpsf2.o)
+ .debug_frame   0x0000000000002b40       0x24 /opt/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/thumb/v7-m/nofp/libgcc.a(_arm_fixsfsi.o)
 
 Cross Reference Table
 
