@@ -26,9 +26,10 @@ build/stm32f1xx_it.o: Core/Src/stm32f1xx_it.c Core/Inc/main.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h \
- Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h \
- Core/Inc/stm32f1xx_it.h diff_signal/diff_signal_rx.h \
- diff_signal/diff_signal.h
+ Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h Core/Inc/tim.h \
+ Core/Inc/main.h Core/Inc/stm32f1xx_it.h diff_signal/diff_signal_rx.h \
+ diff_signal/diff_signal.h sensor_device/soft_timer.h \
+ ARM_SEGGER_RTT/SEGGER_RTT.h ARM_SEGGER_RTT/SEGGER_RTT_Conf.h
 
 Core/Inc/main.h:
 
@@ -92,8 +93,18 @@ Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h:
 
 Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h:
 
+Core/Inc/tim.h:
+
+Core/Inc/main.h:
+
 Core/Inc/stm32f1xx_it.h:
 
 diff_signal/diff_signal_rx.h:
 
 diff_signal/diff_signal.h:
+
+sensor_device/soft_timer.h:
+
+ARM_SEGGER_RTT/SEGGER_RTT.h:
+
+ARM_SEGGER_RTT/SEGGER_RTT_Conf.h:

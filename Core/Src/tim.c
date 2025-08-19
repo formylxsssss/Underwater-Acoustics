@@ -28,7 +28,7 @@ TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim3;
 TIM_HandleTypeDef htim8;
-
+TIM_HandleTypeDef htim6;
 /* TIM1 init function */
 void MX_TIM1_Init(void)
 {
@@ -165,7 +165,34 @@ void MX_TIM8_Init(void)
   HAL_TIM_MspPostInit(&htim8);
 
 }
+/********************* TIM6 INIT ************************/
+void MX_TIM6_Init(void)
+{
+    /* 1. 使能时钟 */
+    __HAL_RCC_TIM6_CLK_ENABLE();
 
+    /* 2. 配置基本参数 */
+    htim6.Instance = TIM6;
+    /* Prescaler = (SystemCoreClock / 1000) - 1  => 计数器时钟 1MHz */
+    htim6.Init.Prescaler = 71;
+    /* 向上计数 */
+    htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
+    /* 自动重装载值 = 1 - 1 => 每次溢出时间 1ms */
+    htim6.Init.Period = 999;
+    /* 关闭 ARR 预装载 */
+    htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+
+    if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
+    {
+        /* 初始化错误处理 */
+        Error_Handler();
+    }
+
+    /* 3. 配置 NVIC：TIM6 全局中断优先级 */
+    HAL_NVIC_SetPriority(TIM6_DAC_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(TIM6_DAC_IRQn);
+}
+/************************* TIM PWM INIT *******************************/
 void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef* tim_pwmHandle)
 {
 

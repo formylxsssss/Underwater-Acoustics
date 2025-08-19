@@ -28,7 +28,7 @@ build/diff_signal_rx.o: diff_signal/diff_signal_rx.c \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h \
- diff_signal/diff_signal.h
+ diff_signal/diff_signal.h Core/Inc/stm32f1xx_it.h
 
 diff_signal/diff_signal_rx.h:
 
@@ -95,3 +95,5 @@ Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h:
 Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h:
 
 diff_signal/diff_signal.h:
+
+Core/Inc/stm32f1xx_it.h:

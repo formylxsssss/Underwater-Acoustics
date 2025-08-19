@@ -1,0 +1,247 @@
+ARM GAS  /tmp/ccqmh2Q8.s 			page 1
+
+
+   1              		.cpu cortex-m3
+   2              		.eabi_attribute 20, 1
+   3              		.eabi_attribute 21, 1
+   4              		.eabi_attribute 23, 3
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 1
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"data_collect.c"
+  12              		.text
+  13              	.Ltext0:
+  14              		.cfi_sections	.debug_frame
+  15              		.section	.text.set_local_dht22_data,"ax",%progbits
+  16              		.align	1
+  17              		.global	set_local_dht22_data
+  18              		.arch armv7-m
+  19              		.syntax unified
+  20              		.thumb
+  21              		.thumb_func
+  22              		.fpu softvfp
+  24              	set_local_dht22_data:
+  25              	.LVL0:
+  26              	.LFB0:
+  27              		.file 1 "sensor_device/data_collect.c"
+   1:sensor_device/data_collect.c **** #include "data_collect.h"
+   2:sensor_device/data_collect.c **** #include "stdint.h"
+   3:sensor_device/data_collect.c **** #include "string.h"
+   4:sensor_device/data_collect.c **** #include "stdlib.h"
+   5:sensor_device/data_collect.c **** 
+   6:sensor_device/data_collect.c **** DATA_GATHER all_data_gather = {0x00};
+   7:sensor_device/data_collect.c **** 
+   8:sensor_device/data_collect.c **** 
+   9:sensor_device/data_collect.c **** void set_local_dht22_data(float temp,float hum)
+  10:sensor_device/data_collect.c **** {
+  28              		.loc 1 10 1 view -0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              		@ link register save eliminated.
+  11:sensor_device/data_collect.c ****     all_data_gather.temperature = temp;
+  33              		.loc 1 11 5 view .LVU1
+  34              		.loc 1 11 33 is_stmt 0 view .LVU2
+  35 0000 014B     		ldr	r3, .L2
+  36 0002 1860     		str	r0, [r3]	@ float
+  12:sensor_device/data_collect.c ****     all_data_gather.humidity = hum;
+  37              		.loc 1 12 5 is_stmt 1 view .LVU3
+  38              		.loc 1 12 30 is_stmt 0 view .LVU4
+  39 0004 5960     		str	r1, [r3, #4]	@ float
+  13:sensor_device/data_collect.c **** }
+  40              		.loc 1 13 1 view .LVU5
+  41 0006 7047     		bx	lr
+  42              	.L3:
+  43              		.align	2
+  44              	.L2:
+  45 0008 00000000 		.word	.LANCHOR0
+ARM GAS  /tmp/ccqmh2Q8.s 			page 2
+
+
+  46              		.cfi_endproc
+  47              	.LFE0:
+  49              		.section	.text.get_local_dht22_data,"ax",%progbits
+  50              		.align	1
+  51              		.global	get_local_dht22_data
+  52              		.syntax unified
+  53              		.thumb
+  54              		.thumb_func
+  55              		.fpu softvfp
+  57              	get_local_dht22_data:
+  58              	.LVL1:
+  59              	.LFB1:
+  14:sensor_device/data_collect.c **** 
+  15:sensor_device/data_collect.c **** void get_local_dht22_data(float *temp,float *hum)
+  16:sensor_device/data_collect.c **** {
+  60              		.loc 1 16 1 is_stmt 1 view -0
+  61              		.cfi_startproc
+  62              		@ args = 0, pretend = 0, frame = 0
+  63              		@ frame_needed = 0, uses_anonymous_args = 0
+  64              		@ link register save eliminated.
+  17:sensor_device/data_collect.c ****     *temp = all_data_gather.temperature;
+  65              		.loc 1 17 5 view .LVU7
+  66              		.loc 1 17 28 is_stmt 0 view .LVU8
+  67 0000 024B     		ldr	r3, .L5
+  68 0002 1A68     		ldr	r2, [r3]	@ float
+  69              		.loc 1 17 11 view .LVU9
+  70 0004 0260     		str	r2, [r0]	@ float
+  18:sensor_device/data_collect.c ****     *hum = all_data_gather.humidity;
+  71              		.loc 1 18 5 is_stmt 1 view .LVU10
+  72              		.loc 1 18 27 is_stmt 0 view .LVU11
+  73 0006 5B68     		ldr	r3, [r3, #4]	@ float
+  74              		.loc 1 18 10 view .LVU12
+  75 0008 0B60     		str	r3, [r1]	@ float
+  19:sensor_device/data_collect.c **** }
+  76              		.loc 1 19 1 view .LVU13
+  77 000a 7047     		bx	lr
+  78              	.L6:
+  79              		.align	2
+  80              	.L5:
+  81 000c 00000000 		.word	.LANCHOR0
+  82              		.cfi_endproc
+  83              	.LFE1:
+  85              		.section	.text.set_local_adxl_345_data,"ax",%progbits
+  86              		.align	1
+  87              		.global	set_local_adxl_345_data
+  88              		.syntax unified
+  89              		.thumb
+  90              		.thumb_func
+  91              		.fpu softvfp
+  93              	set_local_adxl_345_data:
+  94              	.LVL2:
+  95              	.LFB2:
+  20:sensor_device/data_collect.c **** 
+  21:sensor_device/data_collect.c **** void set_local_adxl_345_data(float x_data,float y_data,float z_data)
+  22:sensor_device/data_collect.c **** {
+  96              		.loc 1 22 1 is_stmt 1 view -0
+  97              		.cfi_startproc
+ARM GAS  /tmp/ccqmh2Q8.s 			page 3
+
+
+  98              		@ args = 0, pretend = 0, frame = 0
+  99              		@ frame_needed = 0, uses_anonymous_args = 0
+ 100              		@ link register save eliminated.
+  23:sensor_device/data_collect.c ****     all_data_gather.x_data = x_data;
+ 101              		.loc 1 23 5 view .LVU15
+ 102              		.loc 1 23 28 is_stmt 0 view .LVU16
+ 103 0000 024B     		ldr	r3, .L8
+ 104 0002 9860     		str	r0, [r3, #8]	@ float
+  24:sensor_device/data_collect.c ****     all_data_gather.y_data = y_data;
+ 105              		.loc 1 24 5 is_stmt 1 view .LVU17
+ 106              		.loc 1 24 28 is_stmt 0 view .LVU18
+ 107 0004 D960     		str	r1, [r3, #12]	@ float
+  25:sensor_device/data_collect.c ****     all_data_gather.z_data = z_data;
+ 108              		.loc 1 25 5 is_stmt 1 view .LVU19
+ 109              		.loc 1 25 28 is_stmt 0 view .LVU20
+ 110 0006 1A61     		str	r2, [r3, #16]	@ float
+  26:sensor_device/data_collect.c **** }
+ 111              		.loc 1 26 1 view .LVU21
+ 112 0008 7047     		bx	lr
+ 113              	.L9:
+ 114 000a 00BF     		.align	2
+ 115              	.L8:
+ 116 000c 00000000 		.word	.LANCHOR0
+ 117              		.cfi_endproc
+ 118              	.LFE2:
+ 120              		.section	.text.get_local_adxl_345_data,"ax",%progbits
+ 121              		.align	1
+ 122              		.global	get_local_adxl_345_data
+ 123              		.syntax unified
+ 124              		.thumb
+ 125              		.thumb_func
+ 126              		.fpu softvfp
+ 128              	get_local_adxl_345_data:
+ 129              	.LVL3:
+ 130              	.LFB3:
+  27:sensor_device/data_collect.c **** 
+  28:sensor_device/data_collect.c **** void get_local_adxl_345_data(float *x_data,float *y_data,float *z_data)
+  29:sensor_device/data_collect.c **** {
+ 131              		.loc 1 29 1 is_stmt 1 view -0
+ 132              		.cfi_startproc
+ 133              		@ args = 0, pretend = 0, frame = 0
+ 134              		@ frame_needed = 0, uses_anonymous_args = 0
+ 135              		@ link register save eliminated.
+ 136              		.loc 1 29 1 is_stmt 0 view .LVU23
+ 137 0000 10B4     		push	{r4}
+ 138              	.LCFI0:
+ 139              		.cfi_def_cfa_offset 4
+ 140              		.cfi_offset 4, -4
+  30:sensor_device/data_collect.c ****     *x_data = all_data_gather.x_data;
+ 141              		.loc 1 30 5 is_stmt 1 view .LVU24
+ 142              		.loc 1 30 30 is_stmt 0 view .LVU25
+ 143 0002 044B     		ldr	r3, .L12
+ 144 0004 9C68     		ldr	r4, [r3, #8]	@ float
+ 145              		.loc 1 30 13 view .LVU26
+ 146 0006 0460     		str	r4, [r0]	@ float
+  31:sensor_device/data_collect.c ****     *y_data = all_data_gather.y_data;
+ 147              		.loc 1 31 5 is_stmt 1 view .LVU27
+ARM GAS  /tmp/ccqmh2Q8.s 			page 4
+
+
+ 148              		.loc 1 31 30 is_stmt 0 view .LVU28
+ 149 0008 D868     		ldr	r0, [r3, #12]	@ float
+ 150              	.LVL4:
+ 151              		.loc 1 31 13 view .LVU29
+ 152 000a 0860     		str	r0, [r1]	@ float
+  32:sensor_device/data_collect.c ****     *z_data = all_data_gather.z_data;
+ 153              		.loc 1 32 5 is_stmt 1 view .LVU30
+ 154              		.loc 1 32 30 is_stmt 0 view .LVU31
+ 155 000c 1B69     		ldr	r3, [r3, #16]	@ float
+ 156              		.loc 1 32 13 view .LVU32
+ 157 000e 1360     		str	r3, [r2]	@ float
+  33:sensor_device/data_collect.c **** 
+  34:sensor_device/data_collect.c **** }...
+ 158              		.loc 1 34 1 view .LVU33
+ 159 0010 10BC     		pop	{r4}
+ 160              	.LCFI1:
+ 161              		.cfi_restore 4
+ 162              		.cfi_def_cfa_offset 0
+ 163 0012 7047     		bx	lr
+ 164              	.L13:
+ 165              		.align	2
+ 166              	.L12:
+ 167 0014 00000000 		.word	.LANCHOR0
+ 168              		.cfi_endproc
+ 169              	.LFE3:
+ 171              		.global	all_data_gather
+ 172              		.section	.bss.all_data_gather,"aw",%nobits
+ 173              		.align	2
+ 174              		.set	.LANCHOR0,. + 0
+ 177              	all_data_gather:
+ 178 0000 00000000 		.space	20
+ 178      00000000 
+ 178      00000000 
+ 178      00000000 
+ 178      00000000 
+ 179              		.text
+ 180              	.Letext0:
+ 181              		.file 2 "sensor_device/data_collect.h"
+ 182              		.file 3 "/opt/gcc-arm-none-eabi-9-2020-q2-update/lib/gcc/arm-none-eabi/9.3.1/include/stddef.h"
+ 183              		.file 4 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/_types.h"
+ 184              		.file 5 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/reent.h"
+ 185              		.file 6 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/lock.h"
+ 186              		.file 7 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/stdlib.h"
+ARM GAS  /tmp/ccqmh2Q8.s 			page 5
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 data_collect.c
+     /tmp/ccqmh2Q8.s:16     .text.set_local_dht22_data:0000000000000000 $t
+     /tmp/ccqmh2Q8.s:24     .text.set_local_dht22_data:0000000000000000 set_local_dht22_data
+     /tmp/ccqmh2Q8.s:45     .text.set_local_dht22_data:0000000000000008 $d
+     /tmp/ccqmh2Q8.s:50     .text.get_local_dht22_data:0000000000000000 $t
+     /tmp/ccqmh2Q8.s:57     .text.get_local_dht22_data:0000000000000000 get_local_dht22_data
+     /tmp/ccqmh2Q8.s:81     .text.get_local_dht22_data:000000000000000c $d
+     /tmp/ccqmh2Q8.s:86     .text.set_local_adxl_345_data:0000000000000000 $t
+     /tmp/ccqmh2Q8.s:93     .text.set_local_adxl_345_data:0000000000000000 set_local_adxl_345_data
+     /tmp/ccqmh2Q8.s:116    .text.set_local_adxl_345_data:000000000000000c $d
+     /tmp/ccqmh2Q8.s:121    .text.get_local_adxl_345_data:0000000000000000 $t
+     /tmp/ccqmh2Q8.s:128    .text.get_local_adxl_345_data:0000000000000000 get_local_adxl_345_data
+     /tmp/ccqmh2Q8.s:167    .text.get_local_adxl_345_data:0000000000000014 $d
+     /tmp/ccqmh2Q8.s:177    .bss.all_data_gather:0000000000000000 all_data_gather
+     /tmp/ccqmh2Q8.s:173    .bss.all_data_gather:0000000000000000 $d
+
+NO UNDEFINED SYMBOLS

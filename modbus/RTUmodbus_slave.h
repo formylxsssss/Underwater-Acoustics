@@ -11,10 +11,6 @@
 #define __RTU_MODBUY_SERVICE_H__
 #include <stdint.h>
 #include "RTUmodbus_CRC.h"
-#include "nrf_log.h"
-#include "nrf_log_ctrl.h"
-#include "nrf_log_default_backends.h"
-#include "project.h"
 #include <string.h>
 
 
@@ -100,6 +96,7 @@ typedef struct
 void MODS_ReciveNew_no_timer(uint8_t _byte);
 void MODS_ReciveNew(uint8_t _byte);
 void MODS_Poll(void);
+uint32_t convert_float_to_uint32(float data);
 void MODS_RxTimeOut(void);
 
 extern MODS_T g_tModS;

@@ -20,10 +20,9 @@ TARGET = underwater_comm
 ALLCSRC =
 ALLINC =
 include ARM_SEGGER_RTT/segger_rtt.mk
-
 include diff_signal/diff_signal.mk
-
 include sensor_device/sensor_device.mk
+include modbus/RTUmodbus.mk
 ######################################
 # building variables
 ######################################

@@ -1,6 +1,7 @@
 #include "diff_signal_rx.h"
 #include "stm32f1xx_hal.h"
 #include "stm32f1xx_hal_adc.h"
+#include "stm32f1xx_it.h"
 // 你的 DWT 延时初始化，保证 DWT->CYCCNT 可用
 extern void DWT_Delay_Init(void);
 extern void DWT_Delay_us(uint32_t us);
@@ -77,14 +78,6 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     HAL_TIM_Base_Start_IT(&htim2);
 }
 
-// ----------------- TIM2 定时中断：触发 ADC 开始转换 -----------------
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-    if (htim->Instance != TIM2) return;
-
-    // 每 BIT_DURATION_US 微秒触发一次 ADC 转换
-    HAL_ADC_Start_IT(&hadc1);
-}
 
 // ----------------- ADC 转换完成回调：收集一位 -----------------
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)

@@ -32,6 +32,8 @@
 #include "SEGGER_RTT.h"
 #include "Custcom_Pin.h"
 #include "eeprom.h"
+#include "soft_timer.h"
+#include "data_collect.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -59,6 +61,8 @@
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+void dht22_data_read_callback(void);
+void ADXL345_data_read_call_back(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -100,16 +104,20 @@ int main(void)
   MX_SPI2_Init();
   MX_TIM1_Init();
   MX_TIM3_Init();
-  // MX_USB_PCD_Init();
+  MX_TIM6_Init();         // CubeMX 生成的 TIM6 初始化
   MX_TIM8_Init();
   ADXL345_Init();
   DiffSignal_Init();
+  SoftTimer_Init();
+  HAL_TIM_Base_Start_IT(&htim6);
 
   HAL_Delay(100);
   DHT22_Init();
   EEPROM_Init();
   myprintf("peripheral init success\n");
   HAL_Delay(2000);
+  SoftTimer_StartPeriodic(2000, dht22_data_read_callback);
+  SoftTimer_StartPeriodic(2000, ADXL345_data_read_call_back);
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -117,31 +125,32 @@ int main(void)
   /* Infinite loop */
 
   /* USER CODE BEGIN WHILE */
-  // float x,y,z = 0;
-  // uint8_t err_code = 0x00;
-  float hum, temp = 0;
-  uint8_t buff[10] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a};
-  uint8_t rev_buf[10] = {0x00};
-  uint8_t dht22_read_error_code = 0x00; 
   while (1)
   {
-    
-    dht22_read_error_code = DHT22_ReadData(&temp, &hum);
-    myprintf("dht22_read_code_error is %d\n",dht22_read_error_code);
-    myprintf("temp%fhum%f\n",temp,hum);
-    //     EEPROM_WriteBuffer(0x00,buff,10);
 
-    // EEPROM_ReadBuffer(0x00,rev_buf,10);
-    // for(int i =0;i<10;i++)
-    // {
-    //   myprintf("buf is %x\n",rev_buf[i]);
-    // }
     HAL_Delay(3000);
     /* USER CODE END WHILE */
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
 }
+
+void dht22_data_read_callback(void)
+{
+  float temp,hum = 0;
+  DHT22_ReadData(&temp, &hum);
+  myprintf("temper is %f hum is %f\n",temp,hum);
+  set_local_dht22_data(temp,hum);
+}
+
+void ADXL345_data_read_call_back(void)
+{
+  float x_data,y_data,z_data;
+  ADXL345_ReadXYZ(&x_data,&y_data,&z_data);
+  myprintf("xdata is %f,ydata is %f,zdata is %f\n",x_data,y_data,z_data);
+  set_local_adxl_345_data(x_data,y_data,z_data);
+}
+
 
 /**
  * @brief System Clock Configuration

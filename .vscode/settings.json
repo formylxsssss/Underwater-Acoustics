@@ -9,6 +9,9 @@
         "spi.h": "c",
         "main.h": "c",
         "custcom_pin.h": "c",
-        "soft_spi.h": "c"
+        "soft_spi.h": "c",
+        "random": "c",
+        "soft_timer.h": "c",
+        "data_collect.h": "c"
     }
 }

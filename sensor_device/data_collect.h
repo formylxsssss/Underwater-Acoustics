@@ -16,9 +16,10 @@ typedef struct
 
 extern DATA_GATHER all_data_gather;
 
-
-
-
+void set_local_dht22_data(float temp,float hum);
+void get_local_dht22_data(float *temp,float *hum);
+void set_local_adxl_345_data(float x_data,float y_data,float z_data);
+void get_local_adxl_345_data(float *x_data,float *y_data,float *z_data);
 
 
 #endif

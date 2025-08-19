@@ -8,12 +8,9 @@
 */
 #include "stdio.h"
 #include "stdint.h"
+#include "string.h"
 #include "RTUmodbus_slave.h"
-#include "nrf_log.h"
-#include "light_output_task.h"
-#include "rom_data_manager.h"
-#include "self_define_uart.h"
-
+#include "data_collect.h"
 static void MODS_SendWithCRC(uint8_t *_pBuf, uint8_t _ucLen);
 static void MODS_SendAckOk(void);
 static void MODS_SendAckErr(uint8_t _ucErrCode);
@@ -69,9 +66,9 @@ void MODS_Poll(void)
 
 	/* 站地址 (1字节） */
 	addr = g_tModS.RxBuf[0]; /* 第1字节 站号 */
-	if (addr != 0x01)	 /* 判断主机发送的命令地址是否符合 */
+	if (addr != 0x01)		 /* 判断主机发送的命令地址是否符合 */
 	{
-		goto err_ret;	
+		goto err_ret;
 	}
 	/* 分析应用层协议 */
 	MODS_AnalyzeApp();
@@ -166,7 +163,8 @@ static void MODS_SendWithCRC(uint8_t *_pBuf, uint8_t _ucLen)
 	crc = CRC16_Modbus(_pBuf, _ucLen);
 	buf[_ucLen++] = crc >> 8;
 	buf[_ucLen++] = crc;
-	self_uart_send(buf, _ucLen);
+	#warning 这里需要给出一个发送的接口
+	// self_uart_send(buf, _ucLen);
 	/* 此部分为了串口打印结果,实际运用中可不要 */
 }
 
@@ -468,50 +466,84 @@ static void MODS_02H(void)
 static uint8_t MODS_ReadRegValue(uint16_t reg_addr, uint8_t *reg_value)
 {
 	uint16_t value;
-
+	float temp, hum = 0;
+	float x_data, y_data, z_data = 0;
 	switch (reg_addr) /* 判断寄存器地址 */
 	{
+	/*************** dht22 ***********/
 	case SLAVE_REG_P0000:
-		value = need_flash_data.all_pwm_data;
+	{
+		get_local_dht22_data(&temp, &hum);
+		uint32_t temper_32 = convert_float_to_uint32(temp);
+		value = temper_32 >> 16;
 		break;
-
+	}
 	case SLAVE_REG_P0001:
-		value = need_flash_data.modbus_address;
+	{
+		get_local_dht22_data(&temp, &hum);
+		uint32_t temper_32 = convert_float_to_uint32(temp);
+		value = temper_32;
 		break;
-
+	}
 	case SLAVE_REG_P0002:
-		value = 0x0000;
+	{
+		get_local_dht22_data(&temp, &hum);
+		uint32_t hum_32 = convert_float_to_uint32(hum);
+		value = hum_32 >> 16;
 		break;
-
+	}
 	case SLAVE_REG_P0003:
-		value = 0x0000;
+	{
+		get_local_dht22_data(&temp, &hum);
+		uint32_t hum_32 = convert_float_to_uint32(hum);
+		value = hum_32;
 		break;
-	
+	}
+	/*************** adxl345 ***********/
 	case SLAVE_REG_P0004:
-		value = 0x0000;
+	{
+		get_local_adxl_345_data(&x_data, &y_data, &z_data);
+		uint32_t x_data_32 = convert_float_to_uint32(x_data);
+		value = x_data_32 >> 16;
 		break;
-	
+	}
 	case SLAVE_REG_P0005:
-		value = 0x0000;
+	{
+		get_local_adxl_345_data(&x_data, &y_data, &z_data);
+		uint32_t x_data_32 = convert_float_to_uint32(x_data);
+		value = x_data_32;
 		break;
-	
+	}
 	case SLAVE_REG_P0006:
-		value = 0x0000;
+	{
+		get_local_adxl_345_data(&x_data, &y_data, &z_data);
+		uint32_t y_data_32 = convert_float_to_uint32(y_data);
+		value = y_data_32 >> 16;
 		break;
-
+	}
 	case SLAVE_REG_P0007:
-		value = 0x0000;
+	{
+		get_local_adxl_345_data(&x_data, &y_data, &z_data);
+		uint32_t y_data_32 = convert_float_to_uint32(y_data);
+		value = y_data_32;
 		break;
-
+	}
 	case SLAVE_REG_P0008:
-		value = 0x0000;
+	{
+		get_local_adxl_345_data(&x_data, &y_data, &z_data);
+		uint32_t z_data_32 = convert_float_to_uint32(z_data);
+		value = z_data_32>>16;
 		break;
-	
+	}
 	case SLAVE_REG_P0009:
-		value = 0x0000;
+	{
+		get_local_adxl_345_data(&x_data, &y_data, &z_data);
+		uint32_t z_data_32 = convert_float_to_uint32(z_data);
+		value = z_data_32;
 		break;
-	
+	}
 	case SLAVE_REG_P000A:
+	
 		value = 0x0000;
 		break;
 	default:
@@ -537,15 +569,13 @@ static uint8_t MODS_WriteRegValue(uint16_t reg_addr, uint16_t reg_value)
 	switch (reg_addr) /* 判断寄存器地址 */
 	{
 	case SLAVE_REG_P0000:
-		tmp_all_pwm_data = reg_value; 
-		need_set_pwm =1;
+		reg_value = 0x00;
 		break;
 	case SLAVE_REG_P0001:
-		tmp_modbus_address = reg_value;
-		need_set_modbus_address =1;
+		reg_value = 0x00;
 		break;
 	case SLAVE_REG_P0002:
-		rom_data_format_data();
+		reg_value = 0x00;
 		break;
 	case SLAVE_REG_P0003:
 
@@ -610,9 +640,9 @@ static void MODS_03H(void)
 
 			01 03 7040 0020 5F06         ---- 读 7040H 倒数第2条波形记录第1段 64字节
 	*/
-	uint16_t reg;
-	uint16_t num;
-	uint16_t i;
+	uint16_t reg = 0x00;
+	uint16_t num = 0x00;
+	uint16_t i = 0x00;
 	uint8_t reg_value[64];
 
 	g_tModS.RspCode = RSP_OK;
@@ -1031,3 +1061,13 @@ err_ret:
 	}
 }
 
+uint32_t convert_float_to_uint32(float data)
+{
+	union
+	{
+		uint32_t uint32_data;
+		float float_data;
+	} convert_util;
+	convert_util.float_data = data;
+	return convert_util.uint32_data;
+}

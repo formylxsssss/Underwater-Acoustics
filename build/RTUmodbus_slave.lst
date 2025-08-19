@@ -1,0 +1,4052 @@
+ARM GAS  /tmp/ccrEi7aK.s 			page 1
+
+
+   1              		.cpu cortex-m3
+   2              		.eabi_attribute 20, 1
+   3              		.eabi_attribute 21, 1
+   4              		.eabi_attribute 23, 3
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 1
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"RTUmodbus_slave.c"
+  12              		.text
+  13              	.Ltext0:
+  14              		.cfi_sections	.debug_frame
+  15              		.section	.text.MODS_WriteRegValue,"ax",%progbits
+  16              		.align	1
+  17              		.arch armv7-m
+  18              		.syntax unified
+  19              		.thumb
+  20              		.thumb_func
+  21              		.fpu softvfp
+  23              	MODS_WriteRegValue:
+  24              	.LVL0:
+  25              	.LFB13:
+  26              		.file 1 "modbus/RTUmodbus_slave.c"
+   1:modbus/RTUmodbus_slave.c **** /*
+   2:modbus/RTUmodbus_slave.c **** ***************************************************************************************************
+   3:modbus/RTUmodbus_slave.c **** *	模块名称 : MODS通信模块. 从站模式
+   4:modbus/RTUmodbus_slave.c **** *	文件名称 : modbus_slave.c
+   5:modbus/RTUmodbus_slave.c **** *	版    本 : V1.4
+   6:modbus/RTUmodbus_slave.c **** *	说    明 : 头文件
+   7:modbus/RTUmodbus_slave.c **** ***************************************************************************************************
+   8:modbus/RTUmodbus_slave.c **** */
+   9:modbus/RTUmodbus_slave.c **** #include "stdio.h"
+  10:modbus/RTUmodbus_slave.c **** #include "stdint.h"
+  11:modbus/RTUmodbus_slave.c **** #include "RTUmodbus_slave.h"
+  12:modbus/RTUmodbus_slave.c **** #include "data_collect.h"
+  13:modbus/RTUmodbus_slave.c **** static void MODS_SendWithCRC(uint8_t *_pBuf, uint8_t _ucLen);
+  14:modbus/RTUmodbus_slave.c **** static void MODS_SendAckOk(void);
+  15:modbus/RTUmodbus_slave.c **** static void MODS_SendAckErr(uint8_t _ucErrCode);
+  16:modbus/RTUmodbus_slave.c **** 
+  17:modbus/RTUmodbus_slave.c **** static void MODS_AnalyzeApp(void);
+  18:modbus/RTUmodbus_slave.c **** 
+  19:modbus/RTUmodbus_slave.c **** static void MODS_01H(void);
+  20:modbus/RTUmodbus_slave.c **** static void MODS_02H(void);
+  21:modbus/RTUmodbus_slave.c **** static void MODS_03H(void);
+  22:modbus/RTUmodbus_slave.c **** static void MODS_04H(void);
+  23:modbus/RTUmodbus_slave.c **** static void MODS_05H(void);
+  24:modbus/RTUmodbus_slave.c **** static void MODS_06H(void);
+  25:modbus/RTUmodbus_slave.c **** static void MODS_10H(void);
+  26:modbus/RTUmodbus_slave.c **** 
+  27:modbus/RTUmodbus_slave.c **** static uint8_t MODS_ReadRegValue(uint16_t reg_addr, uint8_t *reg_value);
+  28:modbus/RTUmodbus_slave.c **** static uint8_t MODS_WriteRegValue(uint16_t reg_addr, uint16_t reg_value);
+  29:modbus/RTUmodbus_slave.c **** 
+  30:modbus/RTUmodbus_slave.c **** static uint8_t g_mods_timeout = 0;
+  31:modbus/RTUmodbus_slave.c **** 
+  32:modbus/RTUmodbus_slave.c **** MODS_T g_tModS;
+ARM GAS  /tmp/ccrEi7aK.s 			page 2
+
+
+  33:modbus/RTUmodbus_slave.c **** /*
+  34:modbus/RTUmodbus_slave.c **** ***************************************************************************************************
+  35:modbus/RTUmodbus_slave.c **** *	函 数 名: MODS_Poll
+  36:modbus/RTUmodbus_slave.c **** *	功能说明: 解析数据包. 在主程序中轮流调用。
+  37:modbus/RTUmodbus_slave.c **** *	形    参: 无
+  38:modbus/RTUmodbus_slave.c **** *	返 回 值: 无
+  39:modbus/RTUmodbus_slave.c **** ***************************************************************************************************
+  40:modbus/RTUmodbus_slave.c **** */
+  41:modbus/RTUmodbus_slave.c **** void MODS_Poll(void)
+  42:modbus/RTUmodbus_slave.c **** {
+  43:modbus/RTUmodbus_slave.c **** 	uint16_t addr;
+  44:modbus/RTUmodbus_slave.c **** 	uint16_t crc1;
+  45:modbus/RTUmodbus_slave.c **** 
+  46:modbus/RTUmodbus_slave.c **** 	/* 超过3.5个字符时间后执行MODH_RxTimeOut()函数。全局变量 g_rtu_timeout = 1; 通�
+  47:modbus/RTUmodbus_slave.c **** 	if (g_mods_timeout == 0)
+  48:modbus/RTUmodbus_slave.c **** 	{
+  49:modbus/RTUmodbus_slave.c **** 		return; /* 没有超时，继续接收。不要清零 g_tModS.RxCount */
+  50:modbus/RTUmodbus_slave.c **** 	}
+  51:modbus/RTUmodbus_slave.c **** 
+  52:modbus/RTUmodbus_slave.c **** 	g_mods_timeout = 0; /* 清标志 */
+  53:modbus/RTUmodbus_slave.c **** 
+  54:modbus/RTUmodbus_slave.c **** 	if (g_tModS.RxCount < 4) /* 接收到的数据小于4个字节就认为错误 */
+  55:modbus/RTUmodbus_slave.c **** 	{
+  56:modbus/RTUmodbus_slave.c **** 		goto err_ret;
+  57:modbus/RTUmodbus_slave.c **** 	}
+  58:modbus/RTUmodbus_slave.c **** 
+  59:modbus/RTUmodbus_slave.c **** 	/* 计算CRC校验和 */
+  60:modbus/RTUmodbus_slave.c **** 	crc1 = CRC16_Modbus(g_tModS.RxBuf, g_tModS.RxCount);
+  61:modbus/RTUmodbus_slave.c **** 	if (crc1 != 0)
+  62:modbus/RTUmodbus_slave.c **** 	{
+  63:modbus/RTUmodbus_slave.c **** 		goto err_ret;
+  64:modbus/RTUmodbus_slave.c **** 	}
+  65:modbus/RTUmodbus_slave.c **** 
+  66:modbus/RTUmodbus_slave.c **** 	/* 站地址 (1字节） */
+  67:modbus/RTUmodbus_slave.c **** 	addr = g_tModS.RxBuf[0]; /* 第1字节 站号 */
+  68:modbus/RTUmodbus_slave.c **** 	if (addr != 0x01)		 /* 判断主机发送的命令地址是否符合 */
+  69:modbus/RTUmodbus_slave.c **** 	{
+  70:modbus/RTUmodbus_slave.c **** 		goto err_ret;
+  71:modbus/RTUmodbus_slave.c **** 	}
+  72:modbus/RTUmodbus_slave.c **** 	/* 分析应用层协议 */
+  73:modbus/RTUmodbus_slave.c **** 	MODS_AnalyzeApp();
+  74:modbus/RTUmodbus_slave.c **** 
+  75:modbus/RTUmodbus_slave.c **** err_ret:
+  76:modbus/RTUmodbus_slave.c **** 	/* 此部分为了串口打印结果,实际运用中可不要 */
+  77:modbus/RTUmodbus_slave.c **** 	g_tModS.RxCount = 0; /* 必须清零计数器，方便下次帧同步 */
+  78:modbus/RTUmodbus_slave.c **** }
+  79:modbus/RTUmodbus_slave.c **** 
+  80:modbus/RTUmodbus_slave.c **** /*
+  81:modbus/RTUmodbus_slave.c **** ***************************************************************************************************
+  82:modbus/RTUmodbus_slave.c **** *	函 数 名: MODS_ReciveNew
+  83:modbus/RTUmodbus_slave.c **** *	功能说明: 串口接收中断服务程序会调用本函数。当收到一个字节时，执�
+  84:modbus/RTUmodbus_slave.c **** *	形    参: 无
+  85:modbus/RTUmodbus_slave.c **** *	返 回 值: 无
+  86:modbus/RTUmodbus_slave.c **** ***************************************************************************************************
+  87:modbus/RTUmodbus_slave.c **** */
+  88:modbus/RTUmodbus_slave.c **** #if 0 // 本工程不适用串口接收去掉不使用modbus定时器的功能
+  89:modbus/RTUmodbus_slave.c **** 
+ARM GAS  /tmp/ccrEi7aK.s 			page 3
+
+
+  90:modbus/RTUmodbus_slave.c **** void MODS_ReciveNew(uint8_t _byte)
+  91:modbus/RTUmodbus_slave.c **** {
+  92:modbus/RTUmodbus_slave.c **** 	/*
+  93:modbus/RTUmodbus_slave.c **** 		3.5个字符的时间间隔，只是用在RTU模式下面，因为RTU模式没有开始符和结�
+  94:modbus/RTUmodbus_slave.c **** 		两个数据包之间只能靠时间间隔来区分，Modbus定义在不同的波特率下，间�
+  95:modbus/RTUmodbus_slave.c **** 		所以就是3.5个字符的时间，波特率高，这个时间间隔就小，波特率低，这�
+  96:modbus/RTUmodbus_slave.c **** 
+  97:modbus/RTUmodbus_slave.c **** 		4800  = 7.297ms
+  98:modbus/RTUmodbus_slave.c **** 		9600  = 3.646ms
+  99:modbus/RTUmodbus_slave.c **** 		19200  = 1.771ms
+ 100:modbus/RTUmodbus_slave.c **** 		38400  = 0.885ms
+ 101:modbus/RTUmodbus_slave.c **** 	*/
+ 102:modbus/RTUmodbus_slave.c **** 	uint32_t timeout;
+ 103:modbus/RTUmodbus_slave.c **** 
+ 104:modbus/RTUmodbus_slave.c **** 	g_mods_timeout = 0;
+ 105:modbus/RTUmodbus_slave.c **** 	
+ 106:modbus/RTUmodbus_slave.c **** 	timeout = 35000000 / SBAUD485;			/* 计算超时时间，单位us 35000000*/
+ 107:modbus/RTUmodbus_slave.c **** 	
+ 108:modbus/RTUmodbus_slave.c **** 	/* 硬件定时中断，定时精度us 硬件定时器1用于ADC, 定时器2用于Modbus */
+ 109:modbus/RTUmodbus_slave.c **** 	bsp_StartHardTimer(1, timeout, (void *)MODS_RxTimeOut);
+ 110:modbus/RTUmodbus_slave.c **** 
+ 111:modbus/RTUmodbus_slave.c **** 	if (g_tModS.RxCount < S_RX_BUF_SIZE)
+ 112:modbus/RTUmodbus_slave.c **** 	{
+ 113:modbus/RTUmodbus_slave.c **** 		g_tModS.RxBuf[g_tModS.RxCount++] = _byte;
+ 114:modbus/RTUmodbus_slave.c **** 	}
+ 115:modbus/RTUmodbus_slave.c **** }
+ 116:modbus/RTUmodbus_slave.c **** #endif
+ 117:modbus/RTUmodbus_slave.c **** /*
+ 118:modbus/RTUmodbus_slave.c **** ***************************************************************************************************
+ 119:modbus/RTUmodbus_slave.c **** *	函 数 名: MODS_ReciveNew_no_timer
+ 120:modbus/RTUmodbus_slave.c **** *	功能说明: 串口接收中断服务程序会调用本函数。当收到一个字节时，执�
+ 121:modbus/RTUmodbus_slave.c **** *	形    参: 无
+ 122:modbus/RTUmodbus_slave.c **** *	返 回 值: 无
+ 123:modbus/RTUmodbus_slave.c **** ***************************************************************************************************
+ 124:modbus/RTUmodbus_slave.c **** */
+ 125:modbus/RTUmodbus_slave.c **** void MODS_ReciveNew_no_timer(uint8_t _byte)
+ 126:modbus/RTUmodbus_slave.c **** {
+ 127:modbus/RTUmodbus_slave.c **** 	g_mods_timeout = 0;
+ 128:modbus/RTUmodbus_slave.c **** 	if (g_tModS.RxCount < S_RX_BUF_SIZE)
+ 129:modbus/RTUmodbus_slave.c **** 	{
+ 130:modbus/RTUmodbus_slave.c **** 		g_tModS.RxBuf[g_tModS.RxCount++] = _byte;
+ 131:modbus/RTUmodbus_slave.c **** 	}
+ 132:modbus/RTUmodbus_slave.c **** }
+ 133:modbus/RTUmodbus_slave.c **** 
+ 134:modbus/RTUmodbus_slave.c **** /*
+ 135:modbus/RTUmodbus_slave.c **** ***************************************************************************************************
+ 136:modbus/RTUmodbus_slave.c **** *	函 数 名: MODS_RxTimeOut
+ 137:modbus/RTUmodbus_slave.c **** *	功能说明: 超过3.5个字符时间后执行本函数。 设置全局变量 g_mods_timeout = 1
+ 138:modbus/RTUmodbus_slave.c **** *	形    参: 无
+ 139:modbus/RTUmodbus_slave.c **** *	返 回 值: 无
+ 140:modbus/RTUmodbus_slave.c **** ***************************************************************************************************
+ 141:modbus/RTUmodbus_slave.c **** */
+ 142:modbus/RTUmodbus_slave.c **** void MODS_RxTimeOut(void)
+ 143:modbus/RTUmodbus_slave.c **** {
+ 144:modbus/RTUmodbus_slave.c **** 	g_mods_timeout = 1;
+ 145:modbus/RTUmodbus_slave.c **** }
+ 146:modbus/RTUmodbus_slave.c **** 
+ARM GAS  /tmp/ccrEi7aK.s 			page 4
+
+
+ 147:modbus/RTUmodbus_slave.c **** /*
+ 148:modbus/RTUmodbus_slave.c **** ***************************************************************************************************
+ 149:modbus/RTUmodbus_slave.c **** *	函 数 名: MODS_SendWithCRC
+ 150:modbus/RTUmodbus_slave.c **** *	功能说明: 发送一串数据, 自动追加2字节CRC
+ 151:modbus/RTUmodbus_slave.c **** *	形    参: _pBuf 数据；
+ 152:modbus/RTUmodbus_slave.c **** *			  _ucLen 数据长度（不带CRC）
+ 153:modbus/RTUmodbus_slave.c **** *	返 回 值: 无
+ 154:modbus/RTUmodbus_slave.c **** ***************************************************************************************************
+ 155:modbus/RTUmodbus_slave.c **** */
+ 156:modbus/RTUmodbus_slave.c **** static void MODS_SendWithCRC(uint8_t *_pBuf, uint8_t _ucLen)
+ 157:modbus/RTUmodbus_slave.c **** {
+ 158:modbus/RTUmodbus_slave.c **** 	uint16_t crc;
+ 159:modbus/RTUmodbus_slave.c **** 	uint8_t buf[S_TX_BUF_SIZE];
+ 160:modbus/RTUmodbus_slave.c **** 
+ 161:modbus/RTUmodbus_slave.c **** 	memcpy(buf, _pBuf, _ucLen);
+ 162:modbus/RTUmodbus_slave.c **** 	crc = CRC16_Modbus(_pBuf, _ucLen);
+ 163:modbus/RTUmodbus_slave.c **** 	buf[_ucLen++] = crc >> 8;
+ 164:modbus/RTUmodbus_slave.c **** 	buf[_ucLen++] = crc;
+ 165:modbus/RTUmodbus_slave.c **** 	self_uart_send(buf, _ucLen);
+ 166:modbus/RTUmodbus_slave.c **** 	/* 此部分为了串口打印结果,实际运用中可不要 */
+ 167:modbus/RTUmodbus_slave.c **** }
+ 168:modbus/RTUmodbus_slave.c **** 
+ 169:modbus/RTUmodbus_slave.c **** /*
+ 170:modbus/RTUmodbus_slave.c **** ***************************************************************************************************
+ 171:modbus/RTUmodbus_slave.c **** *	函 数 名: MODS_SendAckErr
+ 172:modbus/RTUmodbus_slave.c **** *	功能说明: 发送错误应答
+ 173:modbus/RTUmodbus_slave.c **** *	形    参: _ucErrCode : 错误代码
+ 174:modbus/RTUmodbus_slave.c **** *	返 回 值: 无
+ 175:modbus/RTUmodbus_slave.c **** ***************************************************************************************************
+ 176:modbus/RTUmodbus_slave.c **** */
+ 177:modbus/RTUmodbus_slave.c **** static void MODS_SendAckErr(uint8_t _ucErrCode)
+ 178:modbus/RTUmodbus_slave.c **** {
+ 179:modbus/RTUmodbus_slave.c **** 	uint8_t txbuf[3];
+ 180:modbus/RTUmodbus_slave.c **** 
+ 181:modbus/RTUmodbus_slave.c **** 	txbuf[0] = g_tModS.RxBuf[0];		/* 485地址 */
+ 182:modbus/RTUmodbus_slave.c **** 	txbuf[1] = g_tModS.RxBuf[1] | 0x80; /* 异常的功能码 */
+ 183:modbus/RTUmodbus_slave.c **** 	txbuf[2] = _ucErrCode;				/* 错误代码(01,02,03,04) */
+ 184:modbus/RTUmodbus_slave.c **** 
+ 185:modbus/RTUmodbus_slave.c **** 	MODS_SendWithCRC(txbuf, 3);
+ 186:modbus/RTUmodbus_slave.c **** }
+ 187:modbus/RTUmodbus_slave.c **** 
+ 188:modbus/RTUmodbus_slave.c **** /*
+ 189:modbus/RTUmodbus_slave.c **** ***************************************************************************************************
+ 190:modbus/RTUmodbus_slave.c **** *	函 数 名: MODS_SendAckOk
+ 191:modbus/RTUmodbus_slave.c **** *	功能说明: 发送正确的应答.
+ 192:modbus/RTUmodbus_slave.c **** *	形    参: 无
+ 193:modbus/RTUmodbus_slave.c **** *	返 回 值: 无
+ 194:modbus/RTUmodbus_slave.c **** ***************************************************************************************************
+ 195:modbus/RTUmodbus_slave.c **** */
+ 196:modbus/RTUmodbus_slave.c **** static void MODS_SendAckOk(void)
+ 197:modbus/RTUmodbus_slave.c **** {
+ 198:modbus/RTUmodbus_slave.c **** 	uint8_t txbuf[6];
+ 199:modbus/RTUmodbus_slave.c **** 	uint8_t i;
+ 200:modbus/RTUmodbus_slave.c **** 
+ 201:modbus/RTUmodbus_slave.c **** 	for (i = 0; i < 6; i++)
+ 202:modbus/RTUmodbus_slave.c **** 	{
+ 203:modbus/RTUmodbus_slave.c **** 		txbuf[i] = g_tModS.RxBuf[i];
+ARM GAS  /tmp/ccrEi7aK.s 			page 5
+
+
+ 204:modbus/RTUmodbus_slave.c **** 	}
+ 205:modbus/RTUmodbus_slave.c **** 	MODS_SendWithCRC(txbuf, 6);
+ 206:modbus/RTUmodbus_slave.c **** }
+ 207:modbus/RTUmodbus_slave.c **** 
+ 208:modbus/RTUmodbus_slave.c **** /*
+ 209:modbus/RTUmodbus_slave.c **** ***************************************************************************************************
+ 210:modbus/RTUmodbus_slave.c **** *	函 数 名: MODS_AnalyzeApp
+ 211:modbus/RTUmodbus_slave.c **** *	功能说明: 分析应用层协议
+ 212:modbus/RTUmodbus_slave.c **** *	形    参: 无
+ 213:modbus/RTUmodbus_slave.c **** *	返 回 值: 无
+ 214:modbus/RTUmodbus_slave.c **** ***************************************************************************************************
+ 215:modbus/RTUmodbus_slave.c **** */
+ 216:modbus/RTUmodbus_slave.c **** static void MODS_AnalyzeApp(void)
+ 217:modbus/RTUmodbus_slave.c **** {
+ 218:modbus/RTUmodbus_slave.c **** 	switch (g_tModS.RxBuf[1]) /* 第2个字节 功能码 */
+ 219:modbus/RTUmodbus_slave.c **** 	{
+ 220:modbus/RTUmodbus_slave.c **** 	case 0x01: /* 读取线圈状态（此例程用led代替）*/
+ 221:modbus/RTUmodbus_slave.c **** 		MODS_01H();
+ 222:modbus/RTUmodbus_slave.c **** 		// bsp_PutMsg(MSG_MODS_01H, 0);	/* 发送消息,主程序处理 */
+ 223:modbus/RTUmodbus_slave.c **** 		break;
+ 224:modbus/RTUmodbus_slave.c **** 
+ 225:modbus/RTUmodbus_slave.c **** 	case 0x02: /* 读取输入状态（按键状态）*/
+ 226:modbus/RTUmodbus_slave.c **** 		MODS_02H();
+ 227:modbus/RTUmodbus_slave.c **** 		// bsp_PutMsg(MSG_MODS_02H, 0);
+ 228:modbus/RTUmodbus_slave.c **** 		break;
+ 229:modbus/RTUmodbus_slave.c **** 
+ 230:modbus/RTUmodbus_slave.c **** 	case 0x03: /* 读取保持寄存器（此例程存在g_tVar中）*/
+ 231:modbus/RTUmodbus_slave.c **** 		MODS_03H();
+ 232:modbus/RTUmodbus_slave.c **** 		// bsp_PutMsg(MSG_MODS_03H, 0);
+ 233:modbus/RTUmodbus_slave.c **** 		break;
+ 234:modbus/RTUmodbus_slave.c **** 
+ 235:modbus/RTUmodbus_slave.c **** 	case 0x04: /* 读取输入寄存器（ADC的值）*/
+ 236:modbus/RTUmodbus_slave.c **** 		MODS_04H();
+ 237:modbus/RTUmodbus_slave.c **** 		// bsp_PutMsg(MSG_MODS_04H, 0);
+ 238:modbus/RTUmodbus_slave.c **** 		break;
+ 239:modbus/RTUmodbus_slave.c **** 
+ 240:modbus/RTUmodbus_slave.c **** 	case 0x05: /* 强制单线圈（设置led）*/
+ 241:modbus/RTUmodbus_slave.c **** 		MODS_05H();
+ 242:modbus/RTUmodbus_slave.c **** 		// bsp_PutMsg(MSG_MODS_05H, 0);
+ 243:modbus/RTUmodbus_slave.c **** 		break;
+ 244:modbus/RTUmodbus_slave.c **** 
+ 245:modbus/RTUmodbus_slave.c **** 	case 0x06: /* 写单个保存寄存器（此例程改写g_tVar中的参数）*/
+ 246:modbus/RTUmodbus_slave.c **** 		MODS_06H();
+ 247:modbus/RTUmodbus_slave.c **** 		// bsp_PutMsg(MSG_MODS_06H, 0);
+ 248:modbus/RTUmodbus_slave.c **** 		break;
+ 249:modbus/RTUmodbus_slave.c **** 
+ 250:modbus/RTUmodbus_slave.c **** 	case 0x10: /* 写多个保存寄存器（此例程存在g_tVar中的参数）*/
+ 251:modbus/RTUmodbus_slave.c **** 		MODS_10H();
+ 252:modbus/RTUmodbus_slave.c **** 		// bsp_PutMsg(MSG_MODS_10H, 0);
+ 253:modbus/RTUmodbus_slave.c **** 		break;
+ 254:modbus/RTUmodbus_slave.c **** 
+ 255:modbus/RTUmodbus_slave.c **** 	default:
+ 256:modbus/RTUmodbus_slave.c **** 		g_tModS.RspCode = RSP_ERR_CMD;
+ 257:modbus/RTUmodbus_slave.c **** 		MODS_SendAckErr(g_tModS.RspCode); /* 告诉主机命令错误 */
+ 258:modbus/RTUmodbus_slave.c **** 		break;
+ 259:modbus/RTUmodbus_slave.c **** 	}
+ 260:modbus/RTUmodbus_slave.c **** }
+ARM GAS  /tmp/ccrEi7aK.s 			page 6
+
+
+ 261:modbus/RTUmodbus_slave.c **** 
+ 262:modbus/RTUmodbus_slave.c **** /*
+ 263:modbus/RTUmodbus_slave.c **** ***************************************************************************************************
+ 264:modbus/RTUmodbus_slave.c **** *	函 数 名: MODS_01H
+ 265:modbus/RTUmodbus_slave.c **** *	功能说明: 读取线圈状态（对应远程开关D01/D02/D03）
+ 266:modbus/RTUmodbus_slave.c **** *	形    参: 无
+ 267:modbus/RTUmodbus_slave.c **** *	返 回 值: 无
+ 268:modbus/RTUmodbus_slave.c **** ***************************************************************************************************
+ 269:modbus/RTUmodbus_slave.c **** */
+ 270:modbus/RTUmodbus_slave.c **** /* 说明:这里用LED代替继电器,便于观察现象 */
+ 271:modbus/RTUmodbus_slave.c **** static void MODS_01H(void)
+ 272:modbus/RTUmodbus_slave.c **** {
+ 273:modbus/RTUmodbus_slave.c **** 	/*
+ 274:modbus/RTUmodbus_slave.c **** 	 举例：
+ 275:modbus/RTUmodbus_slave.c **** 		主机发送:
+ 276:modbus/RTUmodbus_slave.c **** 			11 从机地址
+ 277:modbus/RTUmodbus_slave.c **** 			01 功能码
+ 278:modbus/RTUmodbus_slave.c **** 			00 寄存器起始地址高字节
+ 279:modbus/RTUmodbus_slave.c **** 			13 寄存器起始地址低字节
+ 280:modbus/RTUmodbus_slave.c **** 			00 寄存器数量高字节
+ 281:modbus/RTUmodbus_slave.c **** 			25 寄存器数量低字节
+ 282:modbus/RTUmodbus_slave.c **** 			0E CRC校验高字节
+ 283:modbus/RTUmodbus_slave.c **** 			84 CRC校验低字节
+ 284:modbus/RTUmodbus_slave.c **** 
+ 285:modbus/RTUmodbus_slave.c **** 		从机应答: 	1代表ON，0代表OFF。若返回的线圈数不为8的倍数，则在最后数�
+ 286:modbus/RTUmodbus_slave.c **** 			11 从机地址
+ 287:modbus/RTUmodbus_slave.c **** 			01 功能码
+ 288:modbus/RTUmodbus_slave.c **** 			05 返回字节数
+ 289:modbus/RTUmodbus_slave.c **** 			CD 数据1(线圈0013H-线圈001AH)
+ 290:modbus/RTUmodbus_slave.c **** 			6B 数据2(线圈001BH-线圈0022H)
+ 291:modbus/RTUmodbus_slave.c **** 			B2 数据3(线圈0023H-线圈002AH)
+ 292:modbus/RTUmodbus_slave.c **** 			0E 数据4(线圈0032H-线圈002BH)
+ 293:modbus/RTUmodbus_slave.c **** 			1B 数据5(线圈0037H-线圈0033H)
+ 294:modbus/RTUmodbus_slave.c **** 			45 CRC校验高字节
+ 295:modbus/RTUmodbus_slave.c **** 			E6 CRC校验低字节
+ 296:modbus/RTUmodbus_slave.c **** 
+ 297:modbus/RTUmodbus_slave.c **** 		例子:
+ 298:modbus/RTUmodbus_slave.c **** 			01 01 10 01 00 03   29 0B	--- 查询D01开始的3个继电器状态
+ 299:modbus/RTUmodbus_slave.c **** 			01 01 10 03 00 01   09 0A   --- 查询D03继电器的状态
+ 300:modbus/RTUmodbus_slave.c **** 	*/
+ 301:modbus/RTUmodbus_slave.c **** 	uint16_t reg;
+ 302:modbus/RTUmodbus_slave.c **** 	uint16_t num;
+ 303:modbus/RTUmodbus_slave.c **** 	uint16_t i;
+ 304:modbus/RTUmodbus_slave.c **** 	uint16_t m;
+ 305:modbus/RTUmodbus_slave.c **** 	uint8_t status[10];
+ 306:modbus/RTUmodbus_slave.c **** 
+ 307:modbus/RTUmodbus_slave.c **** 	g_tModS.RspCode = RSP_OK;
+ 308:modbus/RTUmodbus_slave.c **** 
+ 309:modbus/RTUmodbus_slave.c **** 	/* 没有外部继电器，直接应答错误 */
+ 310:modbus/RTUmodbus_slave.c **** 	if (g_tModS.RxCount != 8)
+ 311:modbus/RTUmodbus_slave.c **** 	{
+ 312:modbus/RTUmodbus_slave.c **** 		g_tModS.RspCode = RSP_ERR_VALUE; /* 数据值域错误 */
+ 313:modbus/RTUmodbus_slave.c **** 		return;
+ 314:modbus/RTUmodbus_slave.c **** 	}
+ 315:modbus/RTUmodbus_slave.c **** 
+ 316:modbus/RTUmodbus_slave.c **** 	reg = BEBufToUint16(&g_tModS.RxBuf[2]); /* 寄存器号 */
+ 317:modbus/RTUmodbus_slave.c **** 	num = BEBufToUint16(&g_tModS.RxBuf[4]); /* 寄存器个数 */
+ARM GAS  /tmp/ccrEi7aK.s 			page 7
+
+
+ 318:modbus/RTUmodbus_slave.c **** 
+ 319:modbus/RTUmodbus_slave.c **** 	m = (num + 7) / 8;
+ 320:modbus/RTUmodbus_slave.c **** 
+ 321:modbus/RTUmodbus_slave.c **** 	if ((reg >= REG_D01) && (num > 0) && (reg + num <= REG_DXX + 1))
+ 322:modbus/RTUmodbus_slave.c **** 	{
+ 323:modbus/RTUmodbus_slave.c **** 		for (i = 0; i < m; i++)
+ 324:modbus/RTUmodbus_slave.c **** 		{
+ 325:modbus/RTUmodbus_slave.c **** 			status[i] = 0;
+ 326:modbus/RTUmodbus_slave.c **** 		}
+ 327:modbus/RTUmodbus_slave.c **** 		for (i = 0; i < num; i++)
+ 328:modbus/RTUmodbus_slave.c **** 		{
+ 329:modbus/RTUmodbus_slave.c **** 			// if (bsp_IsLedOn(i + 1 + reg - REG_D01))		/* 读LED的状态，写入状态寄存器的每一�
+ 330:modbus/RTUmodbus_slave.c **** 			// {
+ 331:modbus/RTUmodbus_slave.c **** 			//		status[i / 8] |= (1 << (i % 8));
+ 332:modbus/RTUmodbus_slave.c **** 			// }
+ 333:modbus/RTUmodbus_slave.c **** 		}
+ 334:modbus/RTUmodbus_slave.c **** 	}
+ 335:modbus/RTUmodbus_slave.c **** 	else
+ 336:modbus/RTUmodbus_slave.c **** 	{
+ 337:modbus/RTUmodbus_slave.c **** 		g_tModS.RspCode = RSP_ERR_REG_ADDR; /* 寄存器地址错误 */
+ 338:modbus/RTUmodbus_slave.c **** 	}
+ 339:modbus/RTUmodbus_slave.c **** 
+ 340:modbus/RTUmodbus_slave.c **** 	if (g_tModS.RspCode == RSP_OK) /* 正确应答 */
+ 341:modbus/RTUmodbus_slave.c **** 	{
+ 342:modbus/RTUmodbus_slave.c **** 		g_tModS.TxCount = 0;
+ 343:modbus/RTUmodbus_slave.c **** 		g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[0];
+ 344:modbus/RTUmodbus_slave.c **** 		g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[1];
+ 345:modbus/RTUmodbus_slave.c **** 		g_tModS.TxBuf[g_tModS.TxCount++] = m; /* 返回字节数 */
+ 346:modbus/RTUmodbus_slave.c **** 
+ 347:modbus/RTUmodbus_slave.c **** 		for (i = 0; i < m; i++)
+ 348:modbus/RTUmodbus_slave.c **** 		{
+ 349:modbus/RTUmodbus_slave.c **** 			g_tModS.TxBuf[g_tModS.TxCount++] = status[i]; /* 继电器状态 */
+ 350:modbus/RTUmodbus_slave.c **** 		}
+ 351:modbus/RTUmodbus_slave.c **** 		MODS_SendWithCRC(g_tModS.TxBuf, g_tModS.TxCount);
+ 352:modbus/RTUmodbus_slave.c **** 	}
+ 353:modbus/RTUmodbus_slave.c **** 	else
+ 354:modbus/RTUmodbus_slave.c **** 	{
+ 355:modbus/RTUmodbus_slave.c **** 		MODS_SendAckErr(g_tModS.RspCode); /* 告诉主机命令错误 */
+ 356:modbus/RTUmodbus_slave.c **** 	}
+ 357:modbus/RTUmodbus_slave.c **** }
+ 358:modbus/RTUmodbus_slave.c **** 
+ 359:modbus/RTUmodbus_slave.c **** /*
+ 360:modbus/RTUmodbus_slave.c **** ***************************************************************************************************
+ 361:modbus/RTUmodbus_slave.c **** *	函 数 名: MODS_02H
+ 362:modbus/RTUmodbus_slave.c **** *	功能说明: 读取输入状态（对应K01～K03）
+ 363:modbus/RTUmodbus_slave.c **** *	形    参: 无
+ 364:modbus/RTUmodbus_slave.c **** *	返 回 值: 无
+ 365:modbus/RTUmodbus_slave.c **** ***************************************************************************************************
+ 366:modbus/RTUmodbus_slave.c **** */
+ 367:modbus/RTUmodbus_slave.c **** static void MODS_02H(void)
+ 368:modbus/RTUmodbus_slave.c **** {
+ 369:modbus/RTUmodbus_slave.c **** 	/*
+ 370:modbus/RTUmodbus_slave.c **** 		主机发送:
+ 371:modbus/RTUmodbus_slave.c **** 			11 从机地址
+ 372:modbus/RTUmodbus_slave.c **** 			02 功能码
+ 373:modbus/RTUmodbus_slave.c **** 			00 寄存器地址高字节
+ 374:modbus/RTUmodbus_slave.c **** 			C4 寄存器地址低字节
+ARM GAS  /tmp/ccrEi7aK.s 			page 8
+
+
+ 375:modbus/RTUmodbus_slave.c **** 			00 寄存器数量高字节
+ 376:modbus/RTUmodbus_slave.c **** 			16 寄存器数量低字节
+ 377:modbus/RTUmodbus_slave.c **** 			BA CRC校验高字节
+ 378:modbus/RTUmodbus_slave.c **** 			A9 CRC校验低字节
+ 379:modbus/RTUmodbus_slave.c **** 
+ 380:modbus/RTUmodbus_slave.c **** 		从机应答:  响应各离散输入寄存器状态，分别对应数据区中的每位值，1 �
+ 381:modbus/RTUmodbus_slave.c **** 				   第一个数据字节的LSB(最低字节)为查询的寻址地址，其他输入口按顺序
+ 382:modbus/RTUmodbus_slave.c **** 				   向高字节排列，直到填充满8位。下一个字节中的8个输入位也是从低字
+ 383:modbus/RTUmodbus_slave.c **** 				   若返回的输入位数不是8的倍数，则在最后的数据字节中的剩余位至该�
+ 384:modbus/RTUmodbus_slave.c **** 			11 从机地址
+ 385:modbus/RTUmodbus_slave.c **** 			02 功能码
+ 386:modbus/RTUmodbus_slave.c **** 			03 返回字节数
+ 387:modbus/RTUmodbus_slave.c **** 			AC 数据1(00C4H-00CBH)
+ 388:modbus/RTUmodbus_slave.c **** 			DB 数据2(00CCH-00D3H)
+ 389:modbus/RTUmodbus_slave.c **** 			35 数据3(00D4H-00D9H)
+ 390:modbus/RTUmodbus_slave.c **** 			20 CRC校验高字节
+ 391:modbus/RTUmodbus_slave.c **** 			18 CRC校验低字节
+ 392:modbus/RTUmodbus_slave.c **** 
+ 393:modbus/RTUmodbus_slave.c **** 		例子:
+ 394:modbus/RTUmodbus_slave.c **** 		01 02 20 01 00 08  23CC  ---- 读取T01-08的状态
+ 395:modbus/RTUmodbus_slave.c **** 		01 02 20 04 00 02  B3CA  ---- 读取T04-05的状态
+ 396:modbus/RTUmodbus_slave.c **** 		01 02 20 01 00 12  A207   ---- 读 T01-18
+ 397:modbus/RTUmodbus_slave.c **** 	*/
+ 398:modbus/RTUmodbus_slave.c **** 
+ 399:modbus/RTUmodbus_slave.c **** 	uint16_t reg;
+ 400:modbus/RTUmodbus_slave.c **** 	uint16_t num;
+ 401:modbus/RTUmodbus_slave.c **** 	uint16_t i;
+ 402:modbus/RTUmodbus_slave.c **** 	uint16_t m;
+ 403:modbus/RTUmodbus_slave.c **** 	uint8_t status[10];
+ 404:modbus/RTUmodbus_slave.c **** 
+ 405:modbus/RTUmodbus_slave.c **** 	g_tModS.RspCode = RSP_OK;
+ 406:modbus/RTUmodbus_slave.c **** 
+ 407:modbus/RTUmodbus_slave.c **** 	if (g_tModS.RxCount != 8)
+ 408:modbus/RTUmodbus_slave.c **** 	{
+ 409:modbus/RTUmodbus_slave.c **** 		g_tModS.RspCode = RSP_ERR_VALUE; /* 数据值域错误 */
+ 410:modbus/RTUmodbus_slave.c **** 		return;
+ 411:modbus/RTUmodbus_slave.c **** 	}
+ 412:modbus/RTUmodbus_slave.c **** 
+ 413:modbus/RTUmodbus_slave.c **** 	reg = BEBufToUint16(&g_tModS.RxBuf[2]); /* 寄存器号 */
+ 414:modbus/RTUmodbus_slave.c **** 	num = BEBufToUint16(&g_tModS.RxBuf[4]); /* 寄存器个数 */
+ 415:modbus/RTUmodbus_slave.c **** 
+ 416:modbus/RTUmodbus_slave.c **** 	m = (num + 7) / 8;
+ 417:modbus/RTUmodbus_slave.c **** 	if ((reg >= REG_T01) && (num > 0) && (reg + num <= REG_TXX + 1))
+ 418:modbus/RTUmodbus_slave.c **** 	{
+ 419:modbus/RTUmodbus_slave.c **** 		for (i = 0; i < m; i++)
+ 420:modbus/RTUmodbus_slave.c **** 		{
+ 421:modbus/RTUmodbus_slave.c **** 			status[i] = 0;
+ 422:modbus/RTUmodbus_slave.c **** 		}
+ 423:modbus/RTUmodbus_slave.c **** 		for (i = 0; i < num; i++)
+ 424:modbus/RTUmodbus_slave.c **** 		{
+ 425:modbus/RTUmodbus_slave.c **** 			// if (bsp_GetKeyState((KEY_ID_E)(KID_K1 + reg - REG_T01 + i)))
+ 426:modbus/RTUmodbus_slave.c **** 			// {
+ 427:modbus/RTUmodbus_slave.c **** 			// 		status[i / 8] |= (1 << (i % 8));
+ 428:modbus/RTUmodbus_slave.c **** 			// }
+ 429:modbus/RTUmodbus_slave.c **** 		}
+ 430:modbus/RTUmodbus_slave.c **** 	}
+ 431:modbus/RTUmodbus_slave.c **** 	else
+ARM GAS  /tmp/ccrEi7aK.s 			page 9
+
+
+ 432:modbus/RTUmodbus_slave.c **** 	{
+ 433:modbus/RTUmodbus_slave.c **** 		g_tModS.RspCode = RSP_ERR_REG_ADDR; /* 寄存器地址错误 */
+ 434:modbus/RTUmodbus_slave.c **** 	}
+ 435:modbus/RTUmodbus_slave.c **** 
+ 436:modbus/RTUmodbus_slave.c **** 	if (g_tModS.RspCode == RSP_OK) /* 正确应答 */
+ 437:modbus/RTUmodbus_slave.c **** 	{
+ 438:modbus/RTUmodbus_slave.c **** 		g_tModS.TxCount = 0;
+ 439:modbus/RTUmodbus_slave.c **** 		g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[0];
+ 440:modbus/RTUmodbus_slave.c **** 		g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[1];
+ 441:modbus/RTUmodbus_slave.c **** 		g_tModS.TxBuf[g_tModS.TxCount++] = m; /* 返回字节数 */
+ 442:modbus/RTUmodbus_slave.c **** 
+ 443:modbus/RTUmodbus_slave.c **** 		for (i = 0; i < m; i++)
+ 444:modbus/RTUmodbus_slave.c **** 		{
+ 445:modbus/RTUmodbus_slave.c **** 			g_tModS.TxBuf[g_tModS.TxCount++] = status[i]; /* T01-02状态 */
+ 446:modbus/RTUmodbus_slave.c **** 		}
+ 447:modbus/RTUmodbus_slave.c **** 		MODS_SendWithCRC(g_tModS.TxBuf, g_tModS.TxCount);
+ 448:modbus/RTUmodbus_slave.c **** 	}
+ 449:modbus/RTUmodbus_slave.c **** 	else
+ 450:modbus/RTUmodbus_slave.c **** 	{
+ 451:modbus/RTUmodbus_slave.c **** 		MODS_SendAckErr(g_tModS.RspCode); /* 告诉主机命令错误 */
+ 452:modbus/RTUmodbus_slave.c **** 	}
+ 453:modbus/RTUmodbus_slave.c **** }
+ 454:modbus/RTUmodbus_slave.c **** 
+ 455:modbus/RTUmodbus_slave.c **** /*
+ 456:modbus/RTUmodbus_slave.c **** ***************************************************************************************************
+ 457:modbus/RTUmodbus_slave.c **** *	函 数 名: MODS_ReadRegValue
+ 458:modbus/RTUmodbus_slave.c **** *	功能说明: 读取保持寄存器的值
+ 459:modbus/RTUmodbus_slave.c **** *	形    参: reg_addr 寄存器地址
+ 460:modbus/RTUmodbus_slave.c **** *			  reg_value 存放寄存器结果
+ 461:modbus/RTUmodbus_slave.c **** *	返 回 值: 1表示OK 0表示错误
+ 462:modbus/RTUmodbus_slave.c **** ***************************************************************************************************
+ 463:modbus/RTUmodbus_slave.c **** */
+ 464:modbus/RTUmodbus_slave.c **** static uint8_t MODS_ReadRegValue(uint16_t reg_addr, uint8_t *reg_value)
+ 465:modbus/RTUmodbus_slave.c **** {
+ 466:modbus/RTUmodbus_slave.c **** 	uint16_t value;
+ 467:modbus/RTUmodbus_slave.c **** 	float temp, hum = 0;
+ 468:modbus/RTUmodbus_slave.c **** 	float x_data, y_data, z_data = 0;
+ 469:modbus/RTUmodbus_slave.c **** 	switch (reg_addr) /* 判断寄存器地址 */
+ 470:modbus/RTUmodbus_slave.c **** 	{
+ 471:modbus/RTUmodbus_slave.c **** 	/*************** dht22 ***********/
+ 472:modbus/RTUmodbus_slave.c **** 	case SLAVE_REG_P0000:
+ 473:modbus/RTUmodbus_slave.c **** 	{
+ 474:modbus/RTUmodbus_slave.c **** 		get_local_dht22_data(&temp, &hum);
+ 475:modbus/RTUmodbus_slave.c **** 		uint32_t temper_32 = convert_float_to_uint32(temp);
+ 476:modbus/RTUmodbus_slave.c **** 		value = temper_32 >> 16;
+ 477:modbus/RTUmodbus_slave.c **** 		break;
+ 478:modbus/RTUmodbus_slave.c **** 	}
+ 479:modbus/RTUmodbus_slave.c **** 	case SLAVE_REG_P0001:
+ 480:modbus/RTUmodbus_slave.c **** 	{
+ 481:modbus/RTUmodbus_slave.c **** 		get_local_dht22_data(&temp, &hum);
+ 482:modbus/RTUmodbus_slave.c **** 		uint32_t temper_32 = convert_float_to_uint32(temp);
+ 483:modbus/RTUmodbus_slave.c **** 		value = temper_32;
+ 484:modbus/RTUmodbus_slave.c **** 		break;
+ 485:modbus/RTUmodbus_slave.c **** 	}
+ 486:modbus/RTUmodbus_slave.c **** 	case SLAVE_REG_P0002:
+ 487:modbus/RTUmodbus_slave.c **** 	{
+ 488:modbus/RTUmodbus_slave.c **** 		get_local_dht22_data(&temp, &hum);
+ARM GAS  /tmp/ccrEi7aK.s 			page 10
+
+
+ 489:modbus/RTUmodbus_slave.c **** 		uint32_t hum_32 = convert_float_to_uint32(hum);
+ 490:modbus/RTUmodbus_slave.c **** 		value = hum_32 >> 16;
+ 491:modbus/RTUmodbus_slave.c **** 		break;
+ 492:modbus/RTUmodbus_slave.c **** 	}
+ 493:modbus/RTUmodbus_slave.c **** 	case SLAVE_REG_P0003:
+ 494:modbus/RTUmodbus_slave.c **** 	{
+ 495:modbus/RTUmodbus_slave.c **** 		get_local_dht22_data(&temp, &hum);
+ 496:modbus/RTUmodbus_slave.c **** 		uint32_t hum_32 = convert_float_to_uint32(hum);
+ 497:modbus/RTUmodbus_slave.c **** 		value = hum_32;
+ 498:modbus/RTUmodbus_slave.c **** 		break;
+ 499:modbus/RTUmodbus_slave.c **** 	}
+ 500:modbus/RTUmodbus_slave.c **** 	/*************** adxl345 ***********/
+ 501:modbus/RTUmodbus_slave.c **** 	case SLAVE_REG_P0004:
+ 502:modbus/RTUmodbus_slave.c **** 	{
+ 503:modbus/RTUmodbus_slave.c **** 		get_local_adxl_345_data(&x_data, &y_data, &z_data);
+ 504:modbus/RTUmodbus_slave.c **** 		uint32_t x_data_32 = convert_float_to_uint32(x_data);
+ 505:modbus/RTUmodbus_slave.c **** 		value = x_data_32 >> 16;
+ 506:modbus/RTUmodbus_slave.c **** 		break;
+ 507:modbus/RTUmodbus_slave.c **** 	}
+ 508:modbus/RTUmodbus_slave.c **** 	case SLAVE_REG_P0005:
+ 509:modbus/RTUmodbus_slave.c **** 	{
+ 510:modbus/RTUmodbus_slave.c **** 		get_local_adxl_345_data(&x_data, &y_data, &z_data);
+ 511:modbus/RTUmodbus_slave.c **** 		uint32_t x_data_32 = convert_float_to_uint32(x_data);
+ 512:modbus/RTUmodbus_slave.c **** 		value = x_data_32;
+ 513:modbus/RTUmodbus_slave.c **** 		break;
+ 514:modbus/RTUmodbus_slave.c **** 	}
+ 515:modbus/RTUmodbus_slave.c **** 	case SLAVE_REG_P0006:
+ 516:modbus/RTUmodbus_slave.c **** 	{
+ 517:modbus/RTUmodbus_slave.c **** 		get_local_adxl_345_data(&x_data, &y_data, &z_data);
+ 518:modbus/RTUmodbus_slave.c **** 		uint32_t y_data_32 = convert_float_to_uint32(y_data);
+ 519:modbus/RTUmodbus_slave.c **** 		value = y_data_32 >> 16;
+ 520:modbus/RTUmodbus_slave.c **** 		break;
+ 521:modbus/RTUmodbus_slave.c **** 	}
+ 522:modbus/RTUmodbus_slave.c **** 	case SLAVE_REG_P0007:
+ 523:modbus/RTUmodbus_slave.c **** 	{
+ 524:modbus/RTUmodbus_slave.c **** 		get_local_adxl_345_data(&x_data, &y_data, &z_data);
+ 525:modbus/RTUmodbus_slave.c **** 		uint32_t y_data_32 = convert_float_to_uint32(y_data);
+ 526:modbus/RTUmodbus_slave.c **** 		value = y_data_32;
+ 527:modbus/RTUmodbus_slave.c **** 		break;
+ 528:modbus/RTUmodbus_slave.c **** 	}
+ 529:modbus/RTUmodbus_slave.c **** 	case SLAVE_REG_P0008:
+ 530:modbus/RTUmodbus_slave.c **** 	{
+ 531:modbus/RTUmodbus_slave.c **** 		get_local_adxl_345_data(&x_data, &y_data, &z_data);
+ 532:modbus/RTUmodbus_slave.c **** 		uint32_t z_data_32 = convert_float_to_uint32(z_data);
+ 533:modbus/RTUmodbus_slave.c **** 		value = z_data_32>>16;
+ 534:modbus/RTUmodbus_slave.c **** 		break;
+ 535:modbus/RTUmodbus_slave.c **** 	}
+ 536:modbus/RTUmodbus_slave.c **** 	case SLAVE_REG_P0009:
+ 537:modbus/RTUmodbus_slave.c **** 	{
+ 538:modbus/RTUmodbus_slave.c **** 		get_local_adxl_345_data(&x_data, &y_data, &z_data);
+ 539:modbus/RTUmodbus_slave.c **** 		uint32_t z_data_32 = convert_float_to_uint32(z_data);
+ 540:modbus/RTUmodbus_slave.c **** 		value = z_data_32;
+ 541:modbus/RTUmodbus_slave.c **** 		break;
+ 542:modbus/RTUmodbus_slave.c **** 	}
+ 543:modbus/RTUmodbus_slave.c **** 	case SLAVE_REG_P000A:
+ 544:modbus/RTUmodbus_slave.c **** 	
+ 545:modbus/RTUmodbus_slave.c **** 		value = 0x0000;
+ARM GAS  /tmp/ccrEi7aK.s 			page 11
+
+
+ 546:modbus/RTUmodbus_slave.c **** 		break;
+ 547:modbus/RTUmodbus_slave.c **** 	default:
+ 548:modbus/RTUmodbus_slave.c **** 		return 0; /* 参数异常，返回 0 */
+ 549:modbus/RTUmodbus_slave.c **** 	}
+ 550:modbus/RTUmodbus_slave.c **** 
+ 551:modbus/RTUmodbus_slave.c **** 	reg_value[0] = value >> 8;
+ 552:modbus/RTUmodbus_slave.c **** 	reg_value[1] = value;
+ 553:modbus/RTUmodbus_slave.c **** 	return 1; /* 读取成功 */
+ 554:modbus/RTUmodbus_slave.c **** }
+ 555:modbus/RTUmodbus_slave.c **** 
+ 556:modbus/RTUmodbus_slave.c **** /*
+ 557:modbus/RTUmodbus_slave.c **** ***************************************************************************************************
+ 558:modbus/RTUmodbus_slave.c **** *	函 数 名: MODS_WriteRegValue
+ 559:modbus/RTUmodbus_slave.c **** *	功能说明: 写保持寄存器的值
+ 560:modbus/RTUmodbus_slave.c **** *	形    参: reg_addr 寄存器地址
+ 561:modbus/RTUmodbus_slave.c **** *			  reg_value 寄存器值
+ 562:modbus/RTUmodbus_slave.c **** *	返 回 值: 1表示OK 0表示错误
+ 563:modbus/RTUmodbus_slave.c **** ***************************************************************************************************
+ 564:modbus/RTUmodbus_slave.c **** */
+ 565:modbus/RTUmodbus_slave.c **** static uint8_t MODS_WriteRegValue(uint16_t reg_addr, uint16_t reg_value)
+ 566:modbus/RTUmodbus_slave.c **** {
+  27              		.loc 1 566 1 view -0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 0
+  30              		@ frame_needed = 0, uses_anonymous_args = 0
+  31              		@ link register save eliminated.
+ 567:modbus/RTUmodbus_slave.c **** 	switch (reg_addr) /* 判断寄存器地址 */
+  32              		.loc 1 567 2 view .LVU1
+  33 0000 0328     		cmp	r0, #3
+  34 0002 03D9     		bls	.L3
+  35 0004 1028     		cmp	r0, #16
+  36 0006 03D1     		bne	.L4
+ 568:modbus/RTUmodbus_slave.c **** 	{
+ 569:modbus/RTUmodbus_slave.c **** 	case SLAVE_REG_P0000:
+ 570:modbus/RTUmodbus_slave.c **** 		reg_value = 0x00;
+ 571:modbus/RTUmodbus_slave.c **** 		break;
+ 572:modbus/RTUmodbus_slave.c **** 	case SLAVE_REG_P0001:
+ 573:modbus/RTUmodbus_slave.c **** 		reg_value = 0x00;
+ 574:modbus/RTUmodbus_slave.c **** 		break;
+ 575:modbus/RTUmodbus_slave.c **** 	case SLAVE_REG_P0002:
+ 576:modbus/RTUmodbus_slave.c **** 		reg_value = 0x00;
+ 577:modbus/RTUmodbus_slave.c **** 		break;
+ 578:modbus/RTUmodbus_slave.c **** 	case SLAVE_REG_P0003:
+ 579:modbus/RTUmodbus_slave.c **** 
+ 580:modbus/RTUmodbus_slave.c **** 		break;
+ 581:modbus/RTUmodbus_slave.c **** 	case SLAVE_REG_P0010:
+ 582:modbus/RTUmodbus_slave.c **** 
+ 583:modbus/RTUmodbus_slave.c **** 		break;
+ 584:modbus/RTUmodbus_slave.c **** 	default:
+ 585:modbus/RTUmodbus_slave.c **** 		return 0; /* 参数异常，返回 0 */
+ 586:modbus/RTUmodbus_slave.c **** 	}
+ 587:modbus/RTUmodbus_slave.c **** 
+ 588:modbus/RTUmodbus_slave.c **** 	return 1; /* 写入成功 */
+  37              		.loc 1 588 9 is_stmt 0 view .LVU2
+  38 0008 0120     		movs	r0, #1
+  39              	.LVL1:
+  40              		.loc 1 588 9 view .LVU3
+ARM GAS  /tmp/ccrEi7aK.s 			page 12
+
+
+  41 000a 7047     		bx	lr
+  42              	.LVL2:
+  43              	.L3:
+  44              		.loc 1 588 9 view .LVU4
+  45 000c 0120     		movs	r0, #1
+  46              	.LVL3:
+  47              		.loc 1 588 9 view .LVU5
+  48 000e 7047     		bx	lr
+  49              	.LVL4:
+  50              	.L4:
+ 567:modbus/RTUmodbus_slave.c **** 	switch (reg_addr) /* 判断寄存器地址 */
+  51              		.loc 1 567 2 view .LVU6
+  52 0010 0020     		movs	r0, #0
+  53              	.LVL5:
+ 589:modbus/RTUmodbus_slave.c **** }
+  54              		.loc 1 589 1 view .LVU7
+  55 0012 7047     		bx	lr
+  56              		.cfi_endproc
+  57              	.LFE13:
+  59              		.section	.text.MODS_SendWithCRC,"ax",%progbits
+  60              		.align	1
+  61              		.syntax unified
+  62              		.thumb
+  63              		.thumb_func
+  64              		.fpu softvfp
+  66              	MODS_SendWithCRC:
+  67              	.LVL6:
+  68              	.LFB6:
+ 157:modbus/RTUmodbus_slave.c **** 	uint16_t crc;
+  69              		.loc 1 157 1 is_stmt 1 view -0
+  70              		.cfi_startproc
+  71              		@ args = 0, pretend = 0, frame = 128
+  72              		@ frame_needed = 0, uses_anonymous_args = 0
+ 157:modbus/RTUmodbus_slave.c **** 	uint16_t crc;
+  73              		.loc 1 157 1 is_stmt 0 view .LVU9
+  74 0000 30B5     		push	{r4, r5, lr}
+  75              	.LCFI0:
+  76              		.cfi_def_cfa_offset 12
+  77              		.cfi_offset 4, -12
+  78              		.cfi_offset 5, -8
+  79              		.cfi_offset 14, -4
+  80 0002 A1B0     		sub	sp, sp, #132
+  81              	.LCFI1:
+  82              		.cfi_def_cfa_offset 144
+  83 0004 0546     		mov	r5, r0
+  84 0006 0C46     		mov	r4, r1
+ 158:modbus/RTUmodbus_slave.c **** 	uint8_t buf[S_TX_BUF_SIZE];
+  85              		.loc 1 158 2 is_stmt 1 view .LVU10
+ 159:modbus/RTUmodbus_slave.c **** 
+  86              		.loc 1 159 2 view .LVU11
+ 161:modbus/RTUmodbus_slave.c **** 	crc = CRC16_Modbus(_pBuf, _ucLen);
+  87              		.loc 1 161 2 view .LVU12
+  88 0008 0A46     		mov	r2, r1
+  89 000a 0146     		mov	r1, r0
+  90              	.LVL7:
+ 161:modbus/RTUmodbus_slave.c **** 	crc = CRC16_Modbus(_pBuf, _ucLen);
+  91              		.loc 1 161 2 is_stmt 0 view .LVU13
+ARM GAS  /tmp/ccrEi7aK.s 			page 13
+
+
+  92 000c 6846     		mov	r0, sp
+  93              	.LVL8:
+ 161:modbus/RTUmodbus_slave.c **** 	crc = CRC16_Modbus(_pBuf, _ucLen);
+  94              		.loc 1 161 2 view .LVU14
+  95 000e FFF7FEFF 		bl	memcpy
+  96              	.LVL9:
+ 162:modbus/RTUmodbus_slave.c **** 	buf[_ucLen++] = crc >> 8;
+  97              		.loc 1 162 2 is_stmt 1 view .LVU15
+ 162:modbus/RTUmodbus_slave.c **** 	buf[_ucLen++] = crc >> 8;
+  98              		.loc 1 162 8 is_stmt 0 view .LVU16
+  99 0012 2146     		mov	r1, r4
+ 100 0014 2846     		mov	r0, r5
+ 101 0016 FFF7FEFF 		bl	CRC16_Modbus
+ 102              	.LVL10:
+ 163:modbus/RTUmodbus_slave.c **** 	buf[_ucLen++] = crc;
+ 103              		.loc 1 163 2 is_stmt 1 view .LVU17
+ 163:modbus/RTUmodbus_slave.c **** 	buf[_ucLen++] = crc;
+ 104              		.loc 1 163 12 is_stmt 0 view .LVU18
+ 105 001a 631C     		adds	r3, r4, #1
+ 106 001c DBB2     		uxtb	r3, r3
+ 107              	.LVL11:
+ 163:modbus/RTUmodbus_slave.c **** 	buf[_ucLen++] = crc;
+ 108              		.loc 1 163 16 view .LVU19
+ 109 001e 20AA     		add	r2, sp, #128
+ 110 0020 2244     		add	r2, r2, r4
+ 111 0022 010A     		lsrs	r1, r0, #8
+ 112 0024 02F8801C 		strb	r1, [r2, #-128]
+ 164:modbus/RTUmodbus_slave.c **** 	self_uart_send(buf, _ucLen);
+ 113              		.loc 1 164 2 is_stmt 1 view .LVU20
+ 164:modbus/RTUmodbus_slave.c **** 	self_uart_send(buf, _ucLen);
+ 114              		.loc 1 164 12 is_stmt 0 view .LVU21
+ 115 0028 A11C     		adds	r1, r4, #2
+ 116              	.LVL12:
+ 164:modbus/RTUmodbus_slave.c **** 	self_uart_send(buf, _ucLen);
+ 117              		.loc 1 164 16 view .LVU22
+ 118 002a 20AA     		add	r2, sp, #128
+ 119 002c 1344     		add	r3, r3, r2
+ 120 002e 03F8800C 		strb	r0, [r3, #-128]
+ 165:modbus/RTUmodbus_slave.c **** 	/* 此部分为了串口打印结果,实际运用中可不要 */
+ 121              		.loc 1 165 2 is_stmt 1 view .LVU23
+ 122 0032 C9B2     		uxtb	r1, r1
+ 165:modbus/RTUmodbus_slave.c **** 	/* 此部分为了串口打印结果,实际运用中可不要 */
+ 123              		.loc 1 165 2 is_stmt 0 view .LVU24
+ 124 0034 6846     		mov	r0, sp
+ 125              	.LVL13:
+ 165:modbus/RTUmodbus_slave.c **** 	/* 此部分为了串口打印结果,实际运用中可不要 */
+ 126              		.loc 1 165 2 view .LVU25
+ 127 0036 FFF7FEFF 		bl	self_uart_send
+ 128              	.LVL14:
+ 167:modbus/RTUmodbus_slave.c **** 
+ 129              		.loc 1 167 1 view .LVU26
+ 130 003a 21B0     		add	sp, sp, #132
+ 131              	.LCFI2:
+ 132              		.cfi_def_cfa_offset 12
+ 133              		@ sp needed
+ 134 003c 30BD     		pop	{r4, r5, pc}
+ 167:modbus/RTUmodbus_slave.c **** 
+ARM GAS  /tmp/ccrEi7aK.s 			page 14
+
+
+ 135              		.loc 1 167 1 view .LVU27
+ 136              		.cfi_endproc
+ 137              	.LFE6:
+ 139              		.section	.text.MODS_SendAckOk,"ax",%progbits
+ 140              		.align	1
+ 141              		.syntax unified
+ 142              		.thumb
+ 143              		.thumb_func
+ 144              		.fpu softvfp
+ 146              	MODS_SendAckOk:
+ 147              	.LFB8:
+ 197:modbus/RTUmodbus_slave.c **** 	uint8_t txbuf[6];
+ 148              		.loc 1 197 1 is_stmt 1 view -0
+ 149              		.cfi_startproc
+ 150              		@ args = 0, pretend = 0, frame = 8
+ 151              		@ frame_needed = 0, uses_anonymous_args = 0
+ 152 0000 00B5     		push	{lr}
+ 153              	.LCFI3:
+ 154              		.cfi_def_cfa_offset 4
+ 155              		.cfi_offset 14, -4
+ 156 0002 83B0     		sub	sp, sp, #12
+ 157              	.LCFI4:
+ 158              		.cfi_def_cfa_offset 16
+ 198:modbus/RTUmodbus_slave.c **** 	uint8_t i;
+ 159              		.loc 1 198 2 view .LVU29
+ 199:modbus/RTUmodbus_slave.c **** 
+ 160              		.loc 1 199 2 view .LVU30
+ 201:modbus/RTUmodbus_slave.c **** 	{
+ 161              		.loc 1 201 2 view .LVU31
+ 162              	.LVL15:
+ 201:modbus/RTUmodbus_slave.c **** 	{
+ 163              		.loc 1 201 9 is_stmt 0 view .LVU32
+ 164 0004 0023     		movs	r3, #0
+ 165              	.LVL16:
+ 166              	.L8:
+ 201:modbus/RTUmodbus_slave.c **** 	{
+ 167              		.loc 1 201 14 is_stmt 1 discriminator 1 view .LVU33
+ 201:modbus/RTUmodbus_slave.c **** 	{
+ 168              		.loc 1 201 2 is_stmt 0 discriminator 1 view .LVU34
+ 169 0006 052B     		cmp	r3, #5
+ 170 0008 08D8     		bhi	.L11
+ 203:modbus/RTUmodbus_slave.c **** 	}
+ 171              		.loc 1 203 3 is_stmt 1 discriminator 3 view .LVU35
+ 203:modbus/RTUmodbus_slave.c **** 	}
+ 172              		.loc 1 203 27 is_stmt 0 discriminator 3 view .LVU36
+ 173 000a 084A     		ldr	r2, .L12
+ 174 000c D15C     		ldrb	r1, [r2, r3]	@ zero_extendqisi2
+ 203:modbus/RTUmodbus_slave.c **** 	}
+ 175              		.loc 1 203 12 discriminator 3 view .LVU37
+ 176 000e 02AA     		add	r2, sp, #8
+ 177 0010 1A44     		add	r2, r2, r3
+ 178 0012 02F8081C 		strb	r1, [r2, #-8]
+ 201:modbus/RTUmodbus_slave.c **** 	{
+ 179              		.loc 1 201 21 is_stmt 1 discriminator 3 view .LVU38
+ 201:modbus/RTUmodbus_slave.c **** 	{
+ 180              		.loc 1 201 22 is_stmt 0 discriminator 3 view .LVU39
+ 181 0016 0133     		adds	r3, r3, #1
+ARM GAS  /tmp/ccrEi7aK.s 			page 15
+
+
+ 182              	.LVL17:
+ 201:modbus/RTUmodbus_slave.c **** 	{
+ 183              		.loc 1 201 22 discriminator 3 view .LVU40
+ 184 0018 DBB2     		uxtb	r3, r3
+ 185              	.LVL18:
+ 201:modbus/RTUmodbus_slave.c **** 	{
+ 186              		.loc 1 201 22 discriminator 3 view .LVU41
+ 187 001a F4E7     		b	.L8
+ 188              	.L11:
+ 205:modbus/RTUmodbus_slave.c **** }
+ 189              		.loc 1 205 2 is_stmt 1 view .LVU42
+ 190 001c 0621     		movs	r1, #6
+ 191 001e 6846     		mov	r0, sp
+ 192 0020 FFF7FEFF 		bl	MODS_SendWithCRC
+ 193              	.LVL19:
+ 206:modbus/RTUmodbus_slave.c **** 
+ 194              		.loc 1 206 1 is_stmt 0 view .LVU43
+ 195 0024 03B0     		add	sp, sp, #12
+ 196              	.LCFI5:
+ 197              		.cfi_def_cfa_offset 4
+ 198              		@ sp needed
+ 199 0026 5DF804FB 		ldr	pc, [sp], #4
+ 200              	.L13:
+ 201 002a 00BF     		.align	2
+ 202              	.L12:
+ 203 002c 00000000 		.word	g_tModS
+ 204              		.cfi_endproc
+ 205              	.LFE8:
+ 207              		.section	.text.MODS_SendAckErr,"ax",%progbits
+ 208              		.align	1
+ 209              		.syntax unified
+ 210              		.thumb
+ 211              		.thumb_func
+ 212              		.fpu softvfp
+ 214              	MODS_SendAckErr:
+ 215              	.LVL20:
+ 216              	.LFB7:
+ 178:modbus/RTUmodbus_slave.c **** 	uint8_t txbuf[3];
+ 217              		.loc 1 178 1 is_stmt 1 view -0
+ 218              		.cfi_startproc
+ 219              		@ args = 0, pretend = 0, frame = 8
+ 220              		@ frame_needed = 0, uses_anonymous_args = 0
+ 178:modbus/RTUmodbus_slave.c **** 	uint8_t txbuf[3];
+ 221              		.loc 1 178 1 is_stmt 0 view .LVU45
+ 222 0000 00B5     		push	{lr}
+ 223              	.LCFI6:
+ 224              		.cfi_def_cfa_offset 4
+ 225              		.cfi_offset 14, -4
+ 226 0002 83B0     		sub	sp, sp, #12
+ 227              	.LCFI7:
+ 228              		.cfi_def_cfa_offset 16
+ 179:modbus/RTUmodbus_slave.c **** 
+ 229              		.loc 1 179 2 is_stmt 1 view .LVU46
+ 181:modbus/RTUmodbus_slave.c **** 	txbuf[1] = g_tModS.RxBuf[1] | 0x80; /* 异常的功能码 */
+ 230              		.loc 1 181 2 view .LVU47
+ 181:modbus/RTUmodbus_slave.c **** 	txbuf[1] = g_tModS.RxBuf[1] | 0x80; /* 异常的功能码 */
+ 231              		.loc 1 181 26 is_stmt 0 view .LVU48
+ARM GAS  /tmp/ccrEi7aK.s 			page 16
+
+
+ 232 0004 084B     		ldr	r3, .L16
+ 233 0006 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+ 181:modbus/RTUmodbus_slave.c **** 	txbuf[1] = g_tModS.RxBuf[1] | 0x80; /* 异常的功能码 */
+ 234              		.loc 1 181 11 view .LVU49
+ 235 0008 8DF80420 		strb	r2, [sp, #4]
+ 182:modbus/RTUmodbus_slave.c **** 	txbuf[2] = _ucErrCode;				/* 错误代码(01,02,03,04) */
+ 236              		.loc 1 182 2 is_stmt 1 view .LVU50
+ 182:modbus/RTUmodbus_slave.c **** 	txbuf[2] = _ucErrCode;				/* 错误代码(01,02,03,04) */
+ 237              		.loc 1 182 26 is_stmt 0 view .LVU51
+ 238 000c 5B78     		ldrb	r3, [r3, #1]	@ zero_extendqisi2
+ 182:modbus/RTUmodbus_slave.c **** 	txbuf[2] = _ucErrCode;				/* 错误代码(01,02,03,04) */
+ 239              		.loc 1 182 11 view .LVU52
+ 240 000e 63F07F03 		orn	r3, r3, #127
+ 241 0012 8DF80530 		strb	r3, [sp, #5]
+ 183:modbus/RTUmodbus_slave.c **** 
+ 242              		.loc 1 183 2 is_stmt 1 view .LVU53
+ 183:modbus/RTUmodbus_slave.c **** 
+ 243              		.loc 1 183 11 is_stmt 0 view .LVU54
+ 244 0016 8DF80600 		strb	r0, [sp, #6]
+ 185:modbus/RTUmodbus_slave.c **** }
+ 245              		.loc 1 185 2 is_stmt 1 view .LVU55
+ 246 001a 0321     		movs	r1, #3
+ 247 001c 01A8     		add	r0, sp, #4
+ 248              	.LVL21:
+ 185:modbus/RTUmodbus_slave.c **** }
+ 249              		.loc 1 185 2 is_stmt 0 view .LVU56
+ 250 001e FFF7FEFF 		bl	MODS_SendWithCRC
+ 251              	.LVL22:
+ 186:modbus/RTUmodbus_slave.c **** 
+ 252              		.loc 1 186 1 view .LVU57
+ 253 0022 03B0     		add	sp, sp, #12
+ 254              	.LCFI8:
+ 255              		.cfi_def_cfa_offset 4
+ 256              		@ sp needed
+ 257 0024 5DF804FB 		ldr	pc, [sp], #4
+ 258              	.L17:
+ 259              		.align	2
+ 260              	.L16:
+ 261 0028 00000000 		.word	g_tModS
+ 262              		.cfi_endproc
+ 263              	.LFE7:
+ 265              		.section	.text.MODS_05H,"ax",%progbits
+ 266              		.align	1
+ 267              		.syntax unified
+ 268              		.thumb
+ 269              		.thumb_func
+ 270              		.fpu softvfp
+ 272              	MODS_05H:
+ 273              	.LFB16:
+ 590:modbus/RTUmodbus_slave.c **** 
+ 591:modbus/RTUmodbus_slave.c **** /*
+ 592:modbus/RTUmodbus_slave.c **** ***************************************************************************************************
+ 593:modbus/RTUmodbus_slave.c **** *	函 数 名: MODS_03H
+ 594:modbus/RTUmodbus_slave.c **** *	功能说明: 读取保持寄存器 在一个或多个保持寄存器中取得当前的二进制�
+ 595:modbus/RTUmodbus_slave.c **** *	形    参: 无
+ 596:modbus/RTUmodbus_slave.c **** *	返 回 值: 无
+ 597:modbus/RTUmodbus_slave.c **** ***************************************************************************************************
+ARM GAS  /tmp/ccrEi7aK.s 			page 17
+
+
+ 598:modbus/RTUmodbus_slave.c **** */
+ 599:modbus/RTUmodbus_slave.c **** static void MODS_03H(void)
+ 600:modbus/RTUmodbus_slave.c **** {
+ 601:modbus/RTUmodbus_slave.c **** 	/*
+ 602:modbus/RTUmodbus_slave.c **** 		从机地址为11H。保持寄存器的起始地址为006BH，结束地址为006DH。该次查询
+ 603:modbus/RTUmodbus_slave.c **** 
+ 604:modbus/RTUmodbus_slave.c **** 		主机发送:
+ 605:modbus/RTUmodbus_slave.c **** 			11 从机地址
+ 606:modbus/RTUmodbus_slave.c **** 			03 功能码
+ 607:modbus/RTUmodbus_slave.c **** 			00 寄存器地址高字节
+ 608:modbus/RTUmodbus_slave.c **** 			6B 寄存器地址低字节
+ 609:modbus/RTUmodbus_slave.c **** 			00 寄存器数量高字节
+ 610:modbus/RTUmodbus_slave.c **** 			03 寄存器数量低字节
+ 611:modbus/RTUmodbus_slave.c **** 			76 CRC高字节
+ 612:modbus/RTUmodbus_slave.c **** 			87 CRC低字节
+ 613:modbus/RTUmodbus_slave.c **** 
+ 614:modbus/RTUmodbus_slave.c **** 		从机应答: 	保持寄存器的长度为2个字节。对于单个保持寄存器而言，寄存
+ 615:modbus/RTUmodbus_slave.c **** 					低字节数据后被传输。保持寄存器之间，低地址寄存器先被传输，高地�
+ 616:modbus/RTUmodbus_slave.c **** 			11 从机地址
+ 617:modbus/RTUmodbus_slave.c **** 			03 功能码
+ 618:modbus/RTUmodbus_slave.c **** 			06 字节数
+ 619:modbus/RTUmodbus_slave.c **** 			00 数据1高字节(006BH)
+ 620:modbus/RTUmodbus_slave.c **** 			6B 数据1低字节(006BH)
+ 621:modbus/RTUmodbus_slave.c **** 			00 数据2高字节(006CH)
+ 622:modbus/RTUmodbus_slave.c **** 			13 数据2 低字节(006CH)
+ 623:modbus/RTUmodbus_slave.c **** 			00 数据3高字节(006DH)
+ 624:modbus/RTUmodbus_slave.c **** 			00 数据3低字节(006DH)
+ 625:modbus/RTUmodbus_slave.c **** 			38 CRC高字节
+ 626:modbus/RTUmodbus_slave.c **** 			B9 CRC低字节
+ 627:modbus/RTUmodbus_slave.c **** 
+ 628:modbus/RTUmodbus_slave.c **** 		例子:
+ 629:modbus/RTUmodbus_slave.c **** 			01 03 30 06 00 01  6B0B      ---- 读 3006H, 触发电流
+ 630:modbus/RTUmodbus_slave.c **** 			01 03 4000 0010 51C6         ---- 读 4000H 倒数第1条浪涌记录 32字节
+ 631:modbus/RTUmodbus_slave.c **** 			01 03 4001 0010 0006         ---- 读 4001H 倒数第1条浪涌记录 32字节
+ 632:modbus/RTUmodbus_slave.c **** 
+ 633:modbus/RTUmodbus_slave.c **** 			01 03 F000 0008 770C         ---- 读 F000H 倒数第1条告警记录 16字节
+ 634:modbus/RTUmodbus_slave.c **** 			01 03 F001 0008 26CC         ---- 读 F001H 倒数第2条告警记录 16字节
+ 635:modbus/RTUmodbus_slave.c **** 
+ 636:modbus/RTUmodbus_slave.c **** 			01 03 7000 0020 5ED2         ---- 读 7000H 倒数第1条波形记录第1段 64字节
+ 637:modbus/RTUmodbus_slave.c **** 			01 03 7001 0020 0F12         ---- 读 7001H 倒数第1条波形记录第2段 64字节
+ 638:modbus/RTUmodbus_slave.c **** 
+ 639:modbus/RTUmodbus_slave.c **** 			01 03 7040 0020 5F06         ---- 读 7040H 倒数第2条波形记录第1段 64字节
+ 640:modbus/RTUmodbus_slave.c **** 	*/
+ 641:modbus/RTUmodbus_slave.c **** 	uint16_t reg = 0x00;
+ 642:modbus/RTUmodbus_slave.c **** 	uint16_t num = 0x00;
+ 643:modbus/RTUmodbus_slave.c **** 	uint16_t i = 0x00;
+ 644:modbus/RTUmodbus_slave.c **** 	uint8_t reg_value[64];
+ 645:modbus/RTUmodbus_slave.c **** 
+ 646:modbus/RTUmodbus_slave.c **** 	g_tModS.RspCode = RSP_OK;
+ 647:modbus/RTUmodbus_slave.c **** 
+ 648:modbus/RTUmodbus_slave.c **** 	if (g_tModS.RxCount != 8) /* 03H命令必须是8个字节 */
+ 649:modbus/RTUmodbus_slave.c **** 	{
+ 650:modbus/RTUmodbus_slave.c **** 		g_tModS.RspCode = RSP_ERR_VALUE; /* 数据值域错误 */
+ 651:modbus/RTUmodbus_slave.c **** 		goto err_ret;
+ 652:modbus/RTUmodbus_slave.c **** 	}
+ 653:modbus/RTUmodbus_slave.c **** 
+ 654:modbus/RTUmodbus_slave.c **** 	reg = BEBufToUint16(&g_tModS.RxBuf[2]); /* 寄存器号 */
+ARM GAS  /tmp/ccrEi7aK.s 			page 18
+
+
+ 655:modbus/RTUmodbus_slave.c **** 	num = BEBufToUint16(&g_tModS.RxBuf[4]); /* 寄存器个数 */
+ 656:modbus/RTUmodbus_slave.c **** 	if (num > sizeof(reg_value) / 2)
+ 657:modbus/RTUmodbus_slave.c **** 	{
+ 658:modbus/RTUmodbus_slave.c **** 		g_tModS.RspCode = RSP_ERR_VALUE; /* 数据值域错误 */
+ 659:modbus/RTUmodbus_slave.c **** 		goto err_ret;
+ 660:modbus/RTUmodbus_slave.c **** 	}
+ 661:modbus/RTUmodbus_slave.c **** 
+ 662:modbus/RTUmodbus_slave.c **** 	for (i = 0; i < num; i++)
+ 663:modbus/RTUmodbus_slave.c **** 	{
+ 664:modbus/RTUmodbus_slave.c **** 		if (MODS_ReadRegValue(reg, &reg_value[2 * i]) == 0) /* 读出寄存器值放入reg_value */
+ 665:modbus/RTUmodbus_slave.c **** 		{
+ 666:modbus/RTUmodbus_slave.c **** 			g_tModS.RspCode = RSP_ERR_REG_ADDR; /* 寄存器地址错误 */
+ 667:modbus/RTUmodbus_slave.c **** 			break;
+ 668:modbus/RTUmodbus_slave.c **** 		}
+ 669:modbus/RTUmodbus_slave.c **** 		// NRF_LOG_INFO("reg_value = %x%x", reg_value[2*i],reg_value[2*i+1]);
+ 670:modbus/RTUmodbus_slave.c **** 		reg++;
+ 671:modbus/RTUmodbus_slave.c **** 	}
+ 672:modbus/RTUmodbus_slave.c **** 
+ 673:modbus/RTUmodbus_slave.c **** err_ret:
+ 674:modbus/RTUmodbus_slave.c **** 	if (g_tModS.RspCode == RSP_OK) /* 正确应答 */
+ 675:modbus/RTUmodbus_slave.c **** 	{
+ 676:modbus/RTUmodbus_slave.c **** 		g_tModS.TxCount = 0;
+ 677:modbus/RTUmodbus_slave.c **** 		g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[0];
+ 678:modbus/RTUmodbus_slave.c **** 		g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[1];
+ 679:modbus/RTUmodbus_slave.c **** 		g_tModS.TxBuf[g_tModS.TxCount++] = num * 2; /* 返回字节数 */
+ 680:modbus/RTUmodbus_slave.c **** 
+ 681:modbus/RTUmodbus_slave.c **** 		for (i = 0; i < num; i++)
+ 682:modbus/RTUmodbus_slave.c **** 		{
+ 683:modbus/RTUmodbus_slave.c **** 			g_tModS.TxBuf[g_tModS.TxCount++] = reg_value[2 * i];
+ 684:modbus/RTUmodbus_slave.c **** 			g_tModS.TxBuf[g_tModS.TxCount++] = reg_value[2 * i + 1];
+ 685:modbus/RTUmodbus_slave.c **** 		}
+ 686:modbus/RTUmodbus_slave.c **** 		MODS_SendWithCRC(g_tModS.TxBuf, g_tModS.TxCount); /* 发送正确应答 */
+ 687:modbus/RTUmodbus_slave.c **** 	}
+ 688:modbus/RTUmodbus_slave.c **** 	else
+ 689:modbus/RTUmodbus_slave.c **** 	{
+ 690:modbus/RTUmodbus_slave.c **** 		MODS_SendAckErr(g_tModS.RspCode); /* 发送错误应答 */
+ 691:modbus/RTUmodbus_slave.c **** 	}
+ 692:modbus/RTUmodbus_slave.c **** }
+ 693:modbus/RTUmodbus_slave.c **** 
+ 694:modbus/RTUmodbus_slave.c **** /*
+ 695:modbus/RTUmodbus_slave.c **** ***************************************************************************************************
+ 696:modbus/RTUmodbus_slave.c **** *	函 数 名: MODS_04H
+ 697:modbus/RTUmodbus_slave.c **** *	功能说明: 读取输入寄存器（对应A01/A02） SMA
+ 698:modbus/RTUmodbus_slave.c **** *	形    参: 无
+ 699:modbus/RTUmodbus_slave.c **** *	返 回 值: 无
+ 700:modbus/RTUmodbus_slave.c **** ***************************************************************************************************
+ 701:modbus/RTUmodbus_slave.c **** */
+ 702:modbus/RTUmodbus_slave.c **** static void MODS_04H(void)
+ 703:modbus/RTUmodbus_slave.c **** {
+ 704:modbus/RTUmodbus_slave.c **** 	/*
+ 705:modbus/RTUmodbus_slave.c **** 		主机发送:
+ 706:modbus/RTUmodbus_slave.c **** 			11 从机地址
+ 707:modbus/RTUmodbus_slave.c **** 			04 功能码
+ 708:modbus/RTUmodbus_slave.c **** 			00 寄存器起始地址高字节
+ 709:modbus/RTUmodbus_slave.c **** 			08 寄存器起始地址低字节
+ 710:modbus/RTUmodbus_slave.c **** 			00 寄存器个数高字节
+ 711:modbus/RTUmodbus_slave.c **** 			02 寄存器个数低字节
+ARM GAS  /tmp/ccrEi7aK.s 			page 19
+
+
+ 712:modbus/RTUmodbus_slave.c **** 			F2 CRC高字节
+ 713:modbus/RTUmodbus_slave.c **** 			99 CRC低字节
+ 714:modbus/RTUmodbus_slave.c **** 
+ 715:modbus/RTUmodbus_slave.c **** 		从机应答:  输入寄存器长度为2个字节。对于单个输入寄存器而言，寄存器
+ 716:modbus/RTUmodbus_slave.c **** 				低字节数据后被传输。输入寄存器之间，低地址寄存器先被传输，高地�
+ 717:modbus/RTUmodbus_slave.c **** 			11 从机地址
+ 718:modbus/RTUmodbus_slave.c **** 			04 功能码
+ 719:modbus/RTUmodbus_slave.c **** 			04 字节数
+ 720:modbus/RTUmodbus_slave.c **** 			00 数据1高字节(0008H)
+ 721:modbus/RTUmodbus_slave.c **** 			0A 数据1低字节(0008H)
+ 722:modbus/RTUmodbus_slave.c **** 			00 数据2高字节(0009H)
+ 723:modbus/RTUmodbus_slave.c **** 			0B 数据2低字节(0009H)
+ 724:modbus/RTUmodbus_slave.c **** 			8B CRC高字节
+ 725:modbus/RTUmodbus_slave.c **** 			80 CRC低字节
+ 726:modbus/RTUmodbus_slave.c **** 
+ 727:modbus/RTUmodbus_slave.c **** 		例子:
+ 728:modbus/RTUmodbus_slave.c **** 
+ 729:modbus/RTUmodbus_slave.c **** 			01 04 2201 0006 2BB0  --- 读 2201H A01通道模拟量 开始的6个数据
+ 730:modbus/RTUmodbus_slave.c **** 			01 04 2201 0001 6A72  --- 读 2201H
+ 731:modbus/RTUmodbus_slave.c **** 
+ 732:modbus/RTUmodbus_slave.c **** 	*/
+ 733:modbus/RTUmodbus_slave.c **** 	uint16_t reg;
+ 734:modbus/RTUmodbus_slave.c **** 	uint16_t num;
+ 735:modbus/RTUmodbus_slave.c **** 	uint16_t i;
+ 736:modbus/RTUmodbus_slave.c **** 	uint16_t status[10];
+ 737:modbus/RTUmodbus_slave.c **** 
+ 738:modbus/RTUmodbus_slave.c **** 	memset(status, 0, 10);
+ 739:modbus/RTUmodbus_slave.c **** 
+ 740:modbus/RTUmodbus_slave.c **** 	g_tModS.RspCode = RSP_OK;
+ 741:modbus/RTUmodbus_slave.c **** 
+ 742:modbus/RTUmodbus_slave.c **** 	if (g_tModS.RxCount != 8)
+ 743:modbus/RTUmodbus_slave.c **** 	{
+ 744:modbus/RTUmodbus_slave.c **** 		g_tModS.RspCode = RSP_ERR_VALUE; /* 数据值域错误 */
+ 745:modbus/RTUmodbus_slave.c **** 		goto err_ret;
+ 746:modbus/RTUmodbus_slave.c **** 	}
+ 747:modbus/RTUmodbus_slave.c **** 
+ 748:modbus/RTUmodbus_slave.c **** 	reg = BEBufToUint16(&g_tModS.RxBuf[2]); /* 寄存器号 */
+ 749:modbus/RTUmodbus_slave.c **** 	num = BEBufToUint16(&g_tModS.RxBuf[4]); /* 寄存器个数 */
+ 750:modbus/RTUmodbus_slave.c **** 
+ 751:modbus/RTUmodbus_slave.c **** 	if ((reg >= REG_A01) && (num > 0) && (reg + num <= REG_AXX + 1))
+ 752:modbus/RTUmodbus_slave.c **** 	{
+ 753:modbus/RTUmodbus_slave.c **** 		for (i = 0; i < num; i++)
+ 754:modbus/RTUmodbus_slave.c **** 		{
+ 755:modbus/RTUmodbus_slave.c **** 			switch (reg)
+ 756:modbus/RTUmodbus_slave.c **** 			{
+ 757:modbus/RTUmodbus_slave.c **** 			/* 测试参数 */
+ 758:modbus/RTUmodbus_slave.c **** 			case REG_A01:
+ 759:modbus/RTUmodbus_slave.c **** 				break;
+ 760:modbus/RTUmodbus_slave.c **** 
+ 761:modbus/RTUmodbus_slave.c **** 			default:
+ 762:modbus/RTUmodbus_slave.c **** 				status[i] = 0;
+ 763:modbus/RTUmodbus_slave.c **** 				break;
+ 764:modbus/RTUmodbus_slave.c **** 			}
+ 765:modbus/RTUmodbus_slave.c **** 			reg++;
+ 766:modbus/RTUmodbus_slave.c **** 		}
+ 767:modbus/RTUmodbus_slave.c **** 	}
+ 768:modbus/RTUmodbus_slave.c **** 	else
+ARM GAS  /tmp/ccrEi7aK.s 			page 20
+
+
+ 769:modbus/RTUmodbus_slave.c **** 	{
+ 770:modbus/RTUmodbus_slave.c **** 		g_tModS.RspCode = RSP_ERR_REG_ADDR; /* 寄存器地址错误 */
+ 771:modbus/RTUmodbus_slave.c **** 	}
+ 772:modbus/RTUmodbus_slave.c **** 
+ 773:modbus/RTUmodbus_slave.c **** err_ret:
+ 774:modbus/RTUmodbus_slave.c **** 	if (g_tModS.RspCode == RSP_OK) /* 正确应答 */
+ 775:modbus/RTUmodbus_slave.c **** 	{
+ 776:modbus/RTUmodbus_slave.c **** 		g_tModS.TxCount = 0;
+ 777:modbus/RTUmodbus_slave.c **** 		g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[0];
+ 778:modbus/RTUmodbus_slave.c **** 		g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[1];
+ 779:modbus/RTUmodbus_slave.c **** 		g_tModS.TxBuf[g_tModS.TxCount++] = num * 2; /* 返回字节数 */
+ 780:modbus/RTUmodbus_slave.c **** 
+ 781:modbus/RTUmodbus_slave.c **** 		for (i = 0; i < num; i++)
+ 782:modbus/RTUmodbus_slave.c **** 		{
+ 783:modbus/RTUmodbus_slave.c **** 			g_tModS.TxBuf[g_tModS.TxCount++] = status[i] >> 8;
+ 784:modbus/RTUmodbus_slave.c **** 			g_tModS.TxBuf[g_tModS.TxCount++] = status[i] & 0xFF;
+ 785:modbus/RTUmodbus_slave.c **** 		}
+ 786:modbus/RTUmodbus_slave.c **** 		MODS_SendWithCRC(g_tModS.TxBuf, g_tModS.TxCount);
+ 787:modbus/RTUmodbus_slave.c **** 	}
+ 788:modbus/RTUmodbus_slave.c **** 	else
+ 789:modbus/RTUmodbus_slave.c **** 	{
+ 790:modbus/RTUmodbus_slave.c **** 		MODS_SendAckErr(g_tModS.RspCode); /* 告诉主机命令错误 */
+ 791:modbus/RTUmodbus_slave.c **** 	}
+ 792:modbus/RTUmodbus_slave.c **** }
+ 793:modbus/RTUmodbus_slave.c **** 
+ 794:modbus/RTUmodbus_slave.c **** /*
+ 795:modbus/RTUmodbus_slave.c **** ***************************************************************************************************
+ 796:modbus/RTUmodbus_slave.c **** *	函 数 名: MODS_05H
+ 797:modbus/RTUmodbus_slave.c **** *	功能说明: 强制单线圈（对应D01/D02/D03）
+ 798:modbus/RTUmodbus_slave.c **** *	形    参: 无
+ 799:modbus/RTUmodbus_slave.c **** *	返 回 值: 无
+ 800:modbus/RTUmodbus_slave.c **** ***************************************************************************************************
+ 801:modbus/RTUmodbus_slave.c **** */
+ 802:modbus/RTUmodbus_slave.c **** static void MODS_05H(void)
+ 803:modbus/RTUmodbus_slave.c **** {
+ 274              		.loc 1 803 1 is_stmt 1 view -0
+ 275              		.cfi_startproc
+ 276              		@ args = 0, pretend = 0, frame = 0
+ 277              		@ frame_needed = 0, uses_anonymous_args = 0
+ 278 0000 38B5     		push	{r3, r4, r5, lr}
+ 279              	.LCFI9:
+ 280              		.cfi_def_cfa_offset 16
+ 281              		.cfi_offset 3, -16
+ 282              		.cfi_offset 4, -12
+ 283              		.cfi_offset 5, -8
+ 284              		.cfi_offset 14, -4
+ 804:modbus/RTUmodbus_slave.c **** 	/*
+ 805:modbus/RTUmodbus_slave.c **** 		主机发送: 写单个线圈寄存器。FF00H值请求线圈处于ON状态，0000H值请求线�
+ 806:modbus/RTUmodbus_slave.c **** 		。05H指令设置单个线圈的状态，15H指令可以设置多个线圈的状态。
+ 807:modbus/RTUmodbus_slave.c **** 			11 从机地址
+ 808:modbus/RTUmodbus_slave.c **** 			05 功能码
+ 809:modbus/RTUmodbus_slave.c **** 			00 寄存器地址高字节
+ 810:modbus/RTUmodbus_slave.c **** 			AC 寄存器地址低字节
+ 811:modbus/RTUmodbus_slave.c **** 			FF 数据1高字节
+ 812:modbus/RTUmodbus_slave.c **** 			00 数据2低字节
+ 813:modbus/RTUmodbus_slave.c **** 			4E CRC校验高字节
+ 814:modbus/RTUmodbus_slave.c **** 			8B CRC校验低字节
+ARM GAS  /tmp/ccrEi7aK.s 			page 21
+
+
+ 815:modbus/RTUmodbus_slave.c **** 
+ 816:modbus/RTUmodbus_slave.c **** 		从机应答:
+ 817:modbus/RTUmodbus_slave.c **** 			11 从机地址
+ 818:modbus/RTUmodbus_slave.c **** 			05 功能码
+ 819:modbus/RTUmodbus_slave.c **** 			00 寄存器地址高字节
+ 820:modbus/RTUmodbus_slave.c **** 			AC 寄存器地址低字节
+ 821:modbus/RTUmodbus_slave.c **** 			FF 寄存器1高字节
+ 822:modbus/RTUmodbus_slave.c **** 			00 寄存器1低字节
+ 823:modbus/RTUmodbus_slave.c **** 			4E CRC校验高字节
+ 824:modbus/RTUmodbus_slave.c **** 			8B CRC校验低字节
+ 825:modbus/RTUmodbus_slave.c **** 
+ 826:modbus/RTUmodbus_slave.c **** 		例子:
+ 827:modbus/RTUmodbus_slave.c **** 		01 05 10 01 FF 00   D93A   -- D01打开
+ 828:modbus/RTUmodbus_slave.c **** 		01 05 10 01 00 00   98CA   -- D01关闭
+ 829:modbus/RTUmodbus_slave.c **** 
+ 830:modbus/RTUmodbus_slave.c **** 		01 05 10 02 FF 00   293A   -- D02打开
+ 831:modbus/RTUmodbus_slave.c **** 		01 05 10 02 00 00   68CA   -- D02关闭
+ 832:modbus/RTUmodbus_slave.c **** 
+ 833:modbus/RTUmodbus_slave.c **** 		01 05 10 03 FF 00   78FA   -- D03打开
+ 834:modbus/RTUmodbus_slave.c **** 		01 05 10 03 00 00   390A   -- D03关闭
+ 835:modbus/RTUmodbus_slave.c **** 	*/
+ 836:modbus/RTUmodbus_slave.c **** 	uint16_t reg;
+ 285              		.loc 1 836 2 view .LVU59
+ 837:modbus/RTUmodbus_slave.c **** 	uint16_t value;
+ 286              		.loc 1 837 2 view .LVU60
+ 838:modbus/RTUmodbus_slave.c **** 
+ 839:modbus/RTUmodbus_slave.c **** 	g_tModS.RspCode = RSP_OK;
+ 287              		.loc 1 839 2 view .LVU61
+ 288              		.loc 1 839 18 is_stmt 0 view .LVU62
+ 289 0002 1B4B     		ldr	r3, .L26
+ 290 0004 0022     		movs	r2, #0
+ 291 0006 83F82120 		strb	r2, [r3, #33]
+ 840:modbus/RTUmodbus_slave.c **** 
+ 841:modbus/RTUmodbus_slave.c **** 	if (g_tModS.RxCount != 8)
+ 292              		.loc 1 841 2 is_stmt 1 view .LVU63
+ 293              		.loc 1 841 13 is_stmt 0 view .LVU64
+ 294 000a 9B7F     		ldrb	r3, [r3, #30]	@ zero_extendqisi2
+ 295              		.loc 1 841 5 view .LVU65
+ 296 000c 082B     		cmp	r3, #8
+ 297 000e 0AD0     		beq	.L19
+ 842:modbus/RTUmodbus_slave.c **** 	{
+ 843:modbus/RTUmodbus_slave.c **** 		g_tModS.RspCode = RSP_ERR_VALUE; /* 数据值域错误 */
+ 298              		.loc 1 843 3 is_stmt 1 view .LVU66
+ 299              		.loc 1 843 19 is_stmt 0 view .LVU67
+ 300 0010 174B     		ldr	r3, .L26
+ 301 0012 0322     		movs	r2, #3
+ 302 0014 83F82120 		strb	r2, [r3, #33]
+ 844:modbus/RTUmodbus_slave.c **** 		goto err_ret;
+ 303              		.loc 1 844 3 is_stmt 1 view .LVU68
+ 304              	.L20:
+ 845:modbus/RTUmodbus_slave.c **** 	}
+ 846:modbus/RTUmodbus_slave.c **** 
+ 847:modbus/RTUmodbus_slave.c **** 	reg = BEBufToUint16(&g_tModS.RxBuf[2]);	  /* 寄存器号 */
+ 848:modbus/RTUmodbus_slave.c **** 	value = BEBufToUint16(&g_tModS.RxBuf[4]); /* 数据 */
+ 849:modbus/RTUmodbus_slave.c **** 
+ 850:modbus/RTUmodbus_slave.c **** 	if (value != 0 && value != 1)
+ 851:modbus/RTUmodbus_slave.c **** 	{
+ARM GAS  /tmp/ccrEi7aK.s 			page 22
+
+
+ 852:modbus/RTUmodbus_slave.c **** 		g_tModS.RspCode = RSP_ERR_VALUE; /* 数据值域错误 */
+ 853:modbus/RTUmodbus_slave.c **** 		goto err_ret;
+ 854:modbus/RTUmodbus_slave.c **** 	}
+ 855:modbus/RTUmodbus_slave.c **** 
+ 856:modbus/RTUmodbus_slave.c **** 	if (reg == REG_D01)
+ 857:modbus/RTUmodbus_slave.c **** 	{
+ 858:modbus/RTUmodbus_slave.c **** 	}
+ 859:modbus/RTUmodbus_slave.c **** 	else if (reg == REG_D02)
+ 860:modbus/RTUmodbus_slave.c **** 	{
+ 861:modbus/RTUmodbus_slave.c **** 	}
+ 862:modbus/RTUmodbus_slave.c **** 	else if (reg == REG_D03)
+ 863:modbus/RTUmodbus_slave.c **** 	{
+ 864:modbus/RTUmodbus_slave.c **** 	}
+ 865:modbus/RTUmodbus_slave.c **** 	else if (reg == REG_D04)
+ 866:modbus/RTUmodbus_slave.c **** 	{
+ 867:modbus/RTUmodbus_slave.c **** 	}
+ 868:modbus/RTUmodbus_slave.c **** 	else
+ 869:modbus/RTUmodbus_slave.c **** 	{
+ 870:modbus/RTUmodbus_slave.c **** 		g_tModS.RspCode = RSP_ERR_REG_ADDR; /* 寄存器地址错误 */
+ 871:modbus/RTUmodbus_slave.c **** 	}
+ 872:modbus/RTUmodbus_slave.c **** err_ret:
+ 873:modbus/RTUmodbus_slave.c **** 	if (g_tModS.RspCode == RSP_OK) /* 正确应答 */
+ 305              		.loc 1 873 2 view .LVU69
+ 306              		.loc 1 873 13 is_stmt 0 view .LVU70
+ 307 0018 154B     		ldr	r3, .L26
+ 308 001a 93F82100 		ldrb	r0, [r3, #33]	@ zero_extendqisi2
+ 309              		.loc 1 873 5 view .LVU71
+ 310 001e 20BB     		cbnz	r0, .L22
+ 874:modbus/RTUmodbus_slave.c **** 	{
+ 875:modbus/RTUmodbus_slave.c **** 		MODS_SendAckOk();
+ 311              		.loc 1 875 3 is_stmt 1 view .LVU72
+ 312 0020 FFF7FEFF 		bl	MODS_SendAckOk
+ 313              	.LVL23:
+ 314              	.L18:
+ 876:modbus/RTUmodbus_slave.c **** 	}
+ 877:modbus/RTUmodbus_slave.c **** 	else
+ 878:modbus/RTUmodbus_slave.c **** 	{
+ 879:modbus/RTUmodbus_slave.c **** 		MODS_SendAckErr(g_tModS.RspCode); /* 告诉主机命令错误 */
+ 880:modbus/RTUmodbus_slave.c **** 	}
+ 881:modbus/RTUmodbus_slave.c **** }
+ 315              		.loc 1 881 1 is_stmt 0 view .LVU73
+ 316 0024 38BD     		pop	{r3, r4, r5, pc}
+ 317              	.L19:
+ 847:modbus/RTUmodbus_slave.c **** 	value = BEBufToUint16(&g_tModS.RxBuf[4]); /* 数据 */
+ 318              		.loc 1 847 2 is_stmt 1 view .LVU74
+ 847:modbus/RTUmodbus_slave.c **** 	value = BEBufToUint16(&g_tModS.RxBuf[4]); /* 数据 */
+ 319              		.loc 1 847 8 is_stmt 0 view .LVU75
+ 320 0026 134D     		ldr	r5, .L26+4
+ 321 0028 2846     		mov	r0, r5
+ 322 002a FFF7FEFF 		bl	BEBufToUint16
+ 323              	.LVL24:
+ 324 002e 0446     		mov	r4, r0
+ 325              	.LVL25:
+ 848:modbus/RTUmodbus_slave.c **** 
+ 326              		.loc 1 848 2 is_stmt 1 view .LVU76
+ 848:modbus/RTUmodbus_slave.c **** 
+ 327              		.loc 1 848 10 is_stmt 0 view .LVU77
+ARM GAS  /tmp/ccrEi7aK.s 			page 23
+
+
+ 328 0030 A81C     		adds	r0, r5, #2
+ 329 0032 FFF7FEFF 		bl	BEBufToUint16
+ 330              	.LVL26:
+ 850:modbus/RTUmodbus_slave.c **** 	{
+ 331              		.loc 1 850 2 is_stmt 1 view .LVU78
+ 850:modbus/RTUmodbus_slave.c **** 	{
+ 332              		.loc 1 850 5 is_stmt 0 view .LVU79
+ 333 0036 0128     		cmp	r0, #1
+ 334 0038 12D8     		bhi	.L25
+ 856:modbus/RTUmodbus_slave.c **** 	{
+ 335              		.loc 1 856 2 is_stmt 1 view .LVU80
+ 856:modbus/RTUmodbus_slave.c **** 	{
+ 336              		.loc 1 856 5 is_stmt 0 view .LVU81
+ 337 003a 40F20113 		movw	r3, #257
+ 338 003e 9C42     		cmp	r4, r3
+ 339 0040 EAD0     		beq	.L20
+ 859:modbus/RTUmodbus_slave.c **** 	{
+ 340              		.loc 1 859 7 is_stmt 1 view .LVU82
+ 859:modbus/RTUmodbus_slave.c **** 	{
+ 341              		.loc 1 859 10 is_stmt 0 view .LVU83
+ 342 0042 B4F5817F 		cmp	r4, #258
+ 343 0046 E7D0     		beq	.L20
+ 862:modbus/RTUmodbus_slave.c **** 	{
+ 344              		.loc 1 862 7 is_stmt 1 view .LVU84
+ 862:modbus/RTUmodbus_slave.c **** 	{
+ 345              		.loc 1 862 10 is_stmt 0 view .LVU85
+ 346 0048 40F20313 		movw	r3, #259
+ 347 004c 9C42     		cmp	r4, r3
+ 348 004e E3D0     		beq	.L20
+ 865:modbus/RTUmodbus_slave.c **** 	{
+ 349              		.loc 1 865 7 is_stmt 1 view .LVU86
+ 865:modbus/RTUmodbus_slave.c **** 	{
+ 350              		.loc 1 865 10 is_stmt 0 view .LVU87
+ 351 0050 B4F5827F 		cmp	r4, #260
+ 352 0054 E0D0     		beq	.L20
+ 870:modbus/RTUmodbus_slave.c **** 	}
+ 353              		.loc 1 870 3 is_stmt 1 view .LVU88
+ 870:modbus/RTUmodbus_slave.c **** 	}
+ 354              		.loc 1 870 19 is_stmt 0 view .LVU89
+ 355 0056 064B     		ldr	r3, .L26
+ 356 0058 0222     		movs	r2, #2
+ 357 005a 83F82120 		strb	r2, [r3, #33]
+ 358 005e DBE7     		b	.L20
+ 359              	.L25:
+ 852:modbus/RTUmodbus_slave.c **** 		goto err_ret;
+ 360              		.loc 1 852 3 is_stmt 1 view .LVU90
+ 852:modbus/RTUmodbus_slave.c **** 		goto err_ret;
+ 361              		.loc 1 852 19 is_stmt 0 view .LVU91
+ 362 0060 AB1E     		subs	r3, r5, #2
+ 363 0062 0322     		movs	r2, #3
+ 364 0064 83F82120 		strb	r2, [r3, #33]
+ 853:modbus/RTUmodbus_slave.c **** 	}
+ 365              		.loc 1 853 3 is_stmt 1 view .LVU92
+ 366 0068 D6E7     		b	.L20
+ 367              	.LVL27:
+ 368              	.L22:
+ 879:modbus/RTUmodbus_slave.c **** 	}
+ARM GAS  /tmp/ccrEi7aK.s 			page 24
+
+
+ 369              		.loc 1 879 3 view .LVU93
+ 370 006a FFF7FEFF 		bl	MODS_SendAckErr
+ 371              	.LVL28:
+ 372              		.loc 1 881 1 is_stmt 0 view .LVU94
+ 373 006e D9E7     		b	.L18
+ 374              	.L27:
+ 375              		.align	2
+ 376              	.L26:
+ 377 0070 00000000 		.word	g_tModS
+ 378 0074 02000000 		.word	g_tModS+2
+ 379              		.cfi_endproc
+ 380              	.LFE16:
+ 382              		.section	.text.MODS_06H,"ax",%progbits
+ 383              		.align	1
+ 384              		.syntax unified
+ 385              		.thumb
+ 386              		.thumb_func
+ 387              		.fpu softvfp
+ 389              	MODS_06H:
+ 390              	.LFB17:
+ 882:modbus/RTUmodbus_slave.c **** 
+ 883:modbus/RTUmodbus_slave.c **** /*
+ 884:modbus/RTUmodbus_slave.c **** ***************************************************************************************************
+ 885:modbus/RTUmodbus_slave.c **** *	函 数 名: MODS_06H
+ 886:modbus/RTUmodbus_slave.c **** *	功能说明: 写单个寄存器
+ 887:modbus/RTUmodbus_slave.c **** *	形    参: 无
+ 888:modbus/RTUmodbus_slave.c **** *	返 回 值: 无
+ 889:modbus/RTUmodbus_slave.c **** ***************************************************************************************************
+ 890:modbus/RTUmodbus_slave.c **** */
+ 891:modbus/RTUmodbus_slave.c **** static void MODS_06H(void)
+ 892:modbus/RTUmodbus_slave.c **** {
+ 391              		.loc 1 892 1 is_stmt 1 view -0
+ 392              		.cfi_startproc
+ 393              		@ args = 0, pretend = 0, frame = 0
+ 394              		@ frame_needed = 0, uses_anonymous_args = 0
+ 395 0000 38B5     		push	{r3, r4, r5, lr}
+ 396              	.LCFI10:
+ 397              		.cfi_def_cfa_offset 16
+ 398              		.cfi_offset 3, -16
+ 399              		.cfi_offset 4, -12
+ 400              		.cfi_offset 5, -8
+ 401              		.cfi_offset 14, -4
+ 893:modbus/RTUmodbus_slave.c **** 
+ 894:modbus/RTUmodbus_slave.c **** 	/*
+ 895:modbus/RTUmodbus_slave.c **** 		写保持寄存器。注意06指令只能操作单个保持寄存器，16指令可以设置单个
+ 896:modbus/RTUmodbus_slave.c **** 
+ 897:modbus/RTUmodbus_slave.c **** 		主机发送:
+ 898:modbus/RTUmodbus_slave.c **** 			11 从机地址
+ 899:modbus/RTUmodbus_slave.c **** 			06 功能码
+ 900:modbus/RTUmodbus_slave.c **** 			00 寄存器地址高字节
+ 901:modbus/RTUmodbus_slave.c **** 			01 寄存器地址低字节
+ 902:modbus/RTUmodbus_slave.c **** 			00 数据1高字节
+ 903:modbus/RTUmodbus_slave.c **** 			01 数据1低字节
+ 904:modbus/RTUmodbus_slave.c **** 			9A CRC校验高字节
+ 905:modbus/RTUmodbus_slave.c **** 			9B CRC校验低字节
+ 906:modbus/RTUmodbus_slave.c **** 
+ 907:modbus/RTUmodbus_slave.c **** 		从机响应:
+ARM GAS  /tmp/ccrEi7aK.s 			page 25
+
+
+ 908:modbus/RTUmodbus_slave.c **** 			11 从机地址
+ 909:modbus/RTUmodbus_slave.c **** 			06 功能码
+ 910:modbus/RTUmodbus_slave.c **** 			00 寄存器地址高字节
+ 911:modbus/RTUmodbus_slave.c **** 			01 寄存器地址低字节
+ 912:modbus/RTUmodbus_slave.c **** 			00 数据1高字节
+ 913:modbus/RTUmodbus_slave.c **** 			01 数据1低字节
+ 914:modbus/RTUmodbus_slave.c **** 			1B CRC校验高字节
+ 915:modbus/RTUmodbus_slave.c **** 			5A	CRC校验低字节
+ 916:modbus/RTUmodbus_slave.c **** 
+ 917:modbus/RTUmodbus_slave.c **** 		例子:
+ 918:modbus/RTUmodbus_slave.c **** 			01 06 30 06 00 25  A710    ---- 触发电流设置为 2.5
+ 919:modbus/RTUmodbus_slave.c **** 			01 06 30 06 00 10  6707    ---- 触发电流设置为 1.0
+ 920:modbus/RTUmodbus_slave.c **** 
+ 921:modbus/RTUmodbus_slave.c **** 
+ 922:modbus/RTUmodbus_slave.c **** 			01 06 30 1B 00 00  F6CD    ---- SMA 滤波系数 = 0 关闭滤波
+ 923:modbus/RTUmodbus_slave.c **** 			01 06 30 1B 00 01  370D    ---- SMA 滤波系数 = 1
+ 924:modbus/RTUmodbus_slave.c **** 			01 06 30 1B 00 02  770C    ---- SMA 滤波系数 = 2
+ 925:modbus/RTUmodbus_slave.c **** 			01 06 30 1B 00 05  36CE    ---- SMA 滤波系数 = 5
+ 926:modbus/RTUmodbus_slave.c **** 
+ 927:modbus/RTUmodbus_slave.c **** 			01 06 30 07 00 01  F6CB    ---- 测试模式修改为 T1
+ 928:modbus/RTUmodbus_slave.c **** 			01 06 30 07 00 02  B6CA    ---- 测试模式修改为 T2
+ 929:modbus/RTUmodbus_slave.c **** 
+ 930:modbus/RTUmodbus_slave.c **** 			01 06 31 00 00 00  8736    ---- 擦除浪涌记录区
+ 931:modbus/RTUmodbus_slave.c **** 			01 06 31 01 00 00  D6F6    ---- 擦除告警记录区
+ 932:modbus/RTUmodbus_slave.c **** 
+ 933:modbus/RTUmodbus_slave.c **** */
+ 934:modbus/RTUmodbus_slave.c **** 
+ 935:modbus/RTUmodbus_slave.c **** 	uint16_t reg;
+ 402              		.loc 1 935 2 view .LVU96
+ 936:modbus/RTUmodbus_slave.c **** 	uint16_t value;
+ 403              		.loc 1 936 2 view .LVU97
+ 937:modbus/RTUmodbus_slave.c **** 
+ 938:modbus/RTUmodbus_slave.c **** 	g_tModS.RspCode = RSP_OK;
+ 404              		.loc 1 938 2 view .LVU98
+ 405              		.loc 1 938 18 is_stmt 0 view .LVU99
+ 406 0002 144B     		ldr	r3, .L34
+ 407 0004 0022     		movs	r2, #0
+ 408 0006 83F82120 		strb	r2, [r3, #33]
+ 939:modbus/RTUmodbus_slave.c **** 
+ 940:modbus/RTUmodbus_slave.c **** 	if (g_tModS.RxCount != 8)
+ 409              		.loc 1 940 2 is_stmt 1 view .LVU100
+ 410              		.loc 1 940 13 is_stmt 0 view .LVU101
+ 411 000a 9B7F     		ldrb	r3, [r3, #30]	@ zero_extendqisi2
+ 412              		.loc 1 940 5 view .LVU102
+ 413 000c 082B     		cmp	r3, #8
+ 414 000e 0AD0     		beq	.L29
+ 941:modbus/RTUmodbus_slave.c **** 	{
+ 942:modbus/RTUmodbus_slave.c **** 		g_tModS.RspCode = RSP_ERR_VALUE; /* 数据值域错误 */
+ 415              		.loc 1 942 3 is_stmt 1 view .LVU103
+ 416              		.loc 1 942 19 is_stmt 0 view .LVU104
+ 417 0010 104B     		ldr	r3, .L34
+ 418 0012 0322     		movs	r2, #3
+ 419 0014 83F82120 		strb	r2, [r3, #33]
+ 943:modbus/RTUmodbus_slave.c **** 		goto err_ret;
+ 420              		.loc 1 943 3 is_stmt 1 view .LVU105
+ 421              	.L30:
+ 944:modbus/RTUmodbus_slave.c **** 	}
+ARM GAS  /tmp/ccrEi7aK.s 			page 26
+
+
+ 945:modbus/RTUmodbus_slave.c **** 
+ 946:modbus/RTUmodbus_slave.c **** 	reg = BEBufToUint16(&g_tModS.RxBuf[2]);	  /* 寄存器号 */
+ 947:modbus/RTUmodbus_slave.c **** 	value = BEBufToUint16(&g_tModS.RxBuf[4]); /* 寄存器值 */
+ 948:modbus/RTUmodbus_slave.c **** 
+ 949:modbus/RTUmodbus_slave.c **** 	if (MODS_WriteRegValue(reg, value) == 1) /* 该函数会把写入的值存入寄存器 */
+ 950:modbus/RTUmodbus_slave.c **** 	{
+ 951:modbus/RTUmodbus_slave.c **** 		;
+ 952:modbus/RTUmodbus_slave.c **** 	}
+ 953:modbus/RTUmodbus_slave.c **** 	else
+ 954:modbus/RTUmodbus_slave.c **** 	{
+ 955:modbus/RTUmodbus_slave.c **** 		g_tModS.RspCode = RSP_ERR_REG_ADDR; /* 寄存器地址错误 */
+ 956:modbus/RTUmodbus_slave.c **** 	}
+ 957:modbus/RTUmodbus_slave.c **** 
+ 958:modbus/RTUmodbus_slave.c **** err_ret:
+ 959:modbus/RTUmodbus_slave.c **** 	if (g_tModS.RspCode == RSP_OK) /* 正确应答 */
+ 422              		.loc 1 959 2 view .LVU106
+ 423              		.loc 1 959 13 is_stmt 0 view .LVU107
+ 424 0018 0E4B     		ldr	r3, .L34
+ 425 001a 93F82100 		ldrb	r0, [r3, #33]	@ zero_extendqisi2
+ 426              		.loc 1 959 5 view .LVU108
+ 427 001e A8B9     		cbnz	r0, .L31
+ 960:modbus/RTUmodbus_slave.c **** 	{
+ 961:modbus/RTUmodbus_slave.c **** 		MODS_SendAckOk();
+ 428              		.loc 1 961 3 is_stmt 1 view .LVU109
+ 429 0020 FFF7FEFF 		bl	MODS_SendAckOk
+ 430              	.LVL29:
+ 431              	.L28:
+ 962:modbus/RTUmodbus_slave.c **** 	}
+ 963:modbus/RTUmodbus_slave.c **** 	else
+ 964:modbus/RTUmodbus_slave.c **** 	{
+ 965:modbus/RTUmodbus_slave.c **** 		MODS_SendAckErr(g_tModS.RspCode); /* 告诉主机命令错误 */
+ 966:modbus/RTUmodbus_slave.c **** 	}
+ 967:modbus/RTUmodbus_slave.c **** }
+ 432              		.loc 1 967 1 is_stmt 0 view .LVU110
+ 433 0024 38BD     		pop	{r3, r4, r5, pc}
+ 434              	.L29:
+ 946:modbus/RTUmodbus_slave.c **** 	value = BEBufToUint16(&g_tModS.RxBuf[4]); /* 寄存器值 */
+ 435              		.loc 1 946 2 is_stmt 1 view .LVU111
+ 946:modbus/RTUmodbus_slave.c **** 	value = BEBufToUint16(&g_tModS.RxBuf[4]); /* 寄存器值 */
+ 436              		.loc 1 946 8 is_stmt 0 view .LVU112
+ 437 0026 0C4D     		ldr	r5, .L34+4
+ 438 0028 2846     		mov	r0, r5
+ 439 002a FFF7FEFF 		bl	BEBufToUint16
+ 440              	.LVL30:
+ 441 002e 0446     		mov	r4, r0
+ 442              	.LVL31:
+ 947:modbus/RTUmodbus_slave.c **** 
+ 443              		.loc 1 947 2 is_stmt 1 view .LVU113
+ 947:modbus/RTUmodbus_slave.c **** 
+ 444              		.loc 1 947 10 is_stmt 0 view .LVU114
+ 445 0030 A81C     		adds	r0, r5, #2
+ 446 0032 FFF7FEFF 		bl	BEBufToUint16
+ 447              	.LVL32:
+ 448 0036 0146     		mov	r1, r0
+ 449              	.LVL33:
+ 949:modbus/RTUmodbus_slave.c **** 	{
+ 450              		.loc 1 949 2 is_stmt 1 view .LVU115
+ARM GAS  /tmp/ccrEi7aK.s 			page 27
+
+
+ 949:modbus/RTUmodbus_slave.c **** 	{
+ 451              		.loc 1 949 6 is_stmt 0 view .LVU116
+ 452 0038 2046     		mov	r0, r4
+ 453 003a FFF7FEFF 		bl	MODS_WriteRegValue
+ 454              	.LVL34:
+ 949:modbus/RTUmodbus_slave.c **** 	{
+ 455              		.loc 1 949 5 view .LVU117
+ 456 003e 0128     		cmp	r0, #1
+ 457 0040 EAD0     		beq	.L30
+ 955:modbus/RTUmodbus_slave.c **** 	}
+ 458              		.loc 1 955 3 is_stmt 1 view .LVU118
+ 955:modbus/RTUmodbus_slave.c **** 	}
+ 459              		.loc 1 955 19 is_stmt 0 view .LVU119
+ 460 0042 AB1E     		subs	r3, r5, #2
+ 461 0044 0222     		movs	r2, #2
+ 462 0046 83F82120 		strb	r2, [r3, #33]
+ 463 004a E5E7     		b	.L30
+ 464              	.LVL35:
+ 465              	.L31:
+ 965:modbus/RTUmodbus_slave.c **** 	}
+ 466              		.loc 1 965 3 is_stmt 1 view .LVU120
+ 467 004c FFF7FEFF 		bl	MODS_SendAckErr
+ 468              	.LVL36:
+ 469              		.loc 1 967 1 is_stmt 0 view .LVU121
+ 470 0050 E8E7     		b	.L28
+ 471              	.L35:
+ 472 0052 00BF     		.align	2
+ 473              	.L34:
+ 474 0054 00000000 		.word	g_tModS
+ 475 0058 02000000 		.word	g_tModS+2
+ 476              		.cfi_endproc
+ 477              	.LFE17:
+ 479              		.section	.text.MODS_10H,"ax",%progbits
+ 480              		.align	1
+ 481              		.syntax unified
+ 482              		.thumb
+ 483              		.thumb_func
+ 484              		.fpu softvfp
+ 486              	MODS_10H:
+ 487              	.LFB18:
+ 968:modbus/RTUmodbus_slave.c **** 
+ 969:modbus/RTUmodbus_slave.c **** /*
+ 970:modbus/RTUmodbus_slave.c **** ***************************************************************************************************
+ 971:modbus/RTUmodbus_slave.c **** *	函 数 名: MODS_10H
+ 972:modbus/RTUmodbus_slave.c **** *	功能说明: 连续写多个寄存器.  进用于改写时钟
+ 973:modbus/RTUmodbus_slave.c **** *	形    参: 无
+ 974:modbus/RTUmodbus_slave.c **** *	返 回 值: 无
+ 975:modbus/RTUmodbus_slave.c **** ***************************************************************************************************
+ 976:modbus/RTUmodbus_slave.c **** */
+ 977:modbus/RTUmodbus_slave.c **** static void MODS_10H(void)
+ 978:modbus/RTUmodbus_slave.c **** {
+ 488              		.loc 1 978 1 is_stmt 1 view -0
+ 489              		.cfi_startproc
+ 490              		@ args = 0, pretend = 0, frame = 0
+ 491              		@ frame_needed = 0, uses_anonymous_args = 0
+ 492 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 493              	.LCFI11:
+ARM GAS  /tmp/ccrEi7aK.s 			page 28
+
+
+ 494              		.cfi_def_cfa_offset 24
+ 495              		.cfi_offset 3, -24
+ 496              		.cfi_offset 4, -20
+ 497              		.cfi_offset 5, -16
+ 498              		.cfi_offset 6, -12
+ 499              		.cfi_offset 7, -8
+ 500              		.cfi_offset 14, -4
+ 979:modbus/RTUmodbus_slave.c **** 	/*
+ 980:modbus/RTUmodbus_slave.c **** 		从机地址为11H。保持寄存器的其实地址为0001H，寄存器的结束地址为0002H。
+ 981:modbus/RTUmodbus_slave.c **** 		保持寄存器0001H的内容为000AH，保持寄存器0002H的内容为0102H。
+ 982:modbus/RTUmodbus_slave.c **** 
+ 983:modbus/RTUmodbus_slave.c **** 		主机发送:
+ 984:modbus/RTUmodbus_slave.c **** 			11 从机地址
+ 985:modbus/RTUmodbus_slave.c **** 			10 功能码
+ 986:modbus/RTUmodbus_slave.c **** 			00 寄存器起始地址高字节
+ 987:modbus/RTUmodbus_slave.c **** 			01 寄存器起始地址低字节
+ 988:modbus/RTUmodbus_slave.c **** 			00 寄存器数量高字节
+ 989:modbus/RTUmodbus_slave.c **** 			02 寄存器数量低字节
+ 990:modbus/RTUmodbus_slave.c **** 			04 字节数
+ 991:modbus/RTUmodbus_slave.c **** 			00 数据1高字节
+ 992:modbus/RTUmodbus_slave.c **** 			0A 数据1低字节
+ 993:modbus/RTUmodbus_slave.c **** 			01 数据2高字节
+ 994:modbus/RTUmodbus_slave.c **** 			02 数据2低字节
+ 995:modbus/RTUmodbus_slave.c **** 			C6 CRC校验高字节
+ 996:modbus/RTUmodbus_slave.c **** 			F0 CRC校验低字节
+ 997:modbus/RTUmodbus_slave.c **** 
+ 998:modbus/RTUmodbus_slave.c **** 		从机响应:
+ 999:modbus/RTUmodbus_slave.c **** 			11 从机地址
+1000:modbus/RTUmodbus_slave.c **** 			06 功能码
+1001:modbus/RTUmodbus_slave.c **** 			00 寄存器地址高字节
+1002:modbus/RTUmodbus_slave.c **** 			01 寄存器地址低字节
+1003:modbus/RTUmodbus_slave.c **** 			00 数据1高字节
+1004:modbus/RTUmodbus_slave.c **** 			01 数据1低字节
+1005:modbus/RTUmodbus_slave.c **** 			1B CRC校验高字节
+1006:modbus/RTUmodbus_slave.c **** 			5A	CRC校验低字节
+1007:modbus/RTUmodbus_slave.c **** 
+1008:modbus/RTUmodbus_slave.c **** 		例子:
+1009:modbus/RTUmodbus_slave.c **** 			01 10 30 00 00 06 0C  07 DE  00 0A  00 01  00 08  00 0C  00 00     389A    ---- 写时钟 2014-1
+1010:modbus/RTUmodbus_slave.c **** 			01 10 30 00 00 06 0C  07 DF  00 01  00 1F  00 17  00 3B  00 39     5549    ---- 写时钟 2015-0
+1011:modbus/RTUmodbus_slave.c **** 
+1012:modbus/RTUmodbus_slave.c **** 	*/
+1013:modbus/RTUmodbus_slave.c **** 	uint16_t reg_addr;
+ 501              		.loc 1 1013 2 view .LVU123
+1014:modbus/RTUmodbus_slave.c **** 	uint16_t reg_num;
+ 502              		.loc 1 1014 2 view .LVU124
+1015:modbus/RTUmodbus_slave.c **** 	uint8_t byte_num;
+ 503              		.loc 1 1015 2 view .LVU125
+1016:modbus/RTUmodbus_slave.c **** 	uint8_t i;
+ 504              		.loc 1 1016 2 view .LVU126
+1017:modbus/RTUmodbus_slave.c **** 	uint16_t value;
+ 505              		.loc 1 1017 2 view .LVU127
+1018:modbus/RTUmodbus_slave.c **** 
+1019:modbus/RTUmodbus_slave.c **** 	g_tModS.RspCode = RSP_OK;
+ 506              		.loc 1 1019 2 view .LVU128
+ 507              		.loc 1 1019 18 is_stmt 0 view .LVU129
+ 508 0002 1B4B     		ldr	r3, .L45
+ 509 0004 0022     		movs	r2, #0
+ARM GAS  /tmp/ccrEi7aK.s 			page 29
+
+
+ 510 0006 83F82120 		strb	r2, [r3, #33]
+1020:modbus/RTUmodbus_slave.c **** 
+1021:modbus/RTUmodbus_slave.c **** 	if (g_tModS.RxCount < 11)
+ 511              		.loc 1 1021 2 is_stmt 1 view .LVU130
+ 512              		.loc 1 1021 13 is_stmt 0 view .LVU131
+ 513 000a 9B7F     		ldrb	r3, [r3, #30]	@ zero_extendqisi2
+ 514              		.loc 1 1021 5 view .LVU132
+ 515 000c 0A2B     		cmp	r3, #10
+ 516 000e 0AD8     		bhi	.L37
+1022:modbus/RTUmodbus_slave.c **** 	{
+1023:modbus/RTUmodbus_slave.c **** 		g_tModS.RspCode = RSP_ERR_VALUE; /* 数据值域错误 */
+ 517              		.loc 1 1023 3 is_stmt 1 view .LVU133
+ 518              		.loc 1 1023 19 is_stmt 0 view .LVU134
+ 519 0010 174B     		ldr	r3, .L45
+ 520 0012 0322     		movs	r2, #3
+ 521 0014 83F82120 		strb	r2, [r3, #33]
+1024:modbus/RTUmodbus_slave.c **** 		goto err_ret;
+ 522              		.loc 1 1024 3 is_stmt 1 view .LVU135
+ 523              	.L38:
+1025:modbus/RTUmodbus_slave.c **** 	}
+1026:modbus/RTUmodbus_slave.c **** 
+1027:modbus/RTUmodbus_slave.c **** 	reg_addr = BEBufToUint16(&g_tModS.RxBuf[2]); /* 寄存器号 */
+1028:modbus/RTUmodbus_slave.c **** 	reg_num = BEBufToUint16(&g_tModS.RxBuf[4]);	 /* 寄存器个数 */
+1029:modbus/RTUmodbus_slave.c **** 	byte_num = g_tModS.RxBuf[6];				 /* 后面的数据体字节数 */
+1030:modbus/RTUmodbus_slave.c **** 
+1031:modbus/RTUmodbus_slave.c **** 	if (byte_num != 2 * reg_num)
+1032:modbus/RTUmodbus_slave.c **** 	{
+1033:modbus/RTUmodbus_slave.c **** 		;
+1034:modbus/RTUmodbus_slave.c **** 	}
+1035:modbus/RTUmodbus_slave.c **** 
+1036:modbus/RTUmodbus_slave.c **** 	for (i = 0; i < reg_num; i++)
+1037:modbus/RTUmodbus_slave.c **** 	{
+1038:modbus/RTUmodbus_slave.c **** 		value = BEBufToUint16(&g_tModS.RxBuf[7 + 2 * i]); /* 寄存器值 */
+1039:modbus/RTUmodbus_slave.c **** 
+1040:modbus/RTUmodbus_slave.c **** 		if (MODS_WriteRegValue(reg_addr + i, value) == 1)
+1041:modbus/RTUmodbus_slave.c **** 		{
+1042:modbus/RTUmodbus_slave.c **** 			;
+1043:modbus/RTUmodbus_slave.c **** 		}
+1044:modbus/RTUmodbus_slave.c **** 		else
+1045:modbus/RTUmodbus_slave.c **** 		{
+1046:modbus/RTUmodbus_slave.c **** 			g_tModS.RspCode = RSP_ERR_REG_ADDR; /* 寄存器地址错误 */
+1047:modbus/RTUmodbus_slave.c **** 			break;
+1048:modbus/RTUmodbus_slave.c **** 		}
+1049:modbus/RTUmodbus_slave.c **** 	}
+1050:modbus/RTUmodbus_slave.c **** 
+1051:modbus/RTUmodbus_slave.c **** err_ret:
+1052:modbus/RTUmodbus_slave.c **** 	if (g_tModS.RspCode == RSP_OK) /* 正确应答 */
+ 524              		.loc 1 1052 2 view .LVU136
+ 525              		.loc 1 1052 13 is_stmt 0 view .LVU137
+ 526 0018 154B     		ldr	r3, .L45
+ 527 001a 93F82100 		ldrb	r0, [r3, #33]	@ zero_extendqisi2
+ 528              		.loc 1 1052 5 view .LVU138
+ 529 001e 20BB     		cbnz	r0, .L42
+1053:modbus/RTUmodbus_slave.c **** 	{
+1054:modbus/RTUmodbus_slave.c **** 		MODS_SendAckOk();
+ 530              		.loc 1 1054 3 is_stmt 1 view .LVU139
+ 531 0020 FFF7FEFF 		bl	MODS_SendAckOk
+ARM GAS  /tmp/ccrEi7aK.s 			page 30
+
+
+ 532              	.LVL37:
+ 533              	.L36:
+1055:modbus/RTUmodbus_slave.c **** 	}
+1056:modbus/RTUmodbus_slave.c **** 	else
+1057:modbus/RTUmodbus_slave.c **** 	{
+1058:modbus/RTUmodbus_slave.c **** 		MODS_SendAckErr(g_tModS.RspCode); /* 告诉主机命令错误 */
+1059:modbus/RTUmodbus_slave.c **** 	}
+1060:modbus/RTUmodbus_slave.c **** }
+ 534              		.loc 1 1060 1 is_stmt 0 view .LVU140
+ 535 0024 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 536              	.L37:
+1027:modbus/RTUmodbus_slave.c **** 	reg_num = BEBufToUint16(&g_tModS.RxBuf[4]);	 /* 寄存器个数 */
+ 537              		.loc 1 1027 2 is_stmt 1 view .LVU141
+1027:modbus/RTUmodbus_slave.c **** 	reg_num = BEBufToUint16(&g_tModS.RxBuf[4]);	 /* 寄存器个数 */
+ 538              		.loc 1 1027 13 is_stmt 0 view .LVU142
+ 539 0026 134C     		ldr	r4, .L45+4
+ 540 0028 2046     		mov	r0, r4
+ 541 002a FFF7FEFF 		bl	BEBufToUint16
+ 542              	.LVL38:
+ 543 002e 0746     		mov	r7, r0
+ 544              	.LVL39:
+1028:modbus/RTUmodbus_slave.c **** 	byte_num = g_tModS.RxBuf[6];				 /* 后面的数据体字节数 */
+ 545              		.loc 1 1028 2 is_stmt 1 view .LVU143
+1028:modbus/RTUmodbus_slave.c **** 	byte_num = g_tModS.RxBuf[6];				 /* 后面的数据体字节数 */
+ 546              		.loc 1 1028 12 is_stmt 0 view .LVU144
+ 547 0030 A01C     		adds	r0, r4, #2
+ 548 0032 FFF7FEFF 		bl	BEBufToUint16
+ 549              	.LVL40:
+ 550 0036 0646     		mov	r6, r0
+ 551              	.LVL41:
+1029:modbus/RTUmodbus_slave.c **** 
+ 552              		.loc 1 1029 2 is_stmt 1 view .LVU145
+1031:modbus/RTUmodbus_slave.c **** 	{
+ 553              		.loc 1 1031 2 view .LVU146
+1033:modbus/RTUmodbus_slave.c **** 	}
+ 554              		.loc 1 1033 3 view .LVU147
+1036:modbus/RTUmodbus_slave.c **** 	{
+ 555              		.loc 1 1036 2 view .LVU148
+1036:modbus/RTUmodbus_slave.c **** 	{
+ 556              		.loc 1 1036 9 is_stmt 0 view .LVU149
+ 557 0038 0024     		movs	r4, #0
+1036:modbus/RTUmodbus_slave.c **** 	{
+ 558              		.loc 1 1036 2 view .LVU150
+ 559 003a 01E0     		b	.L39
+ 560              	.LVL42:
+ 561              	.L40:
+1042:modbus/RTUmodbus_slave.c **** 		}
+ 562              		.loc 1 1042 4 is_stmt 1 discriminator 2 view .LVU151
+1036:modbus/RTUmodbus_slave.c **** 	{
+ 563              		.loc 1 1036 27 discriminator 2 view .LVU152
+1036:modbus/RTUmodbus_slave.c **** 	{
+ 564              		.loc 1 1036 28 is_stmt 0 discriminator 2 view .LVU153
+ 565 003c 0134     		adds	r4, r4, #1
+ 566              	.LVL43:
+1036:modbus/RTUmodbus_slave.c **** 	{
+ 567              		.loc 1 1036 28 discriminator 2 view .LVU154
+ 568 003e E4B2     		uxtb	r4, r4
+ARM GAS  /tmp/ccrEi7aK.s 			page 31
+
+
+ 569              	.LVL44:
+ 570              	.L39:
+1036:modbus/RTUmodbus_slave.c **** 	{
+ 571              		.loc 1 1036 14 is_stmt 1 discriminator 1 view .LVU155
+1036:modbus/RTUmodbus_slave.c **** 	{
+ 572              		.loc 1 1036 16 is_stmt 0 discriminator 1 view .LVU156
+ 573 0040 A5B2     		uxth	r5, r4
+1036:modbus/RTUmodbus_slave.c **** 	{
+ 574              		.loc 1 1036 2 discriminator 1 view .LVU157
+ 575 0042 B542     		cmp	r5, r6
+ 576 0044 E8D2     		bcs	.L38
+1038:modbus/RTUmodbus_slave.c **** 
+ 577              		.loc 1 1038 3 is_stmt 1 view .LVU158
+1038:modbus/RTUmodbus_slave.c **** 
+ 578              		.loc 1 1038 46 is_stmt 0 view .LVU159
+ 579 0046 6300     		lsls	r3, r4, #1
+1038:modbus/RTUmodbus_slave.c **** 
+ 580              		.loc 1 1038 42 view .LVU160
+ 581 0048 0733     		adds	r3, r3, #7
+1038:modbus/RTUmodbus_slave.c **** 
+ 582              		.loc 1 1038 11 view .LVU161
+ 583 004a 0948     		ldr	r0, .L45
+ 584 004c 1844     		add	r0, r0, r3
+ 585 004e FFF7FEFF 		bl	BEBufToUint16
+ 586              	.LVL45:
+ 587 0052 0146     		mov	r1, r0
+ 588              	.LVL46:
+1040:modbus/RTUmodbus_slave.c **** 		{
+ 589              		.loc 1 1040 3 is_stmt 1 view .LVU162
+1040:modbus/RTUmodbus_slave.c **** 		{
+ 590              		.loc 1 1040 7 is_stmt 0 view .LVU163
+ 591 0054 3D44     		add	r5, r5, r7
+ 592 0056 A8B2     		uxth	r0, r5
+ 593 0058 FFF7FEFF 		bl	MODS_WriteRegValue
+ 594              	.LVL47:
+1040:modbus/RTUmodbus_slave.c **** 		{
+ 595              		.loc 1 1040 6 view .LVU164
+ 596 005c 0128     		cmp	r0, #1
+ 597 005e EDD0     		beq	.L40
+1046:modbus/RTUmodbus_slave.c **** 			break;
+ 598              		.loc 1 1046 4 is_stmt 1 view .LVU165
+1046:modbus/RTUmodbus_slave.c **** 			break;
+ 599              		.loc 1 1046 20 is_stmt 0 view .LVU166
+ 600 0060 034B     		ldr	r3, .L45
+ 601 0062 0222     		movs	r2, #2
+ 602 0064 83F82120 		strb	r2, [r3, #33]
+1047:modbus/RTUmodbus_slave.c **** 		}
+ 603              		.loc 1 1047 4 is_stmt 1 view .LVU167
+ 604 0068 D6E7     		b	.L38
+ 605              	.LVL48:
+ 606              	.L42:
+1058:modbus/RTUmodbus_slave.c **** 	}
+ 607              		.loc 1 1058 3 view .LVU168
+ 608 006a FFF7FEFF 		bl	MODS_SendAckErr
+ 609              	.LVL49:
+ 610              		.loc 1 1060 1 is_stmt 0 view .LVU169
+ 611 006e D9E7     		b	.L36
+ARM GAS  /tmp/ccrEi7aK.s 			page 32
+
+
+ 612              	.L46:
+ 613              		.align	2
+ 614              	.L45:
+ 615 0070 00000000 		.word	g_tModS
+ 616 0074 02000000 		.word	g_tModS+2
+ 617              		.cfi_endproc
+ 618              	.LFE18:
+ 620              		.section	.text.MODS_01H,"ax",%progbits
+ 621              		.align	1
+ 622              		.syntax unified
+ 623              		.thumb
+ 624              		.thumb_func
+ 625              		.fpu softvfp
+ 627              	MODS_01H:
+ 628              	.LFB10:
+ 272:modbus/RTUmodbus_slave.c **** 	/*
+ 629              		.loc 1 272 1 is_stmt 1 view -0
+ 630              		.cfi_startproc
+ 631              		@ args = 0, pretend = 0, frame = 16
+ 632              		@ frame_needed = 0, uses_anonymous_args = 0
+ 301:modbus/RTUmodbus_slave.c **** 	uint16_t num;
+ 633              		.loc 1 301 2 view .LVU171
+ 302:modbus/RTUmodbus_slave.c **** 	uint16_t i;
+ 634              		.loc 1 302 2 view .LVU172
+ 303:modbus/RTUmodbus_slave.c **** 	uint16_t m;
+ 635              		.loc 1 303 2 view .LVU173
+ 304:modbus/RTUmodbus_slave.c **** 	uint8_t status[10];
+ 636              		.loc 1 304 2 view .LVU174
+ 305:modbus/RTUmodbus_slave.c **** 
+ 637              		.loc 1 305 2 view .LVU175
+ 307:modbus/RTUmodbus_slave.c **** 
+ 638              		.loc 1 307 2 view .LVU176
+ 307:modbus/RTUmodbus_slave.c **** 
+ 639              		.loc 1 307 18 is_stmt 0 view .LVU177
+ 640 0000 344B     		ldr	r3, .L67
+ 641 0002 0022     		movs	r2, #0
+ 642 0004 83F82120 		strb	r2, [r3, #33]
+ 310:modbus/RTUmodbus_slave.c **** 	{
+ 643              		.loc 1 310 2 is_stmt 1 view .LVU178
+ 310:modbus/RTUmodbus_slave.c **** 	{
+ 644              		.loc 1 310 13 is_stmt 0 view .LVU179
+ 645 0008 9B7F     		ldrb	r3, [r3, #30]	@ zero_extendqisi2
+ 310:modbus/RTUmodbus_slave.c **** 	{
+ 646              		.loc 1 310 5 view .LVU180
+ 647 000a 082B     		cmp	r3, #8
+ 648 000c 04D0     		beq	.L48
+ 312:modbus/RTUmodbus_slave.c **** 		return;
+ 649              		.loc 1 312 3 is_stmt 1 view .LVU181
+ 312:modbus/RTUmodbus_slave.c **** 		return;
+ 650              		.loc 1 312 19 is_stmt 0 view .LVU182
+ 651 000e 314B     		ldr	r3, .L67
+ 652 0010 0322     		movs	r2, #3
+ 653 0012 83F82120 		strb	r2, [r3, #33]
+ 313:modbus/RTUmodbus_slave.c **** 	}
+ 654              		.loc 1 313 3 is_stmt 1 view .LVU183
+ 655 0016 7047     		bx	lr
+ 656              	.L48:
+ARM GAS  /tmp/ccrEi7aK.s 			page 33
+
+
+ 272:modbus/RTUmodbus_slave.c **** 	/*
+ 657              		.loc 1 272 1 is_stmt 0 view .LVU184
+ 658 0018 70B5     		push	{r4, r5, r6, lr}
+ 659              	.LCFI12:
+ 660              		.cfi_def_cfa_offset 16
+ 661              		.cfi_offset 4, -16
+ 662              		.cfi_offset 5, -12
+ 663              		.cfi_offset 6, -8
+ 664              		.cfi_offset 14, -4
+ 665 001a 84B0     		sub	sp, sp, #16
+ 666              	.LCFI13:
+ 667              		.cfi_def_cfa_offset 32
+ 316:modbus/RTUmodbus_slave.c **** 	num = BEBufToUint16(&g_tModS.RxBuf[4]); /* 寄存器个数 */
+ 668              		.loc 1 316 2 is_stmt 1 view .LVU185
+ 316:modbus/RTUmodbus_slave.c **** 	num = BEBufToUint16(&g_tModS.RxBuf[4]); /* 寄存器个数 */
+ 669              		.loc 1 316 8 is_stmt 0 view .LVU186
+ 670 001c 2E4C     		ldr	r4, .L67+4
+ 671 001e 2046     		mov	r0, r4
+ 672 0020 FFF7FEFF 		bl	BEBufToUint16
+ 673              	.LVL50:
+ 674 0024 0546     		mov	r5, r0
+ 675              	.LVL51:
+ 317:modbus/RTUmodbus_slave.c **** 
+ 676              		.loc 1 317 2 is_stmt 1 view .LVU187
+ 317:modbus/RTUmodbus_slave.c **** 
+ 677              		.loc 1 317 8 is_stmt 0 view .LVU188
+ 678 0026 A01C     		adds	r0, r4, #2
+ 679 0028 FFF7FEFF 		bl	BEBufToUint16
+ 680              	.LVL52:
+ 319:modbus/RTUmodbus_slave.c **** 
+ 681              		.loc 1 319 2 is_stmt 1 view .LVU189
+ 319:modbus/RTUmodbus_slave.c **** 
+ 682              		.loc 1 319 16 is_stmt 0 view .LVU190
+ 683 002c C41D     		adds	r4, r0, #7
+ 684 002e 20D4     		bmi	.L65
+ 685              	.L50:
+ 686 0030 E610     		asrs	r6, r4, #3
+ 319:modbus/RTUmodbus_slave.c **** 
+ 687              		.loc 1 319 4 view .LVU191
+ 688 0032 C4F3CF04 		ubfx	r4, r4, #3, #16
+ 689              	.LVL53:
+ 321:modbus/RTUmodbus_slave.c **** 	{
+ 690              		.loc 1 321 2 is_stmt 1 view .LVU192
+ 321:modbus/RTUmodbus_slave.c **** 	{
+ 691              		.loc 1 321 5 is_stmt 0 view .LVU193
+ 692 0036 B5F5807F 		cmp	r5, #256
+ 693 003a 04D9     		bls	.L51
+ 321:modbus/RTUmodbus_slave.c **** 	{
+ 694              		.loc 1 321 23 discriminator 1 view .LVU194
+ 695 003c 18B1     		cbz	r0, .L51
+ 321:modbus/RTUmodbus_slave.c **** 	{
+ 696              		.loc 1 321 44 discriminator 2 view .LVU195
+ 697 003e 0544     		add	r5, r5, r0
+ 698              	.LVL54:
+ 321:modbus/RTUmodbus_slave.c **** 	{
+ 699              		.loc 1 321 36 discriminator 2 view .LVU196
+ 700 0040 B5F5837F 		cmp	r5, #262
+ARM GAS  /tmp/ccrEi7aK.s 			page 34
+
+
+ 701 0044 17DB     		blt	.L61
+ 702              	.L51:
+ 337:modbus/RTUmodbus_slave.c **** 	}
+ 703              		.loc 1 337 3 is_stmt 1 view .LVU197
+ 337:modbus/RTUmodbus_slave.c **** 	}
+ 704              		.loc 1 337 19 is_stmt 0 view .LVU198
+ 705 0046 234B     		ldr	r3, .L67
+ 706 0048 0222     		movs	r2, #2
+ 707 004a 83F82120 		strb	r2, [r3, #33]
+ 708              	.L56:
+ 340:modbus/RTUmodbus_slave.c **** 	{
+ 709              		.loc 1 340 2 is_stmt 1 view .LVU199
+ 340:modbus/RTUmodbus_slave.c **** 	{
+ 710              		.loc 1 340 13 is_stmt 0 view .LVU200
+ 711 004e 214B     		ldr	r3, .L67
+ 712 0050 93F82100 		ldrb	r0, [r3, #33]	@ zero_extendqisi2
+ 713              	.LVL55:
+ 340:modbus/RTUmodbus_slave.c **** 	{
+ 714              		.loc 1 340 5 view .LVU201
+ 715 0054 0028     		cmp	r0, #0
+ 716 0056 39D1     		bne	.L57
+ 342:modbus/RTUmodbus_slave.c **** 		g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[0];
+ 717              		.loc 1 342 3 is_stmt 1 view .LVU202
+ 343:modbus/RTUmodbus_slave.c **** 		g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[1];
+ 718              		.loc 1 343 3 view .LVU203
+ 343:modbus/RTUmodbus_slave.c **** 		g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[1];
+ 719              		.loc 1 343 51 is_stmt 0 view .LVU204
+ 720 0058 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+ 343:modbus/RTUmodbus_slave.c **** 		g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[1];
+ 721              		.loc 1 343 36 view .LVU205
+ 722 005a 83F82220 		strb	r2, [r3, #34]
+ 344:modbus/RTUmodbus_slave.c **** 		g_tModS.TxBuf[g_tModS.TxCount++] = m; /* 返回字节数 */
+ 723              		.loc 1 344 3 is_stmt 1 view .LVU206
+ 344:modbus/RTUmodbus_slave.c **** 		g_tModS.TxBuf[g_tModS.TxCount++] = m; /* 返回字节数 */
+ 724              		.loc 1 344 51 is_stmt 0 view .LVU207
+ 725 005e 5A78     		ldrb	r2, [r3, #1]	@ zero_extendqisi2
+ 344:modbus/RTUmodbus_slave.c **** 		g_tModS.TxBuf[g_tModS.TxCount++] = m; /* 返回字节数 */
+ 726              		.loc 1 344 36 view .LVU208
+ 727 0060 83F82320 		strb	r2, [r3, #35]
+ 345:modbus/RTUmodbus_slave.c **** 
+ 728              		.loc 1 345 3 is_stmt 1 view .LVU209
+ 345:modbus/RTUmodbus_slave.c **** 
+ 729              		.loc 1 345 32 is_stmt 0 view .LVU210
+ 730 0064 0322     		movs	r2, #3
+ 731 0066 83F8A220 		strb	r2, [r3, #162]
+ 345:modbus/RTUmodbus_slave.c **** 
+ 732              		.loc 1 345 36 view .LVU211
+ 733 006a 83F82460 		strb	r6, [r3, #36]
+ 347:modbus/RTUmodbus_slave.c **** 		{
+ 734              		.loc 1 347 3 is_stmt 1 view .LVU212
+ 735              	.LVL56:
+ 347:modbus/RTUmodbus_slave.c **** 		{
+ 736              		.loc 1 347 10 is_stmt 0 view .LVU213
+ 737 006e 0023     		movs	r3, #0
+ 347:modbus/RTUmodbus_slave.c **** 		{
+ 738              		.loc 1 347 3 view .LVU214
+ 739 0070 22E0     		b	.L58
+ARM GAS  /tmp/ccrEi7aK.s 			page 35
+
+
+ 740              	.LVL57:
+ 741              	.L65:
+ 319:modbus/RTUmodbus_slave.c **** 
+ 742              		.loc 1 319 16 view .LVU215
+ 743 0072 0734     		adds	r4, r4, #7
+ 744 0074 DCE7     		b	.L50
+ 745              	.LVL58:
+ 746              	.L61:
+ 323:modbus/RTUmodbus_slave.c **** 		{
+ 747              		.loc 1 323 10 view .LVU216
+ 748 0076 0023     		movs	r3, #0
+ 749              	.L52:
+ 750              	.LVL59:
+ 323:modbus/RTUmodbus_slave.c **** 		{
+ 751              		.loc 1 323 15 is_stmt 1 discriminator 1 view .LVU217
+ 323:modbus/RTUmodbus_slave.c **** 		{
+ 752              		.loc 1 323 3 is_stmt 0 discriminator 1 view .LVU218
+ 753 0078 A342     		cmp	r3, r4
+ 754 007a 07D2     		bcs	.L66
+ 325:modbus/RTUmodbus_slave.c **** 		}
+ 755              		.loc 1 325 4 is_stmt 1 discriminator 3 view .LVU219
+ 325:modbus/RTUmodbus_slave.c **** 		}
+ 756              		.loc 1 325 14 is_stmt 0 discriminator 3 view .LVU220
+ 757 007c 04AA     		add	r2, sp, #16
+ 758 007e 1A44     		add	r2, r2, r3
+ 759 0080 0021     		movs	r1, #0
+ 760 0082 02F80C1C 		strb	r1, [r2, #-12]
+ 323:modbus/RTUmodbus_slave.c **** 		{
+ 761              		.loc 1 323 22 is_stmt 1 discriminator 3 view .LVU221
+ 323:modbus/RTUmodbus_slave.c **** 		{
+ 762              		.loc 1 323 23 is_stmt 0 discriminator 3 view .LVU222
+ 763 0086 0133     		adds	r3, r3, #1
+ 764              	.LVL60:
+ 323:modbus/RTUmodbus_slave.c **** 		{
+ 765              		.loc 1 323 23 discriminator 3 view .LVU223
+ 766 0088 9BB2     		uxth	r3, r3
+ 767              	.LVL61:
+ 323:modbus/RTUmodbus_slave.c **** 		{
+ 768              		.loc 1 323 23 discriminator 3 view .LVU224
+ 769 008a F5E7     		b	.L52
+ 770              	.L66:
+ 327:modbus/RTUmodbus_slave.c **** 		{
+ 771              		.loc 1 327 10 view .LVU225
+ 772 008c 0023     		movs	r3, #0
+ 773              	.LVL62:
+ 327:modbus/RTUmodbus_slave.c **** 		{
+ 774              		.loc 1 327 10 view .LVU226
+ 775 008e 01E0     		b	.L54
+ 776              	.LVL63:
+ 777              	.L55:
+ 333:modbus/RTUmodbus_slave.c **** 	}
+ 778              		.loc 1 333 3 is_stmt 1 discriminator 3 view .LVU227
+ 327:modbus/RTUmodbus_slave.c **** 		{
+ 779              		.loc 1 327 24 discriminator 3 view .LVU228
+ 327:modbus/RTUmodbus_slave.c **** 		{
+ 780              		.loc 1 327 25 is_stmt 0 discriminator 3 view .LVU229
+ 781 0090 0133     		adds	r3, r3, #1
+ARM GAS  /tmp/ccrEi7aK.s 			page 36
+
+
+ 782              	.LVL64:
+ 327:modbus/RTUmodbus_slave.c **** 		{
+ 783              		.loc 1 327 25 discriminator 3 view .LVU230
+ 784 0092 9BB2     		uxth	r3, r3
+ 785              	.LVL65:
+ 786              	.L54:
+ 327:modbus/RTUmodbus_slave.c **** 		{
+ 787              		.loc 1 327 15 is_stmt 1 discriminator 1 view .LVU231
+ 327:modbus/RTUmodbus_slave.c **** 		{
+ 788              		.loc 1 327 3 is_stmt 0 discriminator 1 view .LVU232
+ 789 0094 8342     		cmp	r3, r0
+ 790 0096 FBD3     		bcc	.L55
+ 791 0098 D9E7     		b	.L56
+ 792              	.LVL66:
+ 793              	.L59:
+ 349:modbus/RTUmodbus_slave.c **** 		}
+ 794              		.loc 1 349 4 is_stmt 1 discriminator 3 view .LVU233
+ 349:modbus/RTUmodbus_slave.c **** 		}
+ 795              		.loc 1 349 25 is_stmt 0 discriminator 3 view .LVU234
+ 796 009a 0E4A     		ldr	r2, .L67
+ 797 009c 92F8A210 		ldrb	r1, [r2, #162]	@ zero_extendqisi2
+ 349:modbus/RTUmodbus_slave.c **** 		}
+ 798              		.loc 1 349 33 discriminator 3 view .LVU235
+ 799 00a0 481C     		adds	r0, r1, #1
+ 800 00a2 82F8A200 		strb	r0, [r2, #162]
+ 349:modbus/RTUmodbus_slave.c **** 		}
+ 801              		.loc 1 349 45 discriminator 3 view .LVU236
+ 802 00a6 04A8     		add	r0, sp, #16
+ 803 00a8 1844     		add	r0, r0, r3
+ 804 00aa 10F80C0C 		ldrb	r0, [r0, #-12]	@ zero_extendqisi2
+ 349:modbus/RTUmodbus_slave.c **** 		}
+ 805              		.loc 1 349 37 discriminator 3 view .LVU237
+ 806 00ae 0A44     		add	r2, r2, r1
+ 807 00b0 82F82200 		strb	r0, [r2, #34]
+ 347:modbus/RTUmodbus_slave.c **** 		{
+ 808              		.loc 1 347 22 is_stmt 1 discriminator 3 view .LVU238
+ 347:modbus/RTUmodbus_slave.c **** 		{
+ 809              		.loc 1 347 23 is_stmt 0 discriminator 3 view .LVU239
+ 810 00b4 0133     		adds	r3, r3, #1
+ 811              	.LVL67:
+ 347:modbus/RTUmodbus_slave.c **** 		{
+ 812              		.loc 1 347 23 discriminator 3 view .LVU240
+ 813 00b6 9BB2     		uxth	r3, r3
+ 814              	.LVL68:
+ 815              	.L58:
+ 347:modbus/RTUmodbus_slave.c **** 		{
+ 816              		.loc 1 347 15 is_stmt 1 discriminator 1 view .LVU241
+ 347:modbus/RTUmodbus_slave.c **** 		{
+ 817              		.loc 1 347 3 is_stmt 0 discriminator 1 view .LVU242
+ 818 00b8 A342     		cmp	r3, r4
+ 819 00ba EED3     		bcc	.L59
+ 351:modbus/RTUmodbus_slave.c **** 	}
+ 820              		.loc 1 351 3 is_stmt 1 view .LVU243
+ 821 00bc 0548     		ldr	r0, .L67
+ 822 00be 90F8A210 		ldrb	r1, [r0, #162]	@ zero_extendqisi2
+ 823 00c2 2230     		adds	r0, r0, #34
+ 824 00c4 FFF7FEFF 		bl	MODS_SendWithCRC
+ARM GAS  /tmp/ccrEi7aK.s 			page 37
+
+
+ 825              	.LVL69:
+ 826              	.L47:
+ 357:modbus/RTUmodbus_slave.c **** 
+ 827              		.loc 1 357 1 is_stmt 0 view .LVU244
+ 828 00c8 04B0     		add	sp, sp, #16
+ 829              	.LCFI14:
+ 830              		.cfi_remember_state
+ 831              		.cfi_def_cfa_offset 16
+ 832              		@ sp needed
+ 833 00ca 70BD     		pop	{r4, r5, r6, pc}
+ 834              	.LVL70:
+ 835              	.L57:
+ 836              	.LCFI15:
+ 837              		.cfi_restore_state
+ 355:modbus/RTUmodbus_slave.c **** 	}
+ 838              		.loc 1 355 3 is_stmt 1 view .LVU245
+ 839 00cc FFF7FEFF 		bl	MODS_SendAckErr
+ 840              	.LVL71:
+ 841 00d0 FAE7     		b	.L47
+ 842              	.L68:
+ 843 00d2 00BF     		.align	2
+ 844              	.L67:
+ 845 00d4 00000000 		.word	g_tModS
+ 846 00d8 02000000 		.word	g_tModS+2
+ 847              		.cfi_endproc
+ 848              	.LFE10:
+ 850              		.section	.text.MODS_02H,"ax",%progbits
+ 851              		.align	1
+ 852              		.syntax unified
+ 853              		.thumb
+ 854              		.thumb_func
+ 855              		.fpu softvfp
+ 857              	MODS_02H:
+ 858              	.LFB11:
+ 368:modbus/RTUmodbus_slave.c **** 	/*
+ 859              		.loc 1 368 1 view -0
+ 860              		.cfi_startproc
+ 861              		@ args = 0, pretend = 0, frame = 16
+ 862              		@ frame_needed = 0, uses_anonymous_args = 0
+ 399:modbus/RTUmodbus_slave.c **** 	uint16_t num;
+ 863              		.loc 1 399 2 view .LVU247
+ 400:modbus/RTUmodbus_slave.c **** 	uint16_t i;
+ 864              		.loc 1 400 2 view .LVU248
+ 401:modbus/RTUmodbus_slave.c **** 	uint16_t m;
+ 865              		.loc 1 401 2 view .LVU249
+ 402:modbus/RTUmodbus_slave.c **** 	uint8_t status[10];
+ 866              		.loc 1 402 2 view .LVU250
+ 403:modbus/RTUmodbus_slave.c **** 
+ 867              		.loc 1 403 2 view .LVU251
+ 405:modbus/RTUmodbus_slave.c **** 
+ 868              		.loc 1 405 2 view .LVU252
+ 405:modbus/RTUmodbus_slave.c **** 
+ 869              		.loc 1 405 18 is_stmt 0 view .LVU253
+ 870 0000 344B     		ldr	r3, .L89
+ 871 0002 0022     		movs	r2, #0
+ 872 0004 83F82120 		strb	r2, [r3, #33]
+ 407:modbus/RTUmodbus_slave.c **** 	{
+ARM GAS  /tmp/ccrEi7aK.s 			page 38
+
+
+ 873              		.loc 1 407 2 is_stmt 1 view .LVU254
+ 407:modbus/RTUmodbus_slave.c **** 	{
+ 874              		.loc 1 407 13 is_stmt 0 view .LVU255
+ 875 0008 9B7F     		ldrb	r3, [r3, #30]	@ zero_extendqisi2
+ 407:modbus/RTUmodbus_slave.c **** 	{
+ 876              		.loc 1 407 5 view .LVU256
+ 877 000a 082B     		cmp	r3, #8
+ 878 000c 04D0     		beq	.L70
+ 409:modbus/RTUmodbus_slave.c **** 		return;
+ 879              		.loc 1 409 3 is_stmt 1 view .LVU257
+ 409:modbus/RTUmodbus_slave.c **** 		return;
+ 880              		.loc 1 409 19 is_stmt 0 view .LVU258
+ 881 000e 314B     		ldr	r3, .L89
+ 882 0010 0322     		movs	r2, #3
+ 883 0012 83F82120 		strb	r2, [r3, #33]
+ 410:modbus/RTUmodbus_slave.c **** 	}
+ 884              		.loc 1 410 3 is_stmt 1 view .LVU259
+ 885 0016 7047     		bx	lr
+ 886              	.L70:
+ 368:modbus/RTUmodbus_slave.c **** 	/*
+ 887              		.loc 1 368 1 is_stmt 0 view .LVU260
+ 888 0018 70B5     		push	{r4, r5, r6, lr}
+ 889              	.LCFI16:
+ 890              		.cfi_def_cfa_offset 16
+ 891              		.cfi_offset 4, -16
+ 892              		.cfi_offset 5, -12
+ 893              		.cfi_offset 6, -8
+ 894              		.cfi_offset 14, -4
+ 895 001a 84B0     		sub	sp, sp, #16
+ 896              	.LCFI17:
+ 897              		.cfi_def_cfa_offset 32
+ 413:modbus/RTUmodbus_slave.c **** 	num = BEBufToUint16(&g_tModS.RxBuf[4]); /* 寄存器个数 */
+ 898              		.loc 1 413 2 is_stmt 1 view .LVU261
+ 413:modbus/RTUmodbus_slave.c **** 	num = BEBufToUint16(&g_tModS.RxBuf[4]); /* 寄存器个数 */
+ 899              		.loc 1 413 8 is_stmt 0 view .LVU262
+ 900 001c 2E4C     		ldr	r4, .L89+4
+ 901 001e 2046     		mov	r0, r4
+ 902 0020 FFF7FEFF 		bl	BEBufToUint16
+ 903              	.LVL72:
+ 904 0024 0546     		mov	r5, r0
+ 905              	.LVL73:
+ 414:modbus/RTUmodbus_slave.c **** 
+ 906              		.loc 1 414 2 is_stmt 1 view .LVU263
+ 414:modbus/RTUmodbus_slave.c **** 
+ 907              		.loc 1 414 8 is_stmt 0 view .LVU264
+ 908 0026 A01C     		adds	r0, r4, #2
+ 909 0028 FFF7FEFF 		bl	BEBufToUint16
+ 910              	.LVL74:
+ 416:modbus/RTUmodbus_slave.c **** 	if ((reg >= REG_T01) && (num > 0) && (reg + num <= REG_TXX + 1))
+ 911              		.loc 1 416 2 is_stmt 1 view .LVU265
+ 416:modbus/RTUmodbus_slave.c **** 	if ((reg >= REG_T01) && (num > 0) && (reg + num <= REG_TXX + 1))
+ 912              		.loc 1 416 16 is_stmt 0 view .LVU266
+ 913 002c C41D     		adds	r4, r0, #7
+ 914 002e 20D4     		bmi	.L87
+ 915              	.L72:
+ 916 0030 E610     		asrs	r6, r4, #3
+ 416:modbus/RTUmodbus_slave.c **** 	if ((reg >= REG_T01) && (num > 0) && (reg + num <= REG_TXX + 1))
+ARM GAS  /tmp/ccrEi7aK.s 			page 39
+
+
+ 917              		.loc 1 416 4 view .LVU267
+ 918 0032 C4F3CF04 		ubfx	r4, r4, #3, #16
+ 919              	.LVL75:
+ 417:modbus/RTUmodbus_slave.c **** 	{
+ 920              		.loc 1 417 2 is_stmt 1 view .LVU268
+ 417:modbus/RTUmodbus_slave.c **** 	{
+ 921              		.loc 1 417 5 is_stmt 0 view .LVU269
+ 922 0036 B5F5007F 		cmp	r5, #512
+ 923 003a 04D9     		bls	.L73
+ 417:modbus/RTUmodbus_slave.c **** 	{
+ 924              		.loc 1 417 23 discriminator 1 view .LVU270
+ 925 003c 18B1     		cbz	r0, .L73
+ 417:modbus/RTUmodbus_slave.c **** 	{
+ 926              		.loc 1 417 44 discriminator 2 view .LVU271
+ 927 003e 0544     		add	r5, r5, r0
+ 928              	.LVL76:
+ 417:modbus/RTUmodbus_slave.c **** 	{
+ 929              		.loc 1 417 36 discriminator 2 view .LVU272
+ 930 0040 B5F5017F 		cmp	r5, #516
+ 931 0044 17DD     		ble	.L83
+ 932              	.L73:
+ 433:modbus/RTUmodbus_slave.c **** 	}
+ 933              		.loc 1 433 3 is_stmt 1 view .LVU273
+ 433:modbus/RTUmodbus_slave.c **** 	}
+ 934              		.loc 1 433 19 is_stmt 0 view .LVU274
+ 935 0046 234B     		ldr	r3, .L89
+ 936 0048 0222     		movs	r2, #2
+ 937 004a 83F82120 		strb	r2, [r3, #33]
+ 938              	.L78:
+ 436:modbus/RTUmodbus_slave.c **** 	{
+ 939              		.loc 1 436 2 is_stmt 1 view .LVU275
+ 436:modbus/RTUmodbus_slave.c **** 	{
+ 940              		.loc 1 436 13 is_stmt 0 view .LVU276
+ 941 004e 214B     		ldr	r3, .L89
+ 942 0050 93F82100 		ldrb	r0, [r3, #33]	@ zero_extendqisi2
+ 943              	.LVL77:
+ 436:modbus/RTUmodbus_slave.c **** 	{
+ 944              		.loc 1 436 5 view .LVU277
+ 945 0054 0028     		cmp	r0, #0
+ 946 0056 39D1     		bne	.L79
+ 438:modbus/RTUmodbus_slave.c **** 		g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[0];
+ 947              		.loc 1 438 3 is_stmt 1 view .LVU278
+ 439:modbus/RTUmodbus_slave.c **** 		g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[1];
+ 948              		.loc 1 439 3 view .LVU279
+ 439:modbus/RTUmodbus_slave.c **** 		g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[1];
+ 949              		.loc 1 439 51 is_stmt 0 view .LVU280
+ 950 0058 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+ 439:modbus/RTUmodbus_slave.c **** 		g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[1];
+ 951              		.loc 1 439 36 view .LVU281
+ 952 005a 83F82220 		strb	r2, [r3, #34]
+ 440:modbus/RTUmodbus_slave.c **** 		g_tModS.TxBuf[g_tModS.TxCount++] = m; /* 返回字节数 */
+ 953              		.loc 1 440 3 is_stmt 1 view .LVU282
+ 440:modbus/RTUmodbus_slave.c **** 		g_tModS.TxBuf[g_tModS.TxCount++] = m; /* 返回字节数 */
+ 954              		.loc 1 440 51 is_stmt 0 view .LVU283
+ 955 005e 5A78     		ldrb	r2, [r3, #1]	@ zero_extendqisi2
+ 440:modbus/RTUmodbus_slave.c **** 		g_tModS.TxBuf[g_tModS.TxCount++] = m; /* 返回字节数 */
+ 956              		.loc 1 440 36 view .LVU284
+ARM GAS  /tmp/ccrEi7aK.s 			page 40
+
+
+ 957 0060 83F82320 		strb	r2, [r3, #35]
+ 441:modbus/RTUmodbus_slave.c **** 
+ 958              		.loc 1 441 3 is_stmt 1 view .LVU285
+ 441:modbus/RTUmodbus_slave.c **** 
+ 959              		.loc 1 441 32 is_stmt 0 view .LVU286
+ 960 0064 0322     		movs	r2, #3
+ 961 0066 83F8A220 		strb	r2, [r3, #162]
+ 441:modbus/RTUmodbus_slave.c **** 
+ 962              		.loc 1 441 36 view .LVU287
+ 963 006a 83F82460 		strb	r6, [r3, #36]
+ 443:modbus/RTUmodbus_slave.c **** 		{
+ 964              		.loc 1 443 3 is_stmt 1 view .LVU288
+ 965              	.LVL78:
+ 443:modbus/RTUmodbus_slave.c **** 		{
+ 966              		.loc 1 443 10 is_stmt 0 view .LVU289
+ 967 006e 0023     		movs	r3, #0
+ 443:modbus/RTUmodbus_slave.c **** 		{
+ 968              		.loc 1 443 3 view .LVU290
+ 969 0070 22E0     		b	.L80
+ 970              	.LVL79:
+ 971              	.L87:
+ 416:modbus/RTUmodbus_slave.c **** 	if ((reg >= REG_T01) && (num > 0) && (reg + num <= REG_TXX + 1))
+ 972              		.loc 1 416 16 view .LVU291
+ 973 0072 0734     		adds	r4, r4, #7
+ 974 0074 DCE7     		b	.L72
+ 975              	.LVL80:
+ 976              	.L83:
+ 419:modbus/RTUmodbus_slave.c **** 		{
+ 977              		.loc 1 419 10 view .LVU292
+ 978 0076 0023     		movs	r3, #0
+ 979              	.L74:
+ 980              	.LVL81:
+ 419:modbus/RTUmodbus_slave.c **** 		{
+ 981              		.loc 1 419 15 is_stmt 1 discriminator 1 view .LVU293
+ 419:modbus/RTUmodbus_slave.c **** 		{
+ 982              		.loc 1 419 3 is_stmt 0 discriminator 1 view .LVU294
+ 983 0078 A342     		cmp	r3, r4
+ 984 007a 07D2     		bcs	.L88
+ 421:modbus/RTUmodbus_slave.c **** 		}
+ 985              		.loc 1 421 4 is_stmt 1 discriminator 3 view .LVU295
+ 421:modbus/RTUmodbus_slave.c **** 		}
+ 986              		.loc 1 421 14 is_stmt 0 discriminator 3 view .LVU296
+ 987 007c 04AA     		add	r2, sp, #16
+ 988 007e 1A44     		add	r2, r2, r3
+ 989 0080 0021     		movs	r1, #0
+ 990 0082 02F80C1C 		strb	r1, [r2, #-12]
+ 419:modbus/RTUmodbus_slave.c **** 		{
+ 991              		.loc 1 419 22 is_stmt 1 discriminator 3 view .LVU297
+ 419:modbus/RTUmodbus_slave.c **** 		{
+ 992              		.loc 1 419 23 is_stmt 0 discriminator 3 view .LVU298
+ 993 0086 0133     		adds	r3, r3, #1
+ 994              	.LVL82:
+ 419:modbus/RTUmodbus_slave.c **** 		{
+ 995              		.loc 1 419 23 discriminator 3 view .LVU299
+ 996 0088 9BB2     		uxth	r3, r3
+ 997              	.LVL83:
+ 419:modbus/RTUmodbus_slave.c **** 		{
+ARM GAS  /tmp/ccrEi7aK.s 			page 41
+
+
+ 998              		.loc 1 419 23 discriminator 3 view .LVU300
+ 999 008a F5E7     		b	.L74
+ 1000              	.L88:
+ 423:modbus/RTUmodbus_slave.c **** 		{
+ 1001              		.loc 1 423 10 view .LVU301
+ 1002 008c 0023     		movs	r3, #0
+ 1003              	.LVL84:
+ 423:modbus/RTUmodbus_slave.c **** 		{
+ 1004              		.loc 1 423 10 view .LVU302
+ 1005 008e 01E0     		b	.L76
+ 1006              	.LVL85:
+ 1007              	.L77:
+ 429:modbus/RTUmodbus_slave.c **** 	}
+ 1008              		.loc 1 429 3 is_stmt 1 discriminator 3 view .LVU303
+ 423:modbus/RTUmodbus_slave.c **** 		{
+ 1009              		.loc 1 423 24 discriminator 3 view .LVU304
+ 423:modbus/RTUmodbus_slave.c **** 		{
+ 1010              		.loc 1 423 25 is_stmt 0 discriminator 3 view .LVU305
+ 1011 0090 0133     		adds	r3, r3, #1
+ 1012              	.LVL86:
+ 423:modbus/RTUmodbus_slave.c **** 		{
+ 1013              		.loc 1 423 25 discriminator 3 view .LVU306
+ 1014 0092 9BB2     		uxth	r3, r3
+ 1015              	.LVL87:
+ 1016              	.L76:
+ 423:modbus/RTUmodbus_slave.c **** 		{
+ 1017              		.loc 1 423 15 is_stmt 1 discriminator 1 view .LVU307
+ 423:modbus/RTUmodbus_slave.c **** 		{
+ 1018              		.loc 1 423 3 is_stmt 0 discriminator 1 view .LVU308
+ 1019 0094 8342     		cmp	r3, r0
+ 1020 0096 FBD3     		bcc	.L77
+ 1021 0098 D9E7     		b	.L78
+ 1022              	.LVL88:
+ 1023              	.L81:
+ 445:modbus/RTUmodbus_slave.c **** 		}
+ 1024              		.loc 1 445 4 is_stmt 1 discriminator 3 view .LVU309
+ 445:modbus/RTUmodbus_slave.c **** 		}
+ 1025              		.loc 1 445 25 is_stmt 0 discriminator 3 view .LVU310
+ 1026 009a 0E4A     		ldr	r2, .L89
+ 1027 009c 92F8A210 		ldrb	r1, [r2, #162]	@ zero_extendqisi2
+ 445:modbus/RTUmodbus_slave.c **** 		}
+ 1028              		.loc 1 445 33 discriminator 3 view .LVU311
+ 1029 00a0 481C     		adds	r0, r1, #1
+ 1030 00a2 82F8A200 		strb	r0, [r2, #162]
+ 445:modbus/RTUmodbus_slave.c **** 		}
+ 1031              		.loc 1 445 45 discriminator 3 view .LVU312
+ 1032 00a6 04A8     		add	r0, sp, #16
+ 1033 00a8 1844     		add	r0, r0, r3
+ 1034 00aa 10F80C0C 		ldrb	r0, [r0, #-12]	@ zero_extendqisi2
+ 445:modbus/RTUmodbus_slave.c **** 		}
+ 1035              		.loc 1 445 37 discriminator 3 view .LVU313
+ 1036 00ae 0A44     		add	r2, r2, r1
+ 1037 00b0 82F82200 		strb	r0, [r2, #34]
+ 443:modbus/RTUmodbus_slave.c **** 		{
+ 1038              		.loc 1 443 22 is_stmt 1 discriminator 3 view .LVU314
+ 443:modbus/RTUmodbus_slave.c **** 		{
+ 1039              		.loc 1 443 23 is_stmt 0 discriminator 3 view .LVU315
+ARM GAS  /tmp/ccrEi7aK.s 			page 42
+
+
+ 1040 00b4 0133     		adds	r3, r3, #1
+ 1041              	.LVL89:
+ 443:modbus/RTUmodbus_slave.c **** 		{
+ 1042              		.loc 1 443 23 discriminator 3 view .LVU316
+ 1043 00b6 9BB2     		uxth	r3, r3
+ 1044              	.LVL90:
+ 1045              	.L80:
+ 443:modbus/RTUmodbus_slave.c **** 		{
+ 1046              		.loc 1 443 15 is_stmt 1 discriminator 1 view .LVU317
+ 443:modbus/RTUmodbus_slave.c **** 		{
+ 1047              		.loc 1 443 3 is_stmt 0 discriminator 1 view .LVU318
+ 1048 00b8 A342     		cmp	r3, r4
+ 1049 00ba EED3     		bcc	.L81
+ 447:modbus/RTUmodbus_slave.c **** 	}
+ 1050              		.loc 1 447 3 is_stmt 1 view .LVU319
+ 1051 00bc 0548     		ldr	r0, .L89
+ 1052 00be 90F8A210 		ldrb	r1, [r0, #162]	@ zero_extendqisi2
+ 1053 00c2 2230     		adds	r0, r0, #34
+ 1054 00c4 FFF7FEFF 		bl	MODS_SendWithCRC
+ 1055              	.LVL91:
+ 1056              	.L69:
+ 453:modbus/RTUmodbus_slave.c **** 
+ 1057              		.loc 1 453 1 is_stmt 0 view .LVU320
+ 1058 00c8 04B0     		add	sp, sp, #16
+ 1059              	.LCFI18:
+ 1060              		.cfi_remember_state
+ 1061              		.cfi_def_cfa_offset 16
+ 1062              		@ sp needed
+ 1063 00ca 70BD     		pop	{r4, r5, r6, pc}
+ 1064              	.LVL92:
+ 1065              	.L79:
+ 1066              	.LCFI19:
+ 1067              		.cfi_restore_state
+ 451:modbus/RTUmodbus_slave.c **** 	}
+ 1068              		.loc 1 451 3 is_stmt 1 view .LVU321
+ 1069 00cc FFF7FEFF 		bl	MODS_SendAckErr
+ 1070              	.LVL93:
+ 1071 00d0 FAE7     		b	.L69
+ 1072              	.L90:
+ 1073 00d2 00BF     		.align	2
+ 1074              	.L89:
+ 1075 00d4 00000000 		.word	g_tModS
+ 1076 00d8 02000000 		.word	g_tModS+2
+ 1077              		.cfi_endproc
+ 1078              	.LFE11:
+ 1080              		.section	.text.MODS_04H,"ax",%progbits
+ 1081              		.align	1
+ 1082              		.syntax unified
+ 1083              		.thumb
+ 1084              		.thumb_func
+ 1085              		.fpu softvfp
+ 1087              	MODS_04H:
+ 1088              	.LFB15:
+ 703:modbus/RTUmodbus_slave.c **** 	/*
+ 1089              		.loc 1 703 1 view -0
+ 1090              		.cfi_startproc
+ 1091              		@ args = 0, pretend = 0, frame = 24
+ARM GAS  /tmp/ccrEi7aK.s 			page 43
+
+
+ 1092              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1093 0000 70B5     		push	{r4, r5, r6, lr}
+ 1094              	.LCFI20:
+ 1095              		.cfi_def_cfa_offset 16
+ 1096              		.cfi_offset 4, -16
+ 1097              		.cfi_offset 5, -12
+ 1098              		.cfi_offset 6, -8
+ 1099              		.cfi_offset 14, -4
+ 1100 0002 86B0     		sub	sp, sp, #24
+ 1101              	.LCFI21:
+ 1102              		.cfi_def_cfa_offset 40
+ 1103 0004 0026     		movs	r6, #0
+ 733:modbus/RTUmodbus_slave.c **** 	uint16_t num;
+ 1104              		.loc 1 733 2 view .LVU323
+ 734:modbus/RTUmodbus_slave.c **** 	uint16_t i;
+ 1105              		.loc 1 734 2 view .LVU324
+ 735:modbus/RTUmodbus_slave.c **** 	uint16_t status[10];
+ 1106              		.loc 1 735 2 view .LVU325
+ 736:modbus/RTUmodbus_slave.c **** 
+ 1107              		.loc 1 736 2 view .LVU326
+ 738:modbus/RTUmodbus_slave.c **** 
+ 1108              		.loc 1 738 2 view .LVU327
+ 1109 0006 0196     		str	r6, [sp, #4]
+ 1110 0008 0296     		str	r6, [sp, #8]
+ 1111 000a ADF80C60 		strh	r6, [sp, #12]	@ movhi
+ 740:modbus/RTUmodbus_slave.c **** 
+ 1112              		.loc 1 740 2 view .LVU328
+ 740:modbus/RTUmodbus_slave.c **** 
+ 1113              		.loc 1 740 18 is_stmt 0 view .LVU329
+ 1114 000e 354B     		ldr	r3, .L104
+ 1115 0010 83F82160 		strb	r6, [r3, #33]
+ 742:modbus/RTUmodbus_slave.c **** 	{
+ 1116              		.loc 1 742 2 is_stmt 1 view .LVU330
+ 742:modbus/RTUmodbus_slave.c **** 	{
+ 1117              		.loc 1 742 13 is_stmt 0 view .LVU331
+ 1118 0014 9B7F     		ldrb	r3, [r3, #30]	@ zero_extendqisi2
+ 742:modbus/RTUmodbus_slave.c **** 	{
+ 1119              		.loc 1 742 5 view .LVU332
+ 1120 0016 082B     		cmp	r3, #8
+ 1121 0018 16D0     		beq	.L92
+ 744:modbus/RTUmodbus_slave.c **** 		goto err_ret;
+ 1122              		.loc 1 744 3 is_stmt 1 view .LVU333
+ 744:modbus/RTUmodbus_slave.c **** 		goto err_ret;
+ 1123              		.loc 1 744 19 is_stmt 0 view .LVU334
+ 1124 001a 324B     		ldr	r3, .L104
+ 1125 001c 0322     		movs	r2, #3
+ 1126 001e 83F82120 		strb	r2, [r3, #33]
+ 745:modbus/RTUmodbus_slave.c **** 	}
+ 1127              		.loc 1 745 3 is_stmt 1 view .LVU335
+ 1128              	.L93:
+ 1129              	.LVL94:
+ 774:modbus/RTUmodbus_slave.c **** 	{
+ 1130              		.loc 1 774 2 view .LVU336
+ 774:modbus/RTUmodbus_slave.c **** 	{
+ 1131              		.loc 1 774 13 is_stmt 0 view .LVU337
+ 1132 0022 304B     		ldr	r3, .L104
+ 1133 0024 93F82100 		ldrb	r0, [r3, #33]	@ zero_extendqisi2
+ARM GAS  /tmp/ccrEi7aK.s 			page 44
+
+
+ 774:modbus/RTUmodbus_slave.c **** 	{
+ 1134              		.loc 1 774 5 view .LVU338
+ 1135 0028 0028     		cmp	r0, #0
+ 1136 002a 57D1     		bne	.L98
+ 776:modbus/RTUmodbus_slave.c **** 		g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[0];
+ 1137              		.loc 1 776 3 is_stmt 1 view .LVU339
+ 777:modbus/RTUmodbus_slave.c **** 		g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[1];
+ 1138              		.loc 1 777 3 view .LVU340
+ 777:modbus/RTUmodbus_slave.c **** 		g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[1];
+ 1139              		.loc 1 777 51 is_stmt 0 view .LVU341
+ 1140 002c 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+ 777:modbus/RTUmodbus_slave.c **** 		g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[1];
+ 1141              		.loc 1 777 36 view .LVU342
+ 1142 002e 83F82220 		strb	r2, [r3, #34]
+ 778:modbus/RTUmodbus_slave.c **** 		g_tModS.TxBuf[g_tModS.TxCount++] = num * 2; /* 返回字节数 */
+ 1143              		.loc 1 778 3 is_stmt 1 view .LVU343
+ 778:modbus/RTUmodbus_slave.c **** 		g_tModS.TxBuf[g_tModS.TxCount++] = num * 2; /* 返回字节数 */
+ 1144              		.loc 1 778 51 is_stmt 0 view .LVU344
+ 1145 0032 5A78     		ldrb	r2, [r3, #1]	@ zero_extendqisi2
+ 778:modbus/RTUmodbus_slave.c **** 		g_tModS.TxBuf[g_tModS.TxCount++] = num * 2; /* 返回字节数 */
+ 1146              		.loc 1 778 36 view .LVU345
+ 1147 0034 83F82320 		strb	r2, [r3, #35]
+ 779:modbus/RTUmodbus_slave.c **** 
+ 1148              		.loc 1 779 3 is_stmt 1 view .LVU346
+ 779:modbus/RTUmodbus_slave.c **** 
+ 1149              		.loc 1 779 32 is_stmt 0 view .LVU347
+ 1150 0038 0322     		movs	r2, #3
+ 1151 003a 83F8A220 		strb	r2, [r3, #162]
+ 779:modbus/RTUmodbus_slave.c **** 
+ 1152              		.loc 1 779 36 view .LVU348
+ 1153 003e 7200     		lsls	r2, r6, #1
+ 1154 0040 83F82420 		strb	r2, [r3, #36]
+ 781:modbus/RTUmodbus_slave.c **** 		{
+ 1155              		.loc 1 781 3 is_stmt 1 view .LVU349
+ 1156              	.LVL95:
+ 781:modbus/RTUmodbus_slave.c **** 		{
+ 1157              		.loc 1 781 10 is_stmt 0 view .LVU350
+ 1158 0044 0022     		movs	r2, #0
+ 781:modbus/RTUmodbus_slave.c **** 		{
+ 1159              		.loc 1 781 3 view .LVU351
+ 1160 0046 3FE0     		b	.L99
+ 1161              	.LVL96:
+ 1162              	.L92:
+ 748:modbus/RTUmodbus_slave.c **** 	num = BEBufToUint16(&g_tModS.RxBuf[4]); /* 寄存器个数 */
+ 1163              		.loc 1 748 2 is_stmt 1 view .LVU352
+ 748:modbus/RTUmodbus_slave.c **** 	num = BEBufToUint16(&g_tModS.RxBuf[4]); /* 寄存器个数 */
+ 1164              		.loc 1 748 8 is_stmt 0 view .LVU353
+ 1165 0048 274D     		ldr	r5, .L104+4
+ 1166 004a 2846     		mov	r0, r5
+ 1167 004c FFF7FEFF 		bl	BEBufToUint16
+ 1168              	.LVL97:
+ 1169 0050 0446     		mov	r4, r0
+ 1170              	.LVL98:
+ 749:modbus/RTUmodbus_slave.c **** 
+ 1171              		.loc 1 749 2 is_stmt 1 view .LVU354
+ 749:modbus/RTUmodbus_slave.c **** 
+ 1172              		.loc 1 749 8 is_stmt 0 view .LVU355
+ARM GAS  /tmp/ccrEi7aK.s 			page 45
+
+
+ 1173 0052 A81C     		adds	r0, r5, #2
+ 1174 0054 FFF7FEFF 		bl	BEBufToUint16
+ 1175              	.LVL99:
+ 1176 0058 0646     		mov	r6, r0
+ 1177              	.LVL100:
+ 751:modbus/RTUmodbus_slave.c **** 	{
+ 1178              		.loc 1 751 2 is_stmt 1 view .LVU356
+ 751:modbus/RTUmodbus_slave.c **** 	{
+ 1179              		.loc 1 751 5 is_stmt 0 view .LVU357
+ 1180 005a B4F5806F 		cmp	r4, #1024
+ 1181 005e 05D9     		bls	.L94
+ 751:modbus/RTUmodbus_slave.c **** 	{
+ 1182              		.loc 1 751 23 discriminator 1 view .LVU358
+ 1183 0060 20B1     		cbz	r0, .L94
+ 751:modbus/RTUmodbus_slave.c **** 	{
+ 1184              		.loc 1 751 44 discriminator 2 view .LVU359
+ 1185 0062 2218     		adds	r2, r4, r0
+ 751:modbus/RTUmodbus_slave.c **** 	{
+ 1186              		.loc 1 751 36 discriminator 2 view .LVU360
+ 1187 0064 40F20243 		movw	r3, #1026
+ 1188 0068 9A42     		cmp	r2, r3
+ 1189 006a 15DD     		ble	.L102
+ 1190              	.L94:
+ 770:modbus/RTUmodbus_slave.c **** 	}
+ 1191              		.loc 1 770 3 is_stmt 1 view .LVU361
+ 770:modbus/RTUmodbus_slave.c **** 	}
+ 1192              		.loc 1 770 19 is_stmt 0 view .LVU362
+ 1193 006c 1D4B     		ldr	r3, .L104
+ 1194 006e 0222     		movs	r2, #2
+ 1195 0070 83F82120 		strb	r2, [r3, #33]
+ 1196 0074 D5E7     		b	.L93
+ 1197              	.LVL101:
+ 1198              	.L96:
+ 765:modbus/RTUmodbus_slave.c **** 		}
+ 1199              		.loc 1 765 4 is_stmt 1 discriminator 2 view .LVU363
+ 765:modbus/RTUmodbus_slave.c **** 		}
+ 1200              		.loc 1 765 7 is_stmt 0 discriminator 2 view .LVU364
+ 1201 0076 0134     		adds	r4, r4, #1
+ 1202              	.LVL102:
+ 765:modbus/RTUmodbus_slave.c **** 		}
+ 1203              		.loc 1 765 7 discriminator 2 view .LVU365
+ 1204 0078 A4B2     		uxth	r4, r4
+ 1205              	.LVL103:
+ 753:modbus/RTUmodbus_slave.c **** 		{
+ 1206              		.loc 1 753 24 is_stmt 1 discriminator 2 view .LVU366
+ 753:modbus/RTUmodbus_slave.c **** 		{
+ 1207              		.loc 1 753 25 is_stmt 0 discriminator 2 view .LVU367
+ 1208 007a 0133     		adds	r3, r3, #1
+ 1209              	.LVL104:
+ 753:modbus/RTUmodbus_slave.c **** 		{
+ 1210              		.loc 1 753 25 discriminator 2 view .LVU368
+ 1211 007c 9BB2     		uxth	r3, r3
+ 1212              	.LVL105:
+ 1213              	.L95:
+ 753:modbus/RTUmodbus_slave.c **** 		{
+ 1214              		.loc 1 753 15 is_stmt 1 discriminator 1 view .LVU369
+ 753:modbus/RTUmodbus_slave.c **** 		{
+ARM GAS  /tmp/ccrEi7aK.s 			page 46
+
+
+ 1215              		.loc 1 753 3 is_stmt 0 discriminator 1 view .LVU370
+ 1216 007e B342     		cmp	r3, r6
+ 1217 0080 CFD2     		bcs	.L93
+ 755:modbus/RTUmodbus_slave.c **** 			{
+ 1218              		.loc 1 755 4 is_stmt 1 view .LVU371
+ 1219 0082 40F20142 		movw	r2, #1025
+ 1220 0086 9442     		cmp	r4, r2
+ 1221 0088 F5D0     		beq	.L96
+ 762:modbus/RTUmodbus_slave.c **** 				break;
+ 1222              		.loc 1 762 5 view .LVU372
+ 762:modbus/RTUmodbus_slave.c **** 				break;
+ 1223              		.loc 1 762 15 is_stmt 0 view .LVU373
+ 1224 008a 0021     		movs	r1, #0
+ 1225 008c 06AA     		add	r2, sp, #24
+ 1226 008e 02EB4302 		add	r2, r2, r3, lsl #1
+ 1227 0092 22F8141C 		strh	r1, [r2, #-20]	@ movhi
+ 763:modbus/RTUmodbus_slave.c **** 			}
+ 1228              		.loc 1 763 5 is_stmt 1 view .LVU374
+ 1229 0096 EEE7     		b	.L96
+ 1230              	.LVL106:
+ 1231              	.L102:
+ 753:modbus/RTUmodbus_slave.c **** 		{
+ 1232              		.loc 1 753 10 is_stmt 0 view .LVU375
+ 1233 0098 0023     		movs	r3, #0
+ 1234 009a F0E7     		b	.L95
+ 1235              	.LVL107:
+ 1236              	.L100:
+ 783:modbus/RTUmodbus_slave.c **** 			g_tModS.TxBuf[g_tModS.TxCount++] = status[i] & 0xFF;
+ 1237              		.loc 1 783 4 is_stmt 1 discriminator 3 view .LVU376
+ 783:modbus/RTUmodbus_slave.c **** 			g_tModS.TxBuf[g_tModS.TxCount++] = status[i] & 0xFF;
+ 1238              		.loc 1 783 45 is_stmt 0 discriminator 3 view .LVU377
+ 1239 009c 06AB     		add	r3, sp, #24
+ 1240 009e 03EB4203 		add	r3, r3, r2, lsl #1
+ 1241 00a2 33F8145C 		ldrh	r5, [r3, #-20]
+ 783:modbus/RTUmodbus_slave.c **** 			g_tModS.TxBuf[g_tModS.TxCount++] = status[i] & 0xFF;
+ 1242              		.loc 1 783 25 discriminator 3 view .LVU378
+ 1243 00a6 0F4B     		ldr	r3, .L104
+ 1244 00a8 93F8A240 		ldrb	r4, [r3, #162]	@ zero_extendqisi2
+ 783:modbus/RTUmodbus_slave.c **** 			g_tModS.TxBuf[g_tModS.TxCount++] = status[i] & 0xFF;
+ 1245              		.loc 1 783 33 discriminator 3 view .LVU379
+ 1246 00ac 611C     		adds	r1, r4, #1
+ 1247 00ae C9B2     		uxtb	r1, r1
+ 783:modbus/RTUmodbus_slave.c **** 			g_tModS.TxBuf[g_tModS.TxCount++] = status[i] & 0xFF;
+ 1248              		.loc 1 783 37 discriminator 3 view .LVU380
+ 1249 00b0 1C44     		add	r4, r4, r3
+ 1250 00b2 280A     		lsrs	r0, r5, #8
+ 1251 00b4 84F82200 		strb	r0, [r4, #34]
+ 784:modbus/RTUmodbus_slave.c **** 		}
+ 1252              		.loc 1 784 4 is_stmt 1 discriminator 3 view .LVU381
+ 784:modbus/RTUmodbus_slave.c **** 		}
+ 1253              		.loc 1 784 33 is_stmt 0 discriminator 3 view .LVU382
+ 1254 00b8 481C     		adds	r0, r1, #1
+ 1255 00ba 83F8A200 		strb	r0, [r3, #162]
+ 784:modbus/RTUmodbus_slave.c **** 		}
+ 1256              		.loc 1 784 37 discriminator 3 view .LVU383
+ 1257 00be 0B44     		add	r3, r3, r1
+ 1258 00c0 83F82250 		strb	r5, [r3, #34]
+ARM GAS  /tmp/ccrEi7aK.s 			page 47
+
+
+ 781:modbus/RTUmodbus_slave.c **** 		{
+ 1259              		.loc 1 781 24 is_stmt 1 discriminator 3 view .LVU384
+ 781:modbus/RTUmodbus_slave.c **** 		{
+ 1260              		.loc 1 781 25 is_stmt 0 discriminator 3 view .LVU385
+ 1261 00c4 0132     		adds	r2, r2, #1
+ 1262              	.LVL108:
+ 781:modbus/RTUmodbus_slave.c **** 		{
+ 1263              		.loc 1 781 25 discriminator 3 view .LVU386
+ 1264 00c6 92B2     		uxth	r2, r2
+ 1265              	.LVL109:
+ 1266              	.L99:
+ 781:modbus/RTUmodbus_slave.c **** 		{
+ 1267              		.loc 1 781 15 is_stmt 1 discriminator 1 view .LVU387
+ 781:modbus/RTUmodbus_slave.c **** 		{
+ 1268              		.loc 1 781 3 is_stmt 0 discriminator 1 view .LVU388
+ 1269 00c8 9642     		cmp	r6, r2
+ 1270 00ca E7D8     		bhi	.L100
+ 786:modbus/RTUmodbus_slave.c **** 	}
+ 1271              		.loc 1 786 3 is_stmt 1 view .LVU389
+ 1272 00cc 0548     		ldr	r0, .L104
+ 1273 00ce 90F8A210 		ldrb	r1, [r0, #162]	@ zero_extendqisi2
+ 1274 00d2 2230     		adds	r0, r0, #34
+ 1275 00d4 FFF7FEFF 		bl	MODS_SendWithCRC
+ 1276              	.LVL110:
+ 1277              	.L91:
+ 792:modbus/RTUmodbus_slave.c **** 
+ 1278              		.loc 1 792 1 is_stmt 0 view .LVU390
+ 1279 00d8 06B0     		add	sp, sp, #24
+ 1280              	.LCFI22:
+ 1281              		.cfi_remember_state
+ 1282              		.cfi_def_cfa_offset 16
+ 1283              		@ sp needed
+ 1284 00da 70BD     		pop	{r4, r5, r6, pc}
+ 1285              	.LVL111:
+ 1286              	.L98:
+ 1287              	.LCFI23:
+ 1288              		.cfi_restore_state
+ 790:modbus/RTUmodbus_slave.c **** 	}
+ 1289              		.loc 1 790 3 is_stmt 1 view .LVU391
+ 1290 00dc FFF7FEFF 		bl	MODS_SendAckErr
+ 1291              	.LVL112:
+ 792:modbus/RTUmodbus_slave.c **** 
+ 1292              		.loc 1 792 1 is_stmt 0 view .LVU392
+ 1293 00e0 FAE7     		b	.L91
+ 1294              	.L105:
+ 1295 00e2 00BF     		.align	2
+ 1296              	.L104:
+ 1297 00e4 00000000 		.word	g_tModS
+ 1298 00e8 02000000 		.word	g_tModS+2
+ 1299              		.cfi_endproc
+ 1300              	.LFE15:
+ 1302              		.section	.text.MODS_ReciveNew_no_timer,"ax",%progbits
+ 1303              		.align	1
+ 1304              		.global	MODS_ReciveNew_no_timer
+ 1305              		.syntax unified
+ 1306              		.thumb
+ 1307              		.thumb_func
+ARM GAS  /tmp/ccrEi7aK.s 			page 48
+
+
+ 1308              		.fpu softvfp
+ 1310              	MODS_ReciveNew_no_timer:
+ 1311              	.LVL113:
+ 1312              	.LFB4:
+ 126:modbus/RTUmodbus_slave.c **** 	g_mods_timeout = 0;
+ 1313              		.loc 1 126 1 is_stmt 1 view -0
+ 1314              		.cfi_startproc
+ 1315              		@ args = 0, pretend = 0, frame = 0
+ 1316              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1317              		@ link register save eliminated.
+ 127:modbus/RTUmodbus_slave.c **** 	if (g_tModS.RxCount < S_RX_BUF_SIZE)
+ 1318              		.loc 1 127 2 view .LVU394
+ 127:modbus/RTUmodbus_slave.c **** 	if (g_tModS.RxCount < S_RX_BUF_SIZE)
+ 1319              		.loc 1 127 17 is_stmt 0 view .LVU395
+ 1320 0000 054B     		ldr	r3, .L108
+ 1321 0002 0022     		movs	r2, #0
+ 1322 0004 1A70     		strb	r2, [r3]
+ 128:modbus/RTUmodbus_slave.c **** 	{
+ 1323              		.loc 1 128 2 is_stmt 1 view .LVU396
+ 128:modbus/RTUmodbus_slave.c **** 	{
+ 1324              		.loc 1 128 13 is_stmt 0 view .LVU397
+ 1325 0006 054B     		ldr	r3, .L108+4
+ 1326 0008 9B7F     		ldrb	r3, [r3, #30]	@ zero_extendqisi2
+ 128:modbus/RTUmodbus_slave.c **** 	{
+ 1327              		.loc 1 128 5 view .LVU398
+ 1328 000a 1D2B     		cmp	r3, #29
+ 1329 000c 03D8     		bhi	.L106
+ 130:modbus/RTUmodbus_slave.c **** 	}
+ 1330              		.loc 1 130 3 is_stmt 1 view .LVU399
+ 130:modbus/RTUmodbus_slave.c **** 	}
+ 1331              		.loc 1 130 32 is_stmt 0 view .LVU400
+ 1332 000e 034A     		ldr	r2, .L108+4
+ 1333 0010 591C     		adds	r1, r3, #1
+ 1334 0012 9177     		strb	r1, [r2, #30]
+ 130:modbus/RTUmodbus_slave.c **** 	}
+ 1335              		.loc 1 130 36 view .LVU401
+ 1336 0014 D054     		strb	r0, [r2, r3]
+ 1337              	.L106:
+ 132:modbus/RTUmodbus_slave.c **** 
+ 1338              		.loc 1 132 1 view .LVU402
+ 1339 0016 7047     		bx	lr
+ 1340              	.L109:
+ 1341              		.align	2
+ 1342              	.L108:
+ 1343 0018 00000000 		.word	.LANCHOR0
+ 1344 001c 00000000 		.word	g_tModS
+ 1345              		.cfi_endproc
+ 1346              	.LFE4:
+ 1348              		.section	.text.MODS_RxTimeOut,"ax",%progbits
+ 1349              		.align	1
+ 1350              		.global	MODS_RxTimeOut
+ 1351              		.syntax unified
+ 1352              		.thumb
+ 1353              		.thumb_func
+ 1354              		.fpu softvfp
+ 1356              	MODS_RxTimeOut:
+ 1357              	.LFB5:
+ARM GAS  /tmp/ccrEi7aK.s 			page 49
+
+
+ 143:modbus/RTUmodbus_slave.c **** 	g_mods_timeout = 1;
+ 1358              		.loc 1 143 1 is_stmt 1 view -0
+ 1359              		.cfi_startproc
+ 1360              		@ args = 0, pretend = 0, frame = 0
+ 1361              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1362              		@ link register save eliminated.
+ 144:modbus/RTUmodbus_slave.c **** }
+ 1363              		.loc 1 144 2 view .LVU404
+ 144:modbus/RTUmodbus_slave.c **** }
+ 1364              		.loc 1 144 17 is_stmt 0 view .LVU405
+ 1365 0000 014B     		ldr	r3, .L111
+ 1366 0002 0122     		movs	r2, #1
+ 1367 0004 1A70     		strb	r2, [r3]
+ 145:modbus/RTUmodbus_slave.c **** 
+ 1368              		.loc 1 145 1 view .LVU406
+ 1369 0006 7047     		bx	lr
+ 1370              	.L112:
+ 1371              		.align	2
+ 1372              	.L111:
+ 1373 0008 00000000 		.word	.LANCHOR0
+ 1374              		.cfi_endproc
+ 1375              	.LFE5:
+ 1377              		.section	.text.convert_float_to_uint32,"ax",%progbits
+ 1378              		.align	1
+ 1379              		.global	convert_float_to_uint32
+ 1380              		.syntax unified
+ 1381              		.thumb
+ 1382              		.thumb_func
+ 1383              		.fpu softvfp
+ 1385              	convert_float_to_uint32:
+ 1386              	.LVL114:
+ 1387              	.LFB19:
+1061:modbus/RTUmodbus_slave.c **** 
+1062:modbus/RTUmodbus_slave.c **** uint32_t convert_float_to_uint32(float data)
+1063:modbus/RTUmodbus_slave.c **** {
+ 1388              		.loc 1 1063 1 is_stmt 1 view -0
+ 1389              		.cfi_startproc
+ 1390              		@ args = 0, pretend = 0, frame = 0
+ 1391              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1392              		@ link register save eliminated.
+1064:modbus/RTUmodbus_slave.c **** 	union
+ 1393              		.loc 1 1064 2 view .LVU408
+1065:modbus/RTUmodbus_slave.c **** 	{
+1066:modbus/RTUmodbus_slave.c **** 		uint32_t uint32_data;
+1067:modbus/RTUmodbus_slave.c **** 		float float_data;
+1068:modbus/RTUmodbus_slave.c **** 	} convert_util;
+1069:modbus/RTUmodbus_slave.c **** 	convert_util.float_data = data;
+ 1394              		.loc 1 1069 2 view .LVU409
+1070:modbus/RTUmodbus_slave.c **** 	return convert_util.uint32_data;
+ 1395              		.loc 1 1070 2 view .LVU410
+1071:modbus/RTUmodbus_slave.c **** }...
+ 1396              		.loc 1 1071 1 is_stmt 0 view .LVU411
+ 1397 0000 7047     		bx	lr
+ 1398              		.cfi_endproc
+ 1399              	.LFE19:
+ 1401              		.section	.text.MODS_ReadRegValue,"ax",%progbits
+ 1402              		.align	1
+ARM GAS  /tmp/ccrEi7aK.s 			page 50
+
+
+ 1403              		.syntax unified
+ 1404              		.thumb
+ 1405              		.thumb_func
+ 1406              		.fpu softvfp
+ 1408              	MODS_ReadRegValue:
+ 1409              	.LVL115:
+ 1410              	.LFB12:
+ 465:modbus/RTUmodbus_slave.c **** {
+ 1411              		.loc 1 465 1 is_stmt 1 view -0
+ 1412              		.cfi_startproc
+ 1413              		@ args = 0, pretend = 0, frame = 24
+ 1414              		@ frame_needed = 0, uses_anonymous_args = 0
+ 465:modbus/RTUmodbus_slave.c **** {
+ 1415              		.loc 1 465 1 is_stmt 0 view .LVU413
+ 1416 0000 10B5     		push	{r4, lr}
+ 1417              	.LCFI24:
+ 1418              		.cfi_def_cfa_offset 8
+ 1419              		.cfi_offset 4, -8
+ 1420              		.cfi_offset 14, -4
+ 1421 0002 86B0     		sub	sp, sp, #24
+ 1422              	.LCFI25:
+ 1423              		.cfi_def_cfa_offset 32
+ 1424 0004 0C46     		mov	r4, r1
+ 466:modbus/RTUmodbus_slave.c **** 	uint16_t value;
+ 1425              		.loc 1 466 2 is_stmt 1 view .LVU414
+ 467:modbus/RTUmodbus_slave.c **** 	float temp, hum = 0;
+ 1426              		.loc 1 467 2 view .LVU415
+ 467:modbus/RTUmodbus_slave.c **** 	float temp, hum = 0;
+ 1427              		.loc 1 467 14 is_stmt 0 view .LVU416
+ 1428 0006 0023     		movs	r3, #0
+ 1429 0008 0493     		str	r3, [sp, #16]	@ float
+ 468:modbus/RTUmodbus_slave.c **** 	float x_data, y_data, z_data = 0;
+ 1430              		.loc 1 468 2 is_stmt 1 view .LVU417
+ 468:modbus/RTUmodbus_slave.c **** 	float x_data, y_data, z_data = 0;
+ 1431              		.loc 1 468 24 is_stmt 0 view .LVU418
+ 1432 000a 0193     		str	r3, [sp, #4]	@ float
+ 469:modbus/RTUmodbus_slave.c **** 	switch (reg_addr) /* 判断寄存器地址 */
+ 1433              		.loc 1 469 2 is_stmt 1 view .LVU419
+ 1434 000c 0A28     		cmp	r0, #10
+ 1435 000e 6ED8     		bhi	.L128
+ 1436 0010 DFE800F0 		tbb	[pc, r0]
+ 1437              	.L117:
+ 1438 0014 06       		.byte	(.L127-.L117)/2
+ 1439 0015 0F       		.byte	(.L126-.L117)/2
+ 1440 0016 18       		.byte	(.L125-.L117)/2
+ 1441 0017 21       		.byte	(.L124-.L117)/2
+ 1442 0018 2A       		.byte	(.L123-.L117)/2
+ 1443 0019 34       		.byte	(.L122-.L117)/2
+ 1444 001a 3E       		.byte	(.L121-.L117)/2
+ 1445 001b 48       		.byte	(.L120-.L117)/2
+ 1446 001c 52       		.byte	(.L119-.L117)/2
+ 1447 001d 5C       		.byte	(.L118-.L117)/2
+ 1448 001e 66       		.byte	(.L129-.L117)/2
+ 1449 001f 00       		.p2align 1
+ 1450              	.L127:
+ 1451              	.LBB2:
+ 474:modbus/RTUmodbus_slave.c **** 		get_local_dht22_data(&temp, &hum);
+ARM GAS  /tmp/ccrEi7aK.s 			page 51
+
+
+ 1452              		.loc 1 474 3 view .LVU420
+ 1453 0020 04A9     		add	r1, sp, #16
+ 1454              	.LVL116:
+ 474:modbus/RTUmodbus_slave.c **** 		get_local_dht22_data(&temp, &hum);
+ 1455              		.loc 1 474 3 is_stmt 0 view .LVU421
+ 1456 0022 05A8     		add	r0, sp, #20
+ 1457              	.LVL117:
+ 474:modbus/RTUmodbus_slave.c **** 		get_local_dht22_data(&temp, &hum);
+ 1458              		.loc 1 474 3 view .LVU422
+ 1459 0024 FFF7FEFF 		bl	get_local_dht22_data
+ 1460              	.LVL118:
+ 475:modbus/RTUmodbus_slave.c **** 		uint32_t temper_32 = convert_float_to_uint32(temp);
+ 1461              		.loc 1 475 3 is_stmt 1 view .LVU423
+ 475:modbus/RTUmodbus_slave.c **** 		uint32_t temper_32 = convert_float_to_uint32(temp);
+ 1462              		.loc 1 475 24 is_stmt 0 view .LVU424
+ 1463 0028 0598     		ldr	r0, [sp, #20]	@ float
+ 1464 002a FFF7FEFF 		bl	convert_float_to_uint32
+ 1465              	.LVL119:
+ 476:modbus/RTUmodbus_slave.c **** 		value = temper_32 >> 16;
+ 1466              		.loc 1 476 3 is_stmt 1 view .LVU425
+ 476:modbus/RTUmodbus_slave.c **** 		value = temper_32 >> 16;
+ 1467              		.loc 1 476 9 is_stmt 0 view .LVU426
+ 1468 002e 000C     		lsrs	r0, r0, #16
+ 1469              	.LVL120:
+ 477:modbus/RTUmodbus_slave.c **** 		break;
+ 1470              		.loc 1 477 3 is_stmt 1 view .LVU427
+ 1471 0030 57E0     		b	.L116
+ 1472              	.LVL121:
+ 1473              	.L126:
+ 477:modbus/RTUmodbus_slave.c **** 		break;
+ 1474              		.loc 1 477 3 is_stmt 0 view .LVU428
+ 1475              	.LBE2:
+ 1476              	.LBB3:
+ 481:modbus/RTUmodbus_slave.c **** 		get_local_dht22_data(&temp, &hum);
+ 1477              		.loc 1 481 3 is_stmt 1 view .LVU429
+ 1478 0032 04A9     		add	r1, sp, #16
+ 1479              	.LVL122:
+ 481:modbus/RTUmodbus_slave.c **** 		get_local_dht22_data(&temp, &hum);
+ 1480              		.loc 1 481 3 is_stmt 0 view .LVU430
+ 1481 0034 05A8     		add	r0, sp, #20
+ 1482              	.LVL123:
+ 481:modbus/RTUmodbus_slave.c **** 		get_local_dht22_data(&temp, &hum);
+ 1483              		.loc 1 481 3 view .LVU431
+ 1484 0036 FFF7FEFF 		bl	get_local_dht22_data
+ 1485              	.LVL124:
+ 482:modbus/RTUmodbus_slave.c **** 		uint32_t temper_32 = convert_float_to_uint32(temp);
+ 1486              		.loc 1 482 3 is_stmt 1 view .LVU432
+ 482:modbus/RTUmodbus_slave.c **** 		uint32_t temper_32 = convert_float_to_uint32(temp);
+ 1487              		.loc 1 482 24 is_stmt 0 view .LVU433
+ 1488 003a 0598     		ldr	r0, [sp, #20]	@ float
+ 1489 003c FFF7FEFF 		bl	convert_float_to_uint32
+ 1490              	.LVL125:
+ 483:modbus/RTUmodbus_slave.c **** 		value = temper_32;
+ 1491              		.loc 1 483 3 is_stmt 1 view .LVU434
+ 483:modbus/RTUmodbus_slave.c **** 		value = temper_32;
+ 1492              		.loc 1 483 9 is_stmt 0 view .LVU435
+ 1493 0040 80B2     		uxth	r0, r0
+ARM GAS  /tmp/ccrEi7aK.s 			page 52
+
+
+ 1494              	.LVL126:
+ 484:modbus/RTUmodbus_slave.c **** 		break;
+ 1495              		.loc 1 484 3 is_stmt 1 view .LVU436
+ 1496 0042 4EE0     		b	.L116
+ 1497              	.LVL127:
+ 1498              	.L125:
+ 484:modbus/RTUmodbus_slave.c **** 		break;
+ 1499              		.loc 1 484 3 is_stmt 0 view .LVU437
+ 1500              	.LBE3:
+ 1501              	.LBB4:
+ 488:modbus/RTUmodbus_slave.c **** 		get_local_dht22_data(&temp, &hum);
+ 1502              		.loc 1 488 3 is_stmt 1 view .LVU438
+ 1503 0044 04A9     		add	r1, sp, #16
+ 1504              	.LVL128:
+ 488:modbus/RTUmodbus_slave.c **** 		get_local_dht22_data(&temp, &hum);
+ 1505              		.loc 1 488 3 is_stmt 0 view .LVU439
+ 1506 0046 05A8     		add	r0, sp, #20
+ 1507              	.LVL129:
+ 488:modbus/RTUmodbus_slave.c **** 		get_local_dht22_data(&temp, &hum);
+ 1508              		.loc 1 488 3 view .LVU440
+ 1509 0048 FFF7FEFF 		bl	get_local_dht22_data
+ 1510              	.LVL130:
+ 489:modbus/RTUmodbus_slave.c **** 		uint32_t hum_32 = convert_float_to_uint32(hum);
+ 1511              		.loc 1 489 3 is_stmt 1 view .LVU441
+ 489:modbus/RTUmodbus_slave.c **** 		uint32_t hum_32 = convert_float_to_uint32(hum);
+ 1512              		.loc 1 489 21 is_stmt 0 view .LVU442
+ 1513 004c 0498     		ldr	r0, [sp, #16]	@ float
+ 1514 004e FFF7FEFF 		bl	convert_float_to_uint32
+ 1515              	.LVL131:
+ 490:modbus/RTUmodbus_slave.c **** 		value = hum_32 >> 16;
+ 1516              		.loc 1 490 3 is_stmt 1 view .LVU443
+ 490:modbus/RTUmodbus_slave.c **** 		value = hum_32 >> 16;
+ 1517              		.loc 1 490 9 is_stmt 0 view .LVU444
+ 1518 0052 000C     		lsrs	r0, r0, #16
+ 1519              	.LVL132:
+ 491:modbus/RTUmodbus_slave.c **** 		break;
+ 1520              		.loc 1 491 3 is_stmt 1 view .LVU445
+ 1521 0054 45E0     		b	.L116
+ 1522              	.LVL133:
+ 1523              	.L124:
+ 491:modbus/RTUmodbus_slave.c **** 		break;
+ 1524              		.loc 1 491 3 is_stmt 0 view .LVU446
+ 1525              	.LBE4:
+ 1526              	.LBB5:
+ 495:modbus/RTUmodbus_slave.c **** 		get_local_dht22_data(&temp, &hum);
+ 1527              		.loc 1 495 3 is_stmt 1 view .LVU447
+ 1528 0056 04A9     		add	r1, sp, #16
+ 1529              	.LVL134:
+ 495:modbus/RTUmodbus_slave.c **** 		get_local_dht22_data(&temp, &hum);
+ 1530              		.loc 1 495 3 is_stmt 0 view .LVU448
+ 1531 0058 05A8     		add	r0, sp, #20
+ 1532              	.LVL135:
+ 495:modbus/RTUmodbus_slave.c **** 		get_local_dht22_data(&temp, &hum);
+ 1533              		.loc 1 495 3 view .LVU449
+ 1534 005a FFF7FEFF 		bl	get_local_dht22_data
+ 1535              	.LVL136:
+ 496:modbus/RTUmodbus_slave.c **** 		uint32_t hum_32 = convert_float_to_uint32(hum);
+ARM GAS  /tmp/ccrEi7aK.s 			page 53
+
+
+ 1536              		.loc 1 496 3 is_stmt 1 view .LVU450
+ 496:modbus/RTUmodbus_slave.c **** 		uint32_t hum_32 = convert_float_to_uint32(hum);
+ 1537              		.loc 1 496 21 is_stmt 0 view .LVU451
+ 1538 005e 0498     		ldr	r0, [sp, #16]	@ float
+ 1539 0060 FFF7FEFF 		bl	convert_float_to_uint32
+ 1540              	.LVL137:
+ 497:modbus/RTUmodbus_slave.c **** 		value = hum_32;
+ 1541              		.loc 1 497 3 is_stmt 1 view .LVU452
+ 497:modbus/RTUmodbus_slave.c **** 		value = hum_32;
+ 1542              		.loc 1 497 9 is_stmt 0 view .LVU453
+ 1543 0064 80B2     		uxth	r0, r0
+ 1544              	.LVL138:
+ 498:modbus/RTUmodbus_slave.c **** 		break;
+ 1545              		.loc 1 498 3 is_stmt 1 view .LVU454
+ 1546 0066 3CE0     		b	.L116
+ 1547              	.LVL139:
+ 1548              	.L123:
+ 498:modbus/RTUmodbus_slave.c **** 		break;
+ 1549              		.loc 1 498 3 is_stmt 0 view .LVU455
+ 1550              	.LBE5:
+ 1551              	.LBB6:
+ 503:modbus/RTUmodbus_slave.c **** 		get_local_adxl_345_data(&x_data, &y_data, &z_data);
+ 1552              		.loc 1 503 3 is_stmt 1 view .LVU456
+ 1553 0068 01AA     		add	r2, sp, #4
+ 1554 006a 02A9     		add	r1, sp, #8
+ 1555              	.LVL140:
+ 503:modbus/RTUmodbus_slave.c **** 		get_local_adxl_345_data(&x_data, &y_data, &z_data);
+ 1556              		.loc 1 503 3 is_stmt 0 view .LVU457
+ 1557 006c 03A8     		add	r0, sp, #12
+ 1558              	.LVL141:
+ 503:modbus/RTUmodbus_slave.c **** 		get_local_adxl_345_data(&x_data, &y_data, &z_data);
+ 1559              		.loc 1 503 3 view .LVU458
+ 1560 006e FFF7FEFF 		bl	get_local_adxl_345_data
+ 1561              	.LVL142:
+ 504:modbus/RTUmodbus_slave.c **** 		uint32_t x_data_32 = convert_float_to_uint32(x_data);
+ 1562              		.loc 1 504 3 is_stmt 1 view .LVU459
+ 504:modbus/RTUmodbus_slave.c **** 		uint32_t x_data_32 = convert_float_to_uint32(x_data);
+ 1563              		.loc 1 504 24 is_stmt 0 view .LVU460
+ 1564 0072 0398     		ldr	r0, [sp, #12]	@ float
+ 1565 0074 FFF7FEFF 		bl	convert_float_to_uint32
+ 1566              	.LVL143:
+ 505:modbus/RTUmodbus_slave.c **** 		value = x_data_32 >> 16;
+ 1567              		.loc 1 505 3 is_stmt 1 view .LVU461
+ 505:modbus/RTUmodbus_slave.c **** 		value = x_data_32 >> 16;
+ 1568              		.loc 1 505 9 is_stmt 0 view .LVU462
+ 1569 0078 000C     		lsrs	r0, r0, #16
+ 1570              	.LVL144:
+ 506:modbus/RTUmodbus_slave.c **** 		break;
+ 1571              		.loc 1 506 3 is_stmt 1 view .LVU463
+ 1572 007a 32E0     		b	.L116
+ 1573              	.LVL145:
+ 1574              	.L122:
+ 506:modbus/RTUmodbus_slave.c **** 		break;
+ 1575              		.loc 1 506 3 is_stmt 0 view .LVU464
+ 1576              	.LBE6:
+ 1577              	.LBB7:
+ 510:modbus/RTUmodbus_slave.c **** 		get_local_adxl_345_data(&x_data, &y_data, &z_data);
+ARM GAS  /tmp/ccrEi7aK.s 			page 54
+
+
+ 1578              		.loc 1 510 3 is_stmt 1 view .LVU465
+ 1579 007c 01AA     		add	r2, sp, #4
+ 1580 007e 02A9     		add	r1, sp, #8
+ 1581              	.LVL146:
+ 510:modbus/RTUmodbus_slave.c **** 		get_local_adxl_345_data(&x_data, &y_data, &z_data);
+ 1582              		.loc 1 510 3 is_stmt 0 view .LVU466
+ 1583 0080 03A8     		add	r0, sp, #12
+ 1584              	.LVL147:
+ 510:modbus/RTUmodbus_slave.c **** 		get_local_adxl_345_data(&x_data, &y_data, &z_data);
+ 1585              		.loc 1 510 3 view .LVU467
+ 1586 0082 FFF7FEFF 		bl	get_local_adxl_345_data
+ 1587              	.LVL148:
+ 511:modbus/RTUmodbus_slave.c **** 		uint32_t x_data_32 = convert_float_to_uint32(x_data);
+ 1588              		.loc 1 511 3 is_stmt 1 view .LVU468
+ 511:modbus/RTUmodbus_slave.c **** 		uint32_t x_data_32 = convert_float_to_uint32(x_data);
+ 1589              		.loc 1 511 24 is_stmt 0 view .LVU469
+ 1590 0086 0398     		ldr	r0, [sp, #12]	@ float
+ 1591 0088 FFF7FEFF 		bl	convert_float_to_uint32
+ 1592              	.LVL149:
+ 512:modbus/RTUmodbus_slave.c **** 		value = x_data_32;
+ 1593              		.loc 1 512 3 is_stmt 1 view .LVU470
+ 512:modbus/RTUmodbus_slave.c **** 		value = x_data_32;
+ 1594              		.loc 1 512 9 is_stmt 0 view .LVU471
+ 1595 008c 80B2     		uxth	r0, r0
+ 1596              	.LVL150:
+ 513:modbus/RTUmodbus_slave.c **** 		break;
+ 1597              		.loc 1 513 3 is_stmt 1 view .LVU472
+ 1598 008e 28E0     		b	.L116
+ 1599              	.LVL151:
+ 1600              	.L121:
+ 513:modbus/RTUmodbus_slave.c **** 		break;
+ 1601              		.loc 1 513 3 is_stmt 0 view .LVU473
+ 1602              	.LBE7:
+ 1603              	.LBB8:
+ 517:modbus/RTUmodbus_slave.c **** 		get_local_adxl_345_data(&x_data, &y_data, &z_data);
+ 1604              		.loc 1 517 3 is_stmt 1 view .LVU474
+ 1605 0090 01AA     		add	r2, sp, #4
+ 1606 0092 02A9     		add	r1, sp, #8
+ 1607              	.LVL152:
+ 517:modbus/RTUmodbus_slave.c **** 		get_local_adxl_345_data(&x_data, &y_data, &z_data);
+ 1608              		.loc 1 517 3 is_stmt 0 view .LVU475
+ 1609 0094 03A8     		add	r0, sp, #12
+ 1610              	.LVL153:
+ 517:modbus/RTUmodbus_slave.c **** 		get_local_adxl_345_data(&x_data, &y_data, &z_data);
+ 1611              		.loc 1 517 3 view .LVU476
+ 1612 0096 FFF7FEFF 		bl	get_local_adxl_345_data
+ 1613              	.LVL154:
+ 518:modbus/RTUmodbus_slave.c **** 		uint32_t y_data_32 = convert_float_to_uint32(y_data);
+ 1614              		.loc 1 518 3 is_stmt 1 view .LVU477
+ 518:modbus/RTUmodbus_slave.c **** 		uint32_t y_data_32 = convert_float_to_uint32(y_data);
+ 1615              		.loc 1 518 24 is_stmt 0 view .LVU478
+ 1616 009a 0298     		ldr	r0, [sp, #8]	@ float
+ 1617 009c FFF7FEFF 		bl	convert_float_to_uint32
+ 1618              	.LVL155:
+ 519:modbus/RTUmodbus_slave.c **** 		value = y_data_32 >> 16;
+ 1619              		.loc 1 519 3 is_stmt 1 view .LVU479
+ 519:modbus/RTUmodbus_slave.c **** 		value = y_data_32 >> 16;
+ARM GAS  /tmp/ccrEi7aK.s 			page 55
+
+
+ 1620              		.loc 1 519 9 is_stmt 0 view .LVU480
+ 1621 00a0 000C     		lsrs	r0, r0, #16
+ 1622              	.LVL156:
+ 520:modbus/RTUmodbus_slave.c **** 		break;
+ 1623              		.loc 1 520 3 is_stmt 1 view .LVU481
+ 1624 00a2 1EE0     		b	.L116
+ 1625              	.LVL157:
+ 1626              	.L120:
+ 520:modbus/RTUmodbus_slave.c **** 		break;
+ 1627              		.loc 1 520 3 is_stmt 0 view .LVU482
+ 1628              	.LBE8:
+ 1629              	.LBB9:
+ 524:modbus/RTUmodbus_slave.c **** 		get_local_adxl_345_data(&x_data, &y_data, &z_data);
+ 1630              		.loc 1 524 3 is_stmt 1 view .LVU483
+ 1631 00a4 01AA     		add	r2, sp, #4
+ 1632 00a6 02A9     		add	r1, sp, #8
+ 1633              	.LVL158:
+ 524:modbus/RTUmodbus_slave.c **** 		get_local_adxl_345_data(&x_data, &y_data, &z_data);
+ 1634              		.loc 1 524 3 is_stmt 0 view .LVU484
+ 1635 00a8 03A8     		add	r0, sp, #12
+ 1636              	.LVL159:
+ 524:modbus/RTUmodbus_slave.c **** 		get_local_adxl_345_data(&x_data, &y_data, &z_data);
+ 1637              		.loc 1 524 3 view .LVU485
+ 1638 00aa FFF7FEFF 		bl	get_local_adxl_345_data
+ 1639              	.LVL160:
+ 525:modbus/RTUmodbus_slave.c **** 		uint32_t y_data_32 = convert_float_to_uint32(y_data);
+ 1640              		.loc 1 525 3 is_stmt 1 view .LVU486
+ 525:modbus/RTUmodbus_slave.c **** 		uint32_t y_data_32 = convert_float_to_uint32(y_data);
+ 1641              		.loc 1 525 24 is_stmt 0 view .LVU487
+ 1642 00ae 0298     		ldr	r0, [sp, #8]	@ float
+ 1643 00b0 FFF7FEFF 		bl	convert_float_to_uint32
+ 1644              	.LVL161:
+ 526:modbus/RTUmodbus_slave.c **** 		value = y_data_32;
+ 1645              		.loc 1 526 3 is_stmt 1 view .LVU488
+ 526:modbus/RTUmodbus_slave.c **** 		value = y_data_32;
+ 1646              		.loc 1 526 9 is_stmt 0 view .LVU489
+ 1647 00b4 80B2     		uxth	r0, r0
+ 1648              	.LVL162:
+ 527:modbus/RTUmodbus_slave.c **** 		break;
+ 1649              		.loc 1 527 3 is_stmt 1 view .LVU490
+ 1650 00b6 14E0     		b	.L116
+ 1651              	.LVL163:
+ 1652              	.L119:
+ 527:modbus/RTUmodbus_slave.c **** 		break;
+ 1653              		.loc 1 527 3 is_stmt 0 view .LVU491
+ 1654              	.LBE9:
+ 1655              	.LBB10:
+ 531:modbus/RTUmodbus_slave.c **** 		get_local_adxl_345_data(&x_data, &y_data, &z_data);
+ 1656              		.loc 1 531 3 is_stmt 1 view .LVU492
+ 1657 00b8 01AA     		add	r2, sp, #4
+ 1658 00ba 02A9     		add	r1, sp, #8
+ 1659              	.LVL164:
+ 531:modbus/RTUmodbus_slave.c **** 		get_local_adxl_345_data(&x_data, &y_data, &z_data);
+ 1660              		.loc 1 531 3 is_stmt 0 view .LVU493
+ 1661 00bc 03A8     		add	r0, sp, #12
+ 1662              	.LVL165:
+ 531:modbus/RTUmodbus_slave.c **** 		get_local_adxl_345_data(&x_data, &y_data, &z_data);
+ARM GAS  /tmp/ccrEi7aK.s 			page 56
+
+
+ 1663              		.loc 1 531 3 view .LVU494
+ 1664 00be FFF7FEFF 		bl	get_local_adxl_345_data
+ 1665              	.LVL166:
+ 532:modbus/RTUmodbus_slave.c **** 		uint32_t z_data_32 = convert_float_to_uint32(z_data);
+ 1666              		.loc 1 532 3 is_stmt 1 view .LVU495
+ 532:modbus/RTUmodbus_slave.c **** 		uint32_t z_data_32 = convert_float_to_uint32(z_data);
+ 1667              		.loc 1 532 24 is_stmt 0 view .LVU496
+ 1668 00c2 0198     		ldr	r0, [sp, #4]	@ float
+ 1669 00c4 FFF7FEFF 		bl	convert_float_to_uint32
+ 1670              	.LVL167:
+ 533:modbus/RTUmodbus_slave.c **** 		value = z_data_32>>16;
+ 1671              		.loc 1 533 3 is_stmt 1 view .LVU497
+ 533:modbus/RTUmodbus_slave.c **** 		value = z_data_32>>16;
+ 1672              		.loc 1 533 9 is_stmt 0 view .LVU498
+ 1673 00c8 000C     		lsrs	r0, r0, #16
+ 1674              	.LVL168:
+ 534:modbus/RTUmodbus_slave.c **** 		break;
+ 1675              		.loc 1 534 3 is_stmt 1 view .LVU499
+ 1676 00ca 0AE0     		b	.L116
+ 1677              	.LVL169:
+ 1678              	.L118:
+ 534:modbus/RTUmodbus_slave.c **** 		break;
+ 1679              		.loc 1 534 3 is_stmt 0 view .LVU500
+ 1680              	.LBE10:
+ 1681              	.LBB11:
+ 538:modbus/RTUmodbus_slave.c **** 		get_local_adxl_345_data(&x_data, &y_data, &z_data);
+ 1682              		.loc 1 538 3 is_stmt 1 view .LVU501
+ 1683 00cc 01AA     		add	r2, sp, #4
+ 1684 00ce 02A9     		add	r1, sp, #8
+ 1685              	.LVL170:
+ 538:modbus/RTUmodbus_slave.c **** 		get_local_adxl_345_data(&x_data, &y_data, &z_data);
+ 1686              		.loc 1 538 3 is_stmt 0 view .LVU502
+ 1687 00d0 03A8     		add	r0, sp, #12
+ 1688              	.LVL171:
+ 538:modbus/RTUmodbus_slave.c **** 		get_local_adxl_345_data(&x_data, &y_data, &z_data);
+ 1689              		.loc 1 538 3 view .LVU503
+ 1690 00d2 FFF7FEFF 		bl	get_local_adxl_345_data
+ 1691              	.LVL172:
+ 539:modbus/RTUmodbus_slave.c **** 		uint32_t z_data_32 = convert_float_to_uint32(z_data);
+ 1692              		.loc 1 539 3 is_stmt 1 view .LVU504
+ 539:modbus/RTUmodbus_slave.c **** 		uint32_t z_data_32 = convert_float_to_uint32(z_data);
+ 1693              		.loc 1 539 24 is_stmt 0 view .LVU505
+ 1694 00d6 0198     		ldr	r0, [sp, #4]	@ float
+ 1695 00d8 FFF7FEFF 		bl	convert_float_to_uint32
+ 1696              	.LVL173:
+ 540:modbus/RTUmodbus_slave.c **** 		value = z_data_32;
+ 1697              		.loc 1 540 3 is_stmt 1 view .LVU506
+ 540:modbus/RTUmodbus_slave.c **** 		value = z_data_32;
+ 1698              		.loc 1 540 9 is_stmt 0 view .LVU507
+ 1699 00dc 80B2     		uxth	r0, r0
+ 1700              	.LVL174:
+ 541:modbus/RTUmodbus_slave.c **** 		break;
+ 1701              		.loc 1 541 3 is_stmt 1 view .LVU508
+ 1702 00de 00E0     		b	.L116
+ 1703              	.LVL175:
+ 1704              	.L129:
+ 541:modbus/RTUmodbus_slave.c **** 		break;
+ARM GAS  /tmp/ccrEi7aK.s 			page 57
+
+
+ 1705              		.loc 1 541 3 is_stmt 0 view .LVU509
+ 1706              	.LBE11:
+ 468:modbus/RTUmodbus_slave.c **** 	float x_data, y_data, z_data = 0;
+ 1707              		.loc 1 468 24 view .LVU510
+ 1708 00e0 0020     		movs	r0, #0
+ 1709              	.LVL176:
+ 1710              	.L116:
+ 551:modbus/RTUmodbus_slave.c **** 	reg_value[0] = value >> 8;
+ 1711              		.loc 1 551 2 is_stmt 1 view .LVU511
+ 551:modbus/RTUmodbus_slave.c **** 	reg_value[0] = value >> 8;
+ 1712              		.loc 1 551 15 is_stmt 0 view .LVU512
+ 1713 00e2 030A     		lsrs	r3, r0, #8
+ 1714 00e4 2370     		strb	r3, [r4]
+ 552:modbus/RTUmodbus_slave.c **** 	reg_value[1] = value;
+ 1715              		.loc 1 552 2 is_stmt 1 view .LVU513
+ 552:modbus/RTUmodbus_slave.c **** 	reg_value[1] = value;
+ 1716              		.loc 1 552 15 is_stmt 0 view .LVU514
+ 1717 00e6 6070     		strb	r0, [r4, #1]
+ 553:modbus/RTUmodbus_slave.c **** 	return 1; /* 读取成功 */
+ 1718              		.loc 1 553 2 is_stmt 1 view .LVU515
+ 553:modbus/RTUmodbus_slave.c **** 	return 1; /* 读取成功 */
+ 1719              		.loc 1 553 9 is_stmt 0 view .LVU516
+ 1720 00e8 0120     		movs	r0, #1
+ 1721              	.LVL177:
+ 1722              	.L115:
+ 554:modbus/RTUmodbus_slave.c **** }
+ 1723              		.loc 1 554 1 view .LVU517
+ 1724 00ea 06B0     		add	sp, sp, #24
+ 1725              	.LCFI26:
+ 1726              		.cfi_def_cfa_offset 8
+ 1727              		@ sp needed
+ 1728 00ec 10BD     		pop	{r4, pc}
+ 1729              	.LVL178:
+ 1730              	.L128:
+ 468:modbus/RTUmodbus_slave.c **** 	float x_data, y_data, z_data = 0;
+ 1731              		.loc 1 468 24 view .LVU518
+ 1732 00ee 0020     		movs	r0, #0
+ 1733              	.LVL179:
+ 468:modbus/RTUmodbus_slave.c **** 	float x_data, y_data, z_data = 0;
+ 1734              		.loc 1 468 24 view .LVU519
+ 1735 00f0 FBE7     		b	.L115
+ 1736              		.cfi_endproc
+ 1737              	.LFE12:
+ 1739              		.section	.text.MODS_03H,"ax",%progbits
+ 1740              		.align	1
+ 1741              		.syntax unified
+ 1742              		.thumb
+ 1743              		.thumb_func
+ 1744              		.fpu softvfp
+ 1746              	MODS_03H:
+ 1747              	.LFB14:
+ 600:modbus/RTUmodbus_slave.c **** {
+ 1748              		.loc 1 600 1 is_stmt 1 view -0
+ 1749              		.cfi_startproc
+ 1750              		@ args = 0, pretend = 0, frame = 64
+ 1751              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1752 0000 70B5     		push	{r4, r5, r6, lr}
+ARM GAS  /tmp/ccrEi7aK.s 			page 58
+
+
+ 1753              	.LCFI27:
+ 1754              		.cfi_def_cfa_offset 16
+ 1755              		.cfi_offset 4, -16
+ 1756              		.cfi_offset 5, -12
+ 1757              		.cfi_offset 6, -8
+ 1758              		.cfi_offset 14, -4
+ 1759 0002 90B0     		sub	sp, sp, #64
+ 1760              	.LCFI28:
+ 1761              		.cfi_def_cfa_offset 80
+ 641:modbus/RTUmodbus_slave.c **** 	uint16_t reg = 0x00;
+ 1762              		.loc 1 641 2 view .LVU521
+ 1763              	.LVL180:
+ 642:modbus/RTUmodbus_slave.c **** 	uint16_t num = 0x00;
+ 1764              		.loc 1 642 2 view .LVU522
+ 643:modbus/RTUmodbus_slave.c **** 	uint16_t i = 0x00;
+ 1765              		.loc 1 643 2 view .LVU523
+ 644:modbus/RTUmodbus_slave.c **** 	uint8_t reg_value[64];
+ 1766              		.loc 1 644 2 view .LVU524
+ 646:modbus/RTUmodbus_slave.c **** 	g_tModS.RspCode = RSP_OK;
+ 1767              		.loc 1 646 2 view .LVU525
+ 646:modbus/RTUmodbus_slave.c **** 	g_tModS.RspCode = RSP_OK;
+ 1768              		.loc 1 646 18 is_stmt 0 view .LVU526
+ 1769 0004 344B     		ldr	r3, .L145
+ 1770 0006 0022     		movs	r2, #0
+ 1771 0008 83F82120 		strb	r2, [r3, #33]
+ 648:modbus/RTUmodbus_slave.c **** 	if (g_tModS.RxCount != 8) /* 03H命令必须是8个字节 */
+ 1772              		.loc 1 648 2 is_stmt 1 view .LVU527
+ 648:modbus/RTUmodbus_slave.c **** 	if (g_tModS.RxCount != 8) /* 03H命令必须是8个字节 */
+ 1773              		.loc 1 648 13 is_stmt 0 view .LVU528
+ 1774 000c 9B7F     		ldrb	r3, [r3, #30]	@ zero_extendqisi2
+ 648:modbus/RTUmodbus_slave.c **** 	if (g_tModS.RxCount != 8) /* 03H命令必须是8个字节 */
+ 1775              		.loc 1 648 5 view .LVU529
+ 1776 000e 082B     		cmp	r3, #8
+ 1777 0010 17D0     		beq	.L132
+ 650:modbus/RTUmodbus_slave.c **** 		g_tModS.RspCode = RSP_ERR_VALUE; /* 数据值域错误 */
+ 1778              		.loc 1 650 3 is_stmt 1 view .LVU530
+ 650:modbus/RTUmodbus_slave.c **** 		g_tModS.RspCode = RSP_ERR_VALUE; /* 数据值域错误 */
+ 1779              		.loc 1 650 19 is_stmt 0 view .LVU531
+ 1780 0012 314B     		ldr	r3, .L145
+ 1781 0014 0322     		movs	r2, #3
+ 1782 0016 83F82120 		strb	r2, [r3, #33]
+ 651:modbus/RTUmodbus_slave.c **** 		goto err_ret;
+ 1783              		.loc 1 651 3 is_stmt 1 view .LVU532
+ 642:modbus/RTUmodbus_slave.c **** 	uint16_t num = 0x00;
+ 1784              		.loc 1 642 11 is_stmt 0 view .LVU533
+ 1785 001a 0025     		movs	r5, #0
+ 1786              	.LVL181:
+ 1787              	.L133:
+ 674:modbus/RTUmodbus_slave.c **** 	if (g_tModS.RspCode == RSP_OK) /* 正确应答 */
+ 1788              		.loc 1 674 2 is_stmt 1 view .LVU534
+ 674:modbus/RTUmodbus_slave.c **** 	if (g_tModS.RspCode == RSP_OK) /* 正确应答 */
+ 1789              		.loc 1 674 13 is_stmt 0 view .LVU535
+ 1790 001c 2E4B     		ldr	r3, .L145
+ 1791 001e 93F82100 		ldrb	r0, [r3, #33]	@ zero_extendqisi2
+ 674:modbus/RTUmodbus_slave.c **** 	if (g_tModS.RspCode == RSP_OK) /* 正确应答 */
+ 1792              		.loc 1 674 5 view .LVU536
+ 1793 0022 0028     		cmp	r0, #0
+ARM GAS  /tmp/ccrEi7aK.s 			page 59
+
+
+ 1794 0024 55D1     		bne	.L137
+ 676:modbus/RTUmodbus_slave.c **** 		g_tModS.TxCount = 0;
+ 1795              		.loc 1 676 3 is_stmt 1 view .LVU537
+ 677:modbus/RTUmodbus_slave.c **** 		g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[0];
+ 1796              		.loc 1 677 3 view .LVU538
+ 677:modbus/RTUmodbus_slave.c **** 		g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[0];
+ 1797              		.loc 1 677 51 is_stmt 0 view .LVU539
+ 1798 0026 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+ 677:modbus/RTUmodbus_slave.c **** 		g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[0];
+ 1799              		.loc 1 677 36 view .LVU540
+ 1800 0028 83F82220 		strb	r2, [r3, #34]
+ 678:modbus/RTUmodbus_slave.c **** 		g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[1];
+ 1801              		.loc 1 678 3 is_stmt 1 view .LVU541
+ 678:modbus/RTUmodbus_slave.c **** 		g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[1];
+ 1802              		.loc 1 678 51 is_stmt 0 view .LVU542
+ 1803 002c 5A78     		ldrb	r2, [r3, #1]	@ zero_extendqisi2
+ 678:modbus/RTUmodbus_slave.c **** 		g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[1];
+ 1804              		.loc 1 678 36 view .LVU543
+ 1805 002e 83F82320 		strb	r2, [r3, #35]
+ 679:modbus/RTUmodbus_slave.c **** 		g_tModS.TxBuf[g_tModS.TxCount++] = num * 2; /* 返回字节数 */
+ 1806              		.loc 1 679 3 is_stmt 1 view .LVU544
+ 679:modbus/RTUmodbus_slave.c **** 		g_tModS.TxBuf[g_tModS.TxCount++] = num * 2; /* 返回字节数 */
+ 1807              		.loc 1 679 32 is_stmt 0 view .LVU545
+ 1808 0032 0322     		movs	r2, #3
+ 1809 0034 83F8A220 		strb	r2, [r3, #162]
+ 679:modbus/RTUmodbus_slave.c **** 		g_tModS.TxBuf[g_tModS.TxCount++] = num * 2; /* 返回字节数 */
+ 1810              		.loc 1 679 36 view .LVU546
+ 1811 0038 6A00     		lsls	r2, r5, #1
+ 1812 003a 83F82420 		strb	r2, [r3, #36]
+ 681:modbus/RTUmodbus_slave.c **** 		for (i = 0; i < num; i++)
+ 1813              		.loc 1 681 3 is_stmt 1 view .LVU547
+ 1814              	.LVL182:
+ 681:modbus/RTUmodbus_slave.c **** 		for (i = 0; i < num; i++)
+ 1815              		.loc 1 681 10 is_stmt 0 view .LVU548
+ 1816 003e 0023     		movs	r3, #0
+ 681:modbus/RTUmodbus_slave.c **** 		for (i = 0; i < num; i++)
+ 1817              		.loc 1 681 3 view .LVU549
+ 1818 0040 3DE0     		b	.L138
+ 1819              	.LVL183:
+ 1820              	.L132:
+ 654:modbus/RTUmodbus_slave.c **** 	reg = BEBufToUint16(&g_tModS.RxBuf[2]); /* 寄存器号 */
+ 1821              		.loc 1 654 2 is_stmt 1 view .LVU550
+ 654:modbus/RTUmodbus_slave.c **** 	reg = BEBufToUint16(&g_tModS.RxBuf[2]); /* 寄存器号 */
+ 1822              		.loc 1 654 8 is_stmt 0 view .LVU551
+ 1823 0042 264C     		ldr	r4, .L145+4
+ 1824 0044 2046     		mov	r0, r4
+ 1825 0046 FFF7FEFF 		bl	BEBufToUint16
+ 1826              	.LVL184:
+ 1827 004a 0646     		mov	r6, r0
+ 1828              	.LVL185:
+ 655:modbus/RTUmodbus_slave.c **** 	num = BEBufToUint16(&g_tModS.RxBuf[4]); /* 寄存器个数 */
+ 1829              		.loc 1 655 2 is_stmt 1 view .LVU552
+ 655:modbus/RTUmodbus_slave.c **** 	num = BEBufToUint16(&g_tModS.RxBuf[4]); /* 寄存器个数 */
+ 1830              		.loc 1 655 8 is_stmt 0 view .LVU553
+ 1831 004c A01C     		adds	r0, r4, #2
+ 1832 004e FFF7FEFF 		bl	BEBufToUint16
+ 1833              	.LVL186:
+ARM GAS  /tmp/ccrEi7aK.s 			page 60
+
+
+ 1834 0052 0546     		mov	r5, r0
+ 1835              	.LVL187:
+ 656:modbus/RTUmodbus_slave.c **** 	if (num > sizeof(reg_value) / 2)
+ 1836              		.loc 1 656 2 is_stmt 1 view .LVU554
+ 656:modbus/RTUmodbus_slave.c **** 	if (num > sizeof(reg_value) / 2)
+ 1837              		.loc 1 656 5 is_stmt 0 view .LVU555
+ 1838 0054 2028     		cmp	r0, #32
+ 1839 0056 0DD8     		bhi	.L143
+ 662:modbus/RTUmodbus_slave.c **** 	for (i = 0; i < num; i++)
+ 1840              		.loc 1 662 9 view .LVU556
+ 1841 0058 0024     		movs	r4, #0
+ 1842              	.LVL188:
+ 1843              	.L134:
+ 662:modbus/RTUmodbus_slave.c **** 	for (i = 0; i < num; i++)
+ 1844              		.loc 1 662 14 is_stmt 1 discriminator 1 view .LVU557
+ 662:modbus/RTUmodbus_slave.c **** 	for (i = 0; i < num; i++)
+ 1845              		.loc 1 662 2 is_stmt 0 discriminator 1 view .LVU558
+ 1846 005a AC42     		cmp	r4, r5
+ 1847 005c DED2     		bcs	.L133
+ 664:modbus/RTUmodbus_slave.c **** 		if (MODS_ReadRegValue(reg, &reg_value[2 * i]) == 0) /* 读出寄存器值放入reg_value */
+ 1848              		.loc 1 664 3 is_stmt 1 view .LVU559
+ 664:modbus/RTUmodbus_slave.c **** 		if (MODS_ReadRegValue(reg, &reg_value[2 * i]) == 0) /* 读出寄存器值放入reg_value */
+ 1849              		.loc 1 664 7 is_stmt 0 view .LVU560
+ 1850 005e 0DEB4401 		add	r1, sp, r4, lsl #1
+ 1851 0062 3046     		mov	r0, r6
+ 1852 0064 FFF7FEFF 		bl	MODS_ReadRegValue
+ 1853              	.LVL189:
+ 664:modbus/RTUmodbus_slave.c **** 		if (MODS_ReadRegValue(reg, &reg_value[2 * i]) == 0) /* 读出寄存器值放入reg_value */
+ 1854              		.loc 1 664 6 view .LVU561
+ 1855 0068 48B1     		cbz	r0, .L144
+ 670:modbus/RTUmodbus_slave.c **** 		reg++;
+ 1856              		.loc 1 670 3 is_stmt 1 discriminator 2 view .LVU562
+ 670:modbus/RTUmodbus_slave.c **** 		reg++;
+ 1857              		.loc 1 670 6 is_stmt 0 discriminator 2 view .LVU563
+ 1858 006a 0136     		adds	r6, r6, #1
+ 1859              	.LVL190:
+ 670:modbus/RTUmodbus_slave.c **** 		reg++;
+ 1860              		.loc 1 670 6 discriminator 2 view .LVU564
+ 1861 006c B6B2     		uxth	r6, r6
+ 1862              	.LVL191:
+ 662:modbus/RTUmodbus_slave.c **** 	for (i = 0; i < num; i++)
+ 1863              		.loc 1 662 23 is_stmt 1 discriminator 2 view .LVU565
+ 662:modbus/RTUmodbus_slave.c **** 	for (i = 0; i < num; i++)
+ 1864              		.loc 1 662 24 is_stmt 0 discriminator 2 view .LVU566
+ 1865 006e 0134     		adds	r4, r4, #1
+ 1866              	.LVL192:
+ 662:modbus/RTUmodbus_slave.c **** 	for (i = 0; i < num; i++)
+ 1867              		.loc 1 662 24 discriminator 2 view .LVU567
+ 1868 0070 A4B2     		uxth	r4, r4
+ 1869              	.LVL193:
+ 662:modbus/RTUmodbus_slave.c **** 	for (i = 0; i < num; i++)
+ 1870              		.loc 1 662 24 discriminator 2 view .LVU568
+ 1871 0072 F2E7     		b	.L134
+ 1872              	.LVL194:
+ 1873              	.L143:
+ 658:modbus/RTUmodbus_slave.c **** 		g_tModS.RspCode = RSP_ERR_VALUE; /* 数据值域错误 */
+ 1874              		.loc 1 658 3 is_stmt 1 view .LVU569
+ARM GAS  /tmp/ccrEi7aK.s 			page 61
+
+
+ 658:modbus/RTUmodbus_slave.c **** 		g_tModS.RspCode = RSP_ERR_VALUE; /* 数据值域错误 */
+ 1875              		.loc 1 658 19 is_stmt 0 view .LVU570
+ 1876 0074 A31E     		subs	r3, r4, #2
+ 1877 0076 0322     		movs	r2, #3
+ 1878 0078 83F82120 		strb	r2, [r3, #33]
+ 659:modbus/RTUmodbus_slave.c **** 		goto err_ret;
+ 1879              		.loc 1 659 3 is_stmt 1 view .LVU571
+ 1880 007c CEE7     		b	.L133
+ 1881              	.LVL195:
+ 1882              	.L144:
+ 666:modbus/RTUmodbus_slave.c **** 			g_tModS.RspCode = RSP_ERR_REG_ADDR; /* 寄存器地址错误 */
+ 1883              		.loc 1 666 4 view .LVU572
+ 666:modbus/RTUmodbus_slave.c **** 			g_tModS.RspCode = RSP_ERR_REG_ADDR; /* 寄存器地址错误 */
+ 1884              		.loc 1 666 20 is_stmt 0 view .LVU573
+ 1885 007e 164B     		ldr	r3, .L145
+ 1886 0080 0222     		movs	r2, #2
+ 1887 0082 83F82120 		strb	r2, [r3, #33]
+ 667:modbus/RTUmodbus_slave.c **** 			break;
+ 1888              		.loc 1 667 4 is_stmt 1 view .LVU574
+ 1889 0086 C9E7     		b	.L133
+ 1890              	.LVL196:
+ 1891              	.L139:
+ 683:modbus/RTUmodbus_slave.c **** 			g_tModS.TxBuf[g_tModS.TxCount++] = reg_value[2 * i];
+ 1892              		.loc 1 683 4 discriminator 3 view .LVU575
+ 683:modbus/RTUmodbus_slave.c **** 			g_tModS.TxBuf[g_tModS.TxCount++] = reg_value[2 * i];
+ 1893              		.loc 1 683 51 is_stmt 0 discriminator 3 view .LVU576
+ 1894 0088 5900     		lsls	r1, r3, #1
+ 683:modbus/RTUmodbus_slave.c **** 			g_tModS.TxBuf[g_tModS.TxCount++] = reg_value[2 * i];
+ 1895              		.loc 1 683 25 discriminator 3 view .LVU577
+ 1896 008a 134A     		ldr	r2, .L145
+ 1897 008c 92F8A200 		ldrb	r0, [r2, #162]	@ zero_extendqisi2
+ 683:modbus/RTUmodbus_slave.c **** 			g_tModS.TxBuf[g_tModS.TxCount++] = reg_value[2 * i];
+ 1898              		.loc 1 683 33 discriminator 3 view .LVU578
+ 1899 0090 441C     		adds	r4, r0, #1
+ 1900 0092 E4B2     		uxtb	r4, r4
+ 683:modbus/RTUmodbus_slave.c **** 			g_tModS.TxBuf[g_tModS.TxCount++] = reg_value[2 * i];
+ 1901              		.loc 1 683 48 discriminator 3 view .LVU579
+ 1902 0094 10AE     		add	r6, sp, #64
+ 1903 0096 06EB4306 		add	r6, r6, r3, lsl #1
+ 1904 009a 16F8406C 		ldrb	r6, [r6, #-64]	@ zero_extendqisi2
+ 683:modbus/RTUmodbus_slave.c **** 			g_tModS.TxBuf[g_tModS.TxCount++] = reg_value[2 * i];
+ 1905              		.loc 1 683 37 discriminator 3 view .LVU580
+ 1906 009e 1044     		add	r0, r0, r2
+ 1907 00a0 80F82260 		strb	r6, [r0, #34]
+ 684:modbus/RTUmodbus_slave.c **** 			g_tModS.TxBuf[g_tModS.TxCount++] = reg_value[2 * i + 1];
+ 1908              		.loc 1 684 4 is_stmt 1 discriminator 3 view .LVU581
+ 684:modbus/RTUmodbus_slave.c **** 			g_tModS.TxBuf[g_tModS.TxCount++] = reg_value[2 * i + 1];
+ 1909              		.loc 1 684 55 is_stmt 0 discriminator 3 view .LVU582
+ 1910 00a4 0131     		adds	r1, r1, #1
+ 684:modbus/RTUmodbus_slave.c **** 			g_tModS.TxBuf[g_tModS.TxCount++] = reg_value[2 * i + 1];
+ 1911              		.loc 1 684 33 discriminator 3 view .LVU583
+ 1912 00a6 601C     		adds	r0, r4, #1
+ 1913 00a8 82F8A200 		strb	r0, [r2, #162]
+ 684:modbus/RTUmodbus_slave.c **** 			g_tModS.TxBuf[g_tModS.TxCount++] = reg_value[2 * i + 1];
+ 1914              		.loc 1 684 48 discriminator 3 view .LVU584
+ 1915 00ac 10A8     		add	r0, sp, #64
+ 1916 00ae 0144     		add	r1, r1, r0
+ARM GAS  /tmp/ccrEi7aK.s 			page 62
+
+
+ 1917 00b0 11F8401C 		ldrb	r1, [r1, #-64]	@ zero_extendqisi2
+ 684:modbus/RTUmodbus_slave.c **** 			g_tModS.TxBuf[g_tModS.TxCount++] = reg_value[2 * i + 1];
+ 1918              		.loc 1 684 37 discriminator 3 view .LVU585
+ 1919 00b4 2244     		add	r2, r2, r4
+ 1920 00b6 82F82210 		strb	r1, [r2, #34]
+ 681:modbus/RTUmodbus_slave.c **** 		for (i = 0; i < num; i++)
+ 1921              		.loc 1 681 24 is_stmt 1 discriminator 3 view .LVU586
+ 681:modbus/RTUmodbus_slave.c **** 		for (i = 0; i < num; i++)
+ 1922              		.loc 1 681 25 is_stmt 0 discriminator 3 view .LVU587
+ 1923 00ba 0133     		adds	r3, r3, #1
+ 1924              	.LVL197:
+ 681:modbus/RTUmodbus_slave.c **** 		for (i = 0; i < num; i++)
+ 1925              		.loc 1 681 25 discriminator 3 view .LVU588
+ 1926 00bc 9BB2     		uxth	r3, r3
+ 1927              	.LVL198:
+ 1928              	.L138:
+ 681:modbus/RTUmodbus_slave.c **** 		for (i = 0; i < num; i++)
+ 1929              		.loc 1 681 15 is_stmt 1 discriminator 1 view .LVU589
+ 681:modbus/RTUmodbus_slave.c **** 		for (i = 0; i < num; i++)
+ 1930              		.loc 1 681 3 is_stmt 0 discriminator 1 view .LVU590
+ 1931 00be 9D42     		cmp	r5, r3
+ 1932 00c0 E2D8     		bhi	.L139
+ 686:modbus/RTUmodbus_slave.c **** 		MODS_SendWithCRC(g_tModS.TxBuf, g_tModS.TxCount); /* 发送正确应答 */
+ 1933              		.loc 1 686 3 is_stmt 1 view .LVU591
+ 1934 00c2 0548     		ldr	r0, .L145
+ 1935 00c4 90F8A210 		ldrb	r1, [r0, #162]	@ zero_extendqisi2
+ 1936 00c8 2230     		adds	r0, r0, #34
+ 1937 00ca FFF7FEFF 		bl	MODS_SendWithCRC
+ 1938              	.LVL199:
+ 1939              	.L131:
+ 692:modbus/RTUmodbus_slave.c **** }
+ 1940              		.loc 1 692 1 is_stmt 0 view .LVU592
+ 1941 00ce 10B0     		add	sp, sp, #64
+ 1942              	.LCFI29:
+ 1943              		.cfi_remember_state
+ 1944              		.cfi_def_cfa_offset 16
+ 1945              		@ sp needed
+ 1946 00d0 70BD     		pop	{r4, r5, r6, pc}
+ 1947              	.LVL200:
+ 1948              	.L137:
+ 1949              	.LCFI30:
+ 1950              		.cfi_restore_state
+ 690:modbus/RTUmodbus_slave.c **** 		MODS_SendAckErr(g_tModS.RspCode); /* 发送错误应答 */
+ 1951              		.loc 1 690 3 is_stmt 1 view .LVU593
+ 1952 00d2 FFF7FEFF 		bl	MODS_SendAckErr
+ 1953              	.LVL201:
+ 692:modbus/RTUmodbus_slave.c **** }
+ 1954              		.loc 1 692 1 is_stmt 0 view .LVU594
+ 1955 00d6 FAE7     		b	.L131
+ 1956              	.L146:
+ 1957              		.align	2
+ 1958              	.L145:
+ 1959 00d8 00000000 		.word	g_tModS
+ 1960 00dc 02000000 		.word	g_tModS+2
+ 1961              		.cfi_endproc
+ 1962              	.LFE14:
+ 1964              		.section	.text.MODS_AnalyzeApp,"ax",%progbits
+ARM GAS  /tmp/ccrEi7aK.s 			page 63
+
+
+ 1965              		.align	1
+ 1966              		.syntax unified
+ 1967              		.thumb
+ 1968              		.thumb_func
+ 1969              		.fpu softvfp
+ 1971              	MODS_AnalyzeApp:
+ 1972              	.LFB9:
+ 217:modbus/RTUmodbus_slave.c **** {
+ 1973              		.loc 1 217 1 is_stmt 1 view -0
+ 1974              		.cfi_startproc
+ 1975              		@ args = 0, pretend = 0, frame = 0
+ 1976              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1977 0000 08B5     		push	{r3, lr}
+ 1978              	.LCFI31:
+ 1979              		.cfi_def_cfa_offset 8
+ 1980              		.cfi_offset 3, -8
+ 1981              		.cfi_offset 14, -4
+ 218:modbus/RTUmodbus_slave.c **** 	switch (g_tModS.RxBuf[1]) /* 第2个字节 功能码 */
+ 1982              		.loc 1 218 2 view .LVU596
+ 218:modbus/RTUmodbus_slave.c **** 	switch (g_tModS.RxBuf[1]) /* 第2个字节 功能码 */
+ 1983              		.loc 1 218 23 is_stmt 0 view .LVU597
+ 1984 0002 154B     		ldr	r3, .L159
+ 1985 0004 5B78     		ldrb	r3, [r3, #1]	@ zero_extendqisi2
+ 1986 0006 013B     		subs	r3, r3, #1
+ 1987 0008 0F2B     		cmp	r3, #15
+ 1988 000a 1ED8     		bhi	.L148
+ 1989 000c DFE803F0 		tbb	[pc, r3]
+ 1990              	.L150:
+ 1991 0010 08       		.byte	(.L156-.L150)/2
+ 1992 0011 0B       		.byte	(.L155-.L150)/2
+ 1993 0012 0E       		.byte	(.L154-.L150)/2
+ 1994 0013 11       		.byte	(.L153-.L150)/2
+ 1995 0014 14       		.byte	(.L152-.L150)/2
+ 1996 0015 17       		.byte	(.L151-.L150)/2
+ 1997 0016 1D       		.byte	(.L148-.L150)/2
+ 1998 0017 1D       		.byte	(.L148-.L150)/2
+ 1999 0018 1D       		.byte	(.L148-.L150)/2
+ 2000 0019 1D       		.byte	(.L148-.L150)/2
+ 2001 001a 1D       		.byte	(.L148-.L150)/2
+ 2002 001b 1D       		.byte	(.L148-.L150)/2
+ 2003 001c 1D       		.byte	(.L148-.L150)/2
+ 2004 001d 1D       		.byte	(.L148-.L150)/2
+ 2005 001e 1D       		.byte	(.L148-.L150)/2
+ 2006 001f 1A       		.byte	(.L149-.L150)/2
+ 2007              		.p2align 1
+ 2008              	.L156:
+ 221:modbus/RTUmodbus_slave.c **** 		MODS_01H();
+ 2009              		.loc 1 221 3 is_stmt 1 view .LVU598
+ 2010 0020 FFF7FEFF 		bl	MODS_01H
+ 2011              	.LVL202:
+ 223:modbus/RTUmodbus_slave.c **** 		break;
+ 2012              		.loc 1 223 3 view .LVU599
+ 2013              	.L147:
+ 260:modbus/RTUmodbus_slave.c **** }
+ 2014              		.loc 1 260 1 is_stmt 0 view .LVU600
+ 2015 0024 08BD     		pop	{r3, pc}
+ 2016              	.L155:
+ARM GAS  /tmp/ccrEi7aK.s 			page 64
+
+
+ 226:modbus/RTUmodbus_slave.c **** 		MODS_02H();
+ 2017              		.loc 1 226 3 is_stmt 1 view .LVU601
+ 2018 0026 FFF7FEFF 		bl	MODS_02H
+ 2019              	.LVL203:
+ 228:modbus/RTUmodbus_slave.c **** 		break;
+ 2020              		.loc 1 228 3 view .LVU602
+ 2021 002a FBE7     		b	.L147
+ 2022              	.L154:
+ 231:modbus/RTUmodbus_slave.c **** 		MODS_03H();
+ 2023              		.loc 1 231 3 view .LVU603
+ 2024 002c FFF7FEFF 		bl	MODS_03H
+ 2025              	.LVL204:
+ 233:modbus/RTUmodbus_slave.c **** 		break;
+ 2026              		.loc 1 233 3 view .LVU604
+ 2027 0030 F8E7     		b	.L147
+ 2028              	.L153:
+ 236:modbus/RTUmodbus_slave.c **** 		MODS_04H();
+ 2029              		.loc 1 236 3 view .LVU605
+ 2030 0032 FFF7FEFF 		bl	MODS_04H
+ 2031              	.LVL205:
+ 238:modbus/RTUmodbus_slave.c **** 		break;
+ 2032              		.loc 1 238 3 view .LVU606
+ 2033 0036 F5E7     		b	.L147
+ 2034              	.L152:
+ 241:modbus/RTUmodbus_slave.c **** 		MODS_05H();
+ 2035              		.loc 1 241 3 view .LVU607
+ 2036 0038 FFF7FEFF 		bl	MODS_05H
+ 2037              	.LVL206:
+ 243:modbus/RTUmodbus_slave.c **** 		break;
+ 2038              		.loc 1 243 3 view .LVU608
+ 2039 003c F2E7     		b	.L147
+ 2040              	.L151:
+ 246:modbus/RTUmodbus_slave.c **** 		MODS_06H();
+ 2041              		.loc 1 246 3 view .LVU609
+ 2042 003e FFF7FEFF 		bl	MODS_06H
+ 2043              	.LVL207:
+ 248:modbus/RTUmodbus_slave.c **** 		break;
+ 2044              		.loc 1 248 3 view .LVU610
+ 2045 0042 EFE7     		b	.L147
+ 2046              	.L149:
+ 251:modbus/RTUmodbus_slave.c **** 		MODS_10H();
+ 2047              		.loc 1 251 3 view .LVU611
+ 2048 0044 FFF7FEFF 		bl	MODS_10H
+ 2049              	.LVL208:
+ 253:modbus/RTUmodbus_slave.c **** 		break;
+ 2050              		.loc 1 253 3 view .LVU612
+ 2051 0048 ECE7     		b	.L147
+ 2052              	.L148:
+ 256:modbus/RTUmodbus_slave.c **** 		g_tModS.RspCode = RSP_ERR_CMD;
+ 2053              		.loc 1 256 3 view .LVU613
+ 256:modbus/RTUmodbus_slave.c **** 		g_tModS.RspCode = RSP_ERR_CMD;
+ 2054              		.loc 1 256 19 is_stmt 0 view .LVU614
+ 2055 004a 0120     		movs	r0, #1
+ 2056 004c 024B     		ldr	r3, .L159
+ 2057 004e 83F82100 		strb	r0, [r3, #33]
+ 257:modbus/RTUmodbus_slave.c **** 		MODS_SendAckErr(g_tModS.RspCode); /* 告诉主机命令错误 */
+ 2058              		.loc 1 257 3 is_stmt 1 view .LVU615
+ARM GAS  /tmp/ccrEi7aK.s 			page 65
+
+
+ 2059 0052 FFF7FEFF 		bl	MODS_SendAckErr
+ 2060              	.LVL209:
+ 258:modbus/RTUmodbus_slave.c **** 		break;
+ 2061              		.loc 1 258 3 view .LVU616
+ 260:modbus/RTUmodbus_slave.c **** }
+ 2062              		.loc 1 260 1 is_stmt 0 view .LVU617
+ 2063 0056 E5E7     		b	.L147
+ 2064              	.L160:
+ 2065              		.align	2
+ 2066              	.L159:
+ 2067 0058 00000000 		.word	g_tModS
+ 2068              		.cfi_endproc
+ 2069              	.LFE9:
+ 2071              		.section	.text.MODS_Poll,"ax",%progbits
+ 2072              		.align	1
+ 2073              		.global	MODS_Poll
+ 2074              		.syntax unified
+ 2075              		.thumb
+ 2076              		.thumb_func
+ 2077              		.fpu softvfp
+ 2079              	MODS_Poll:
+ 2080              	.LFB3:
+  42:modbus/RTUmodbus_slave.c **** {
+ 2081              		.loc 1 42 1 is_stmt 1 view -0
+ 2082              		.cfi_startproc
+ 2083              		@ args = 0, pretend = 0, frame = 0
+ 2084              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2085 0000 08B5     		push	{r3, lr}
+ 2086              	.LCFI32:
+ 2087              		.cfi_def_cfa_offset 8
+ 2088              		.cfi_offset 3, -8
+ 2089              		.cfi_offset 14, -4
+  43:modbus/RTUmodbus_slave.c **** 	uint16_t addr;
+ 2090              		.loc 1 43 2 view .LVU619
+  44:modbus/RTUmodbus_slave.c **** 	uint16_t crc1;
+ 2091              		.loc 1 44 2 view .LVU620
+  47:modbus/RTUmodbus_slave.c **** 	if (g_mods_timeout == 0)
+ 2092              		.loc 1 47 2 view .LVU621
+  47:modbus/RTUmodbus_slave.c **** 	if (g_mods_timeout == 0)
+ 2093              		.loc 1 47 21 is_stmt 0 view .LVU622
+ 2094 0002 0D4B     		ldr	r3, .L166
+ 2095 0004 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+  47:modbus/RTUmodbus_slave.c **** 	if (g_mods_timeout == 0)
+ 2096              		.loc 1 47 5 view .LVU623
+ 2097 0006 4BB1     		cbz	r3, .L161
+  52:modbus/RTUmodbus_slave.c **** 	g_mods_timeout = 0; /* 清标志 */
+ 2098              		.loc 1 52 2 is_stmt 1 view .LVU624
+  52:modbus/RTUmodbus_slave.c **** 	g_mods_timeout = 0; /* 清标志 */
+ 2099              		.loc 1 52 17 is_stmt 0 view .LVU625
+ 2100 0008 0B4B     		ldr	r3, .L166
+ 2101 000a 0022     		movs	r2, #0
+ 2102 000c 1A70     		strb	r2, [r3]
+  54:modbus/RTUmodbus_slave.c **** 	if (g_tModS.RxCount < 4) /* 接收到的数据小于4个字节就认为错误 */
+ 2103              		.loc 1 54 2 is_stmt 1 view .LVU626
+  54:modbus/RTUmodbus_slave.c **** 	if (g_tModS.RxCount < 4) /* 接收到的数据小于4个字节就认为错误 */
+ 2104              		.loc 1 54 13 is_stmt 0 view .LVU627
+ 2105 000e 0B4B     		ldr	r3, .L166+4
+ARM GAS  /tmp/ccrEi7aK.s 			page 66
+
+
+ 2106 0010 997F     		ldrb	r1, [r3, #30]	@ zero_extendqisi2
+  54:modbus/RTUmodbus_slave.c **** 	if (g_tModS.RxCount < 4) /* 接收到的数据小于4个字节就认为错误 */
+ 2107              		.loc 1 54 5 view .LVU628
+ 2108 0012 0329     		cmp	r1, #3
+ 2109 0014 03D8     		bhi	.L165
+ 2110              	.L163:
+  77:modbus/RTUmodbus_slave.c **** 	g_tModS.RxCount = 0; /* 必须清零计数器，方便下次帧同步 */
+ 2111              		.loc 1 77 2 is_stmt 1 view .LVU629
+  77:modbus/RTUmodbus_slave.c **** 	g_tModS.RxCount = 0; /* 必须清零计数器，方便下次帧同步 */
+ 2112              		.loc 1 77 18 is_stmt 0 view .LVU630
+ 2113 0016 094B     		ldr	r3, .L166+4
+ 2114 0018 0022     		movs	r2, #0
+ 2115 001a 9A77     		strb	r2, [r3, #30]
+ 2116              	.L161:
+  78:modbus/RTUmodbus_slave.c **** }
+ 2117              		.loc 1 78 1 view .LVU631
+ 2118 001c 08BD     		pop	{r3, pc}
+ 2119              	.L165:
+  60:modbus/RTUmodbus_slave.c **** 	crc1 = CRC16_Modbus(g_tModS.RxBuf, g_tModS.RxCount);
+ 2120              		.loc 1 60 2 is_stmt 1 view .LVU632
+  60:modbus/RTUmodbus_slave.c **** 	crc1 = CRC16_Modbus(g_tModS.RxBuf, g_tModS.RxCount);
+ 2121              		.loc 1 60 9 is_stmt 0 view .LVU633
+ 2122 001e 1846     		mov	r0, r3
+ 2123 0020 FFF7FEFF 		bl	CRC16_Modbus
+ 2124              	.LVL210:
+  61:modbus/RTUmodbus_slave.c **** 	if (crc1 != 0)
+ 2125              		.loc 1 61 2 is_stmt 1 view .LVU634
+  61:modbus/RTUmodbus_slave.c **** 	if (crc1 != 0)
+ 2126              		.loc 1 61 5 is_stmt 0 view .LVU635
+ 2127 0024 0028     		cmp	r0, #0
+ 2128 0026 F6D1     		bne	.L163
+  67:modbus/RTUmodbus_slave.c **** 	addr = g_tModS.RxBuf[0]; /* 第1字节 站号 */
+ 2129              		.loc 1 67 2 is_stmt 1 view .LVU636
+  67:modbus/RTUmodbus_slave.c **** 	addr = g_tModS.RxBuf[0]; /* 第1字节 站号 */
+ 2130              		.loc 1 67 22 is_stmt 0 view .LVU637
+ 2131 0028 044B     		ldr	r3, .L166+4
+ 2132 002a 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 2133              	.LVL211:
+  68:modbus/RTUmodbus_slave.c **** 	if (addr != 0x01)		 /* 判断主机发送的命令地址是否符合 */
+ 2134              		.loc 1 68 2 is_stmt 1 view .LVU638
+  68:modbus/RTUmodbus_slave.c **** 	if (addr != 0x01)		 /* 判断主机发送的命令地址是否符合 */
+ 2135              		.loc 1 68 5 is_stmt 0 view .LVU639
+ 2136 002c 012B     		cmp	r3, #1
+ 2137 002e F2D1     		bne	.L163
+  73:modbus/RTUmodbus_slave.c **** 	MODS_AnalyzeApp();
+ 2138              		.loc 1 73 2 is_stmt 1 view .LVU640
+ 2139 0030 FFF7FEFF 		bl	MODS_AnalyzeApp
+ 2140              	.LVL212:
+  73:modbus/RTUmodbus_slave.c **** 	MODS_AnalyzeApp();
+ 2141              		.loc 1 73 2 is_stmt 0 view .LVU641
+ 2142 0034 EFE7     		b	.L163
+ 2143              	.L167:
+ 2144 0036 00BF     		.align	2
+ 2145              	.L166:
+ 2146 0038 00000000 		.word	.LANCHOR0
+ 2147 003c 00000000 		.word	g_tModS
+ 2148              		.cfi_endproc
+ARM GAS  /tmp/ccrEi7aK.s 			page 67
+
+
+ 2149              	.LFE3:
+ 2151              		.comm	g_tModS,163,4
+ 2152              		.section	.bss.g_mods_timeout,"aw",%nobits
+ 2153              		.set	.LANCHOR0,. + 0
+ 2156              	g_mods_timeout:
+ 2157 0000 00       		.space	1
+ 2158              		.text
+ 2159              	.Letext0:
+ 2160              		.file 2 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/machine/_default_types.h"
+ 2161              		.file 3 "/opt/gcc-arm-none-eabi-9-2020-q2-update/lib/gcc/arm-none-eabi/9.3.1/include/stddef.h"
+ 2162              		.file 4 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/_types.h"
+ 2163              		.file 5 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/reent.h"
+ 2164              		.file 6 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/lock.h"
+ 2165              		.file 7 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/_stdint.h"
+ 2166              		.file 8 "modbus/RTUmodbus_slave.h"
+ 2167              		.file 9 "sensor_device/data_collect.h"
+ 2168              		.file 10 "modbus/RTUmodbus_CRC.h"
+ 2169              		.file 11 "<built-in>"
+ARM GAS  /tmp/ccrEi7aK.s 			page 68
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 RTUmodbus_slave.c
+     /tmp/ccrEi7aK.s:16     .text.MODS_WriteRegValue:0000000000000000 $t
+     /tmp/ccrEi7aK.s:23     .text.MODS_WriteRegValue:0000000000000000 MODS_WriteRegValue
+     /tmp/ccrEi7aK.s:60     .text.MODS_SendWithCRC:0000000000000000 $t
+     /tmp/ccrEi7aK.s:66     .text.MODS_SendWithCRC:0000000000000000 MODS_SendWithCRC
+     /tmp/ccrEi7aK.s:140    .text.MODS_SendAckOk:0000000000000000 $t
+     /tmp/ccrEi7aK.s:146    .text.MODS_SendAckOk:0000000000000000 MODS_SendAckOk
+     /tmp/ccrEi7aK.s:203    .text.MODS_SendAckOk:000000000000002c $d
+                            *COM*:00000000000000a3 g_tModS
+     /tmp/ccrEi7aK.s:208    .text.MODS_SendAckErr:0000000000000000 $t
+     /tmp/ccrEi7aK.s:214    .text.MODS_SendAckErr:0000000000000000 MODS_SendAckErr
+     /tmp/ccrEi7aK.s:261    .text.MODS_SendAckErr:0000000000000028 $d
+     /tmp/ccrEi7aK.s:266    .text.MODS_05H:0000000000000000 $t
+     /tmp/ccrEi7aK.s:272    .text.MODS_05H:0000000000000000 MODS_05H
+     /tmp/ccrEi7aK.s:377    .text.MODS_05H:0000000000000070 $d
+     /tmp/ccrEi7aK.s:383    .text.MODS_06H:0000000000000000 $t
+     /tmp/ccrEi7aK.s:389    .text.MODS_06H:0000000000000000 MODS_06H
+     /tmp/ccrEi7aK.s:474    .text.MODS_06H:0000000000000054 $d
+     /tmp/ccrEi7aK.s:480    .text.MODS_10H:0000000000000000 $t
+     /tmp/ccrEi7aK.s:486    .text.MODS_10H:0000000000000000 MODS_10H
+     /tmp/ccrEi7aK.s:615    .text.MODS_10H:0000000000000070 $d
+     /tmp/ccrEi7aK.s:621    .text.MODS_01H:0000000000000000 $t
+     /tmp/ccrEi7aK.s:627    .text.MODS_01H:0000000000000000 MODS_01H
+     /tmp/ccrEi7aK.s:845    .text.MODS_01H:00000000000000d4 $d
+     /tmp/ccrEi7aK.s:851    .text.MODS_02H:0000000000000000 $t
+     /tmp/ccrEi7aK.s:857    .text.MODS_02H:0000000000000000 MODS_02H
+     /tmp/ccrEi7aK.s:1075   .text.MODS_02H:00000000000000d4 $d
+     /tmp/ccrEi7aK.s:1081   .text.MODS_04H:0000000000000000 $t
+     /tmp/ccrEi7aK.s:1087   .text.MODS_04H:0000000000000000 MODS_04H
+     /tmp/ccrEi7aK.s:1297   .text.MODS_04H:00000000000000e4 $d
+     /tmp/ccrEi7aK.s:1303   .text.MODS_ReciveNew_no_timer:0000000000000000 $t
+     /tmp/ccrEi7aK.s:1310   .text.MODS_ReciveNew_no_timer:0000000000000000 MODS_ReciveNew_no_timer
+     /tmp/ccrEi7aK.s:1343   .text.MODS_ReciveNew_no_timer:0000000000000018 $d
+     /tmp/ccrEi7aK.s:1349   .text.MODS_RxTimeOut:0000000000000000 $t
+     /tmp/ccrEi7aK.s:1356   .text.MODS_RxTimeOut:0000000000000000 MODS_RxTimeOut
+     /tmp/ccrEi7aK.s:1373   .text.MODS_RxTimeOut:0000000000000008 $d
+     /tmp/ccrEi7aK.s:1378   .text.convert_float_to_uint32:0000000000000000 $t
+     /tmp/ccrEi7aK.s:1385   .text.convert_float_to_uint32:0000000000000000 convert_float_to_uint32
+     /tmp/ccrEi7aK.s:1402   .text.MODS_ReadRegValue:0000000000000000 $t
+     /tmp/ccrEi7aK.s:1408   .text.MODS_ReadRegValue:0000000000000000 MODS_ReadRegValue
+     /tmp/ccrEi7aK.s:1438   .text.MODS_ReadRegValue:0000000000000014 $d
+     /tmp/ccrEi7aK.s:1740   .text.MODS_03H:0000000000000000 $t
+     /tmp/ccrEi7aK.s:1746   .text.MODS_03H:0000000000000000 MODS_03H
+     /tmp/ccrEi7aK.s:1959   .text.MODS_03H:00000000000000d8 $d
+     /tmp/ccrEi7aK.s:1965   .text.MODS_AnalyzeApp:0000000000000000 $t
+     /tmp/ccrEi7aK.s:1971   .text.MODS_AnalyzeApp:0000000000000000 MODS_AnalyzeApp
+     /tmp/ccrEi7aK.s:1991   .text.MODS_AnalyzeApp:0000000000000010 $d
+     /tmp/ccrEi7aK.s:2007   .text.MODS_AnalyzeApp:0000000000000020 $t
+     /tmp/ccrEi7aK.s:2067   .text.MODS_AnalyzeApp:0000000000000058 $d
+     /tmp/ccrEi7aK.s:2072   .text.MODS_Poll:0000000000000000 $t
+     /tmp/ccrEi7aK.s:2079   .text.MODS_Poll:0000000000000000 MODS_Poll
+     /tmp/ccrEi7aK.s:2146   .text.MODS_Poll:0000000000000038 $d
+     /tmp/ccrEi7aK.s:2156   .bss.g_mods_timeout:0000000000000000 g_mods_timeout
+     /tmp/ccrEi7aK.s:2157   .bss.g_mods_timeout:0000000000000000 $d
+     /tmp/ccrEi7aK.s:1449   .text.MODS_ReadRegValue:000000000000001f $d
+     /tmp/ccrEi7aK.s:1449   .text.MODS_ReadRegValue:0000000000000020 $t
+ARM GAS  /tmp/ccrEi7aK.s 			page 69
+
+
+
+UNDEFINED SYMBOLS
+memcpy
+CRC16_Modbus
+self_uart_send
+BEBufToUint16
+get_local_dht22_data
+get_local_adxl_345_data
