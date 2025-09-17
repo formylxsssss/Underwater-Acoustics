@@ -20,7 +20,7 @@ static uint8_t bit_cnt;
 void DiffSignal_RX_Init(void)
 {
     // 1) DWT 初始化
-    DWT_Delay_Init();
+
 
     // 2) PA1 EXTI 下降沿触发（起始位）
     __HAL_RCC_GPIOA_CLK_ENABLE();

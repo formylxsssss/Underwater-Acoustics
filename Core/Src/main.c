@@ -31,9 +31,12 @@
 #include "diff_signal.h"
 #include "SEGGER_RTT.h"
 #include "Custcom_Pin.h"
+#include "battery_adc.h"
+#include "uart3_drv.h"
 #include "eeprom.h"
 #include "soft_timer.h"
 #include "data_collect.h"
+#include "stm32f1xx_hal_tim.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -100,13 +103,15 @@ int main(void)
 
   /* Initialize all configured peripherals */
   __HAL_AFIO_REMAP_SWJ_NOJTAG();
+  __HAL_AFIO_REMAP_TIM1_PARTIAL();
   MX_GPIO_Init();
   MX_SPI2_Init();
   MX_TIM1_Init();
-  MX_TIM3_Init();
-  MX_TIM6_Init();         // CubeMX 生成的 TIM6 初始化
+  MX_TIM6_Init(); // CubeMX 生成的 TIM6 初始化
   MX_TIM8_Init();
   ADXL345_Init();
+  BatteryADC_Init();
+  USART3_Driver_Init(UART_BAUD_RARE);
   DiffSignal_Init();
   SoftTimer_Init();
   HAL_TIM_Base_Start_IT(&htim6);
@@ -119,16 +124,10 @@ int main(void)
   SoftTimer_StartPeriodic(2000, dht22_data_read_callback);
   SoftTimer_StartPeriodic(2000, ADXL345_data_read_call_back);
   /* USER CODE BEGIN 2 */
-
-  /* USER CODE END 2 */
-
-  /* Infinite loop */
-
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-
-    HAL_Delay(3000);
+  
     /* USER CODE END WHILE */
     /* USER CODE BEGIN 3 */
   }
@@ -137,20 +136,19 @@ int main(void)
 
 void dht22_data_read_callback(void)
 {
-  float temp,hum = 0;
+  float temp, hum = 0;
   DHT22_ReadData(&temp, &hum);
-  myprintf("temper is %f hum is %f\n",temp,hum);
-  set_local_dht22_data(temp,hum);
+  myprintf("temper is %f hum is %f\n", temp, hum);
+  set_local_dht22_data(temp, hum);
 }
 
 void ADXL345_data_read_call_back(void)
 {
-  float x_data,y_data,z_data;
-  ADXL345_ReadXYZ(&x_data,&y_data,&z_data);
-  myprintf("xdata is %f,ydata is %f,zdata is %f\n",x_data,y_data,z_data);
-  set_local_adxl_345_data(x_data,y_data,z_data);
+  float x_data, y_data, z_data;
+  ADXL345_ReadXYZ(&x_data, &y_data, &z_data);
+  myprintf("xdata is %f,ydata is %f,zdata is %f\n", x_data, y_data, z_data);
+  set_local_adxl_345_data(x_data, y_data, z_data);
 }
-
 
 /**
  * @brief System Clock Configuration

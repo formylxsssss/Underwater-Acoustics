@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccDaFLu3.s 			page 1
+ARM GAS  /tmp/ccrEkm4C.s 			page 1
 
 
    1              		.cpu cortex-m3
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccDaFLu3.s 			page 1
   30:Core/Src/spi.c **** void MX_SPI2_Init(void)
   31:Core/Src/spi.c **** {
   27              		.loc 1 31 1 view -0
-ARM GAS  /tmp/ccDaFLu3.s 			page 2
+ARM GAS  /tmp/ccrEkm4C.s 			page 2
 
 
   28              		.cfi_startproc
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccDaFLu3.s 			page 1
   71              		.loc 1 42 3 is_stmt 1 view .LVU19
   72              		.loc 1 42 21 is_stmt 0 view .LVU20
   73 0028 4362     		str	r3, [r0, #36]
-ARM GAS  /tmp/ccDaFLu3.s 			page 3
+ARM GAS  /tmp/ccrEkm4C.s 			page 3
 
 
   43:Core/Src/spi.c ****   hspi2.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccDaFLu3.s 			page 1
  118              		@ frame_needed = 0, uses_anonymous_args = 0
  119              		.loc 1 53 1 is_stmt 0 view .LVU32
  120 0000 10B5     		push	{r4, lr}
-ARM GAS  /tmp/ccDaFLu3.s 			page 4
+ARM GAS  /tmp/ccrEkm4C.s 			page 4
 
 
  121              	.LCFI1:
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccDaFLu3.s 			page 1
  144              		.loc 1 84 1 view .LVU38
  145 0016 06B0     		add	sp, sp, #24
  146              	.LCFI3:
-ARM GAS  /tmp/ccDaFLu3.s 			page 5
+ARM GAS  /tmp/ccrEkm4C.s 			page 5
 
 
  147              		.cfi_remember_state
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccDaFLu3.s 			page 1
  187              		.loc 1 70 25 is_stmt 0 view .LVU52
  188 0042 4FF42043 		mov	r3, #40960
  189 0046 0293     		str	r3, [sp, #8]
-ARM GAS  /tmp/ccDaFLu3.s 			page 6
+ARM GAS  /tmp/ccrEkm4C.s 			page 6
 
 
   71:Core/Src/spi.c ****     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccDaFLu3.s 			page 1
  232              		.section	.text.HAL_SPI_MspDeInit,"ax",%progbits
  233              		.align	1
  234              		.global	HAL_SPI_MspDeInit
-ARM GAS  /tmp/ccDaFLu3.s 			page 7
+ARM GAS  /tmp/ccrEkm4C.s 			page 7
 
 
  235              		.syntax unified
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccDaFLu3.s 			page 1
   95:Core/Src/spi.c **** 
  266              		.loc 1 95 5 is_stmt 1 view .LVU73
  267 000c 064A     		ldr	r2, .L17+4
-ARM GAS  /tmp/ccDaFLu3.s 			page 8
+ARM GAS  /tmp/ccrEkm4C.s 			page 8
 
 
  268 000e D369     		ldr	r3, [r2, #28]
@@ -458,21 +458,21 @@ ARM GAS  /tmp/ccDaFLu3.s 			page 1
  301              		.file 11 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h"
  302              		.file 12 "Core/Inc/spi.h"
  303              		.file 13 "Core/Inc/main.h"
-ARM GAS  /tmp/ccDaFLu3.s 			page 9
+ARM GAS  /tmp/ccrEkm4C.s 			page 9
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 spi.c
-     /tmp/ccDaFLu3.s:16     .text.MX_SPI2_Init:0000000000000000 $t
-     /tmp/ccDaFLu3.s:24     .text.MX_SPI2_Init:0000000000000000 MX_SPI2_Init
-     /tmp/ccDaFLu3.s:99     .text.MX_SPI2_Init:0000000000000040 $d
+     /tmp/ccrEkm4C.s:16     .text.MX_SPI2_Init:0000000000000000 $t
+     /tmp/ccrEkm4C.s:24     .text.MX_SPI2_Init:0000000000000000 MX_SPI2_Init
+     /tmp/ccrEkm4C.s:99     .text.MX_SPI2_Init:0000000000000040 $d
                             *COM*:0000000000000058 hspi2
-     /tmp/ccDaFLu3.s:105    .text.HAL_SPI_MspInit:0000000000000000 $t
-     /tmp/ccDaFLu3.s:112    .text.HAL_SPI_MspInit:0000000000000000 HAL_SPI_MspInit
-     /tmp/ccDaFLu3.s:227    .text.HAL_SPI_MspInit:0000000000000070 $d
-     /tmp/ccDaFLu3.s:233    .text.HAL_SPI_MspDeInit:0000000000000000 $t
-     /tmp/ccDaFLu3.s:240    .text.HAL_SPI_MspDeInit:0000000000000000 HAL_SPI_MspDeInit
-     /tmp/ccDaFLu3.s:283    .text.HAL_SPI_MspDeInit:0000000000000024 $d
+     /tmp/ccrEkm4C.s:105    .text.HAL_SPI_MspInit:0000000000000000 $t
+     /tmp/ccrEkm4C.s:112    .text.HAL_SPI_MspInit:0000000000000000 HAL_SPI_MspInit
+     /tmp/ccrEkm4C.s:227    .text.HAL_SPI_MspInit:0000000000000070 $d
+     /tmp/ccrEkm4C.s:233    .text.HAL_SPI_MspDeInit:0000000000000000 $t
+     /tmp/ccrEkm4C.s:240    .text.HAL_SPI_MspDeInit:0000000000000000 HAL_SPI_MspDeInit
+     /tmp/ccrEkm4C.s:283    .text.HAL_SPI_MspDeInit:0000000000000024 $d
 
 UNDEFINED SYMBOLS
 HAL_SPI_Init

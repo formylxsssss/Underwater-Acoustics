@@ -1,4 +1,4 @@
-ARM GAS  /tmp/cceXbPp1.s 			page 1
+ARM GAS  /tmp/cc6Hbd9V.s 			page 1
 
 
    1              		.cpu cortex-m3
@@ -32,38 +32,39 @@ ARM GAS  /tmp/cceXbPp1.s 			page 1
    4:diff_signal/diff_signal.c **** #include "diff_signal.h"
    5:diff_signal/diff_signal.c **** #include "diff_signal_rx.h"
    6:diff_signal/diff_signal.c **** #include "SEGGER_RTT.h"
-   7:diff_signal/diff_signal.c **** // 初始化 DWT 微秒延迟功能
-   8:diff_signal/diff_signal.c **** void DWT_Delay_Init(void)
-   9:diff_signal/diff_signal.c **** {
-  27              		.loc 1 9 1 view -0
+   7:diff_signal/diff_signal.c **** 
+   8:diff_signal/diff_signal.c **** // 初始化 DWT 微秒延迟功能
+   9:diff_signal/diff_signal.c **** void DWT_Delay_Init(void)
+  10:diff_signal/diff_signal.c **** {
+  27              		.loc 1 10 1 view -0
   28              		.cfi_startproc
   29              		@ args = 0, pretend = 0, frame = 0
   30              		@ frame_needed = 0, uses_anonymous_args = 0
   31              		@ link register save eliminated.
-  10:diff_signal/diff_signal.c ****     CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
-  32              		.loc 1 10 5 view .LVU1
-  33              		.loc 1 10 22 is_stmt 0 view .LVU2
+  11:diff_signal/diff_signal.c ****     CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+  32              		.loc 1 11 5 view .LVU1
+  33              		.loc 1 11 22 is_stmt 0 view .LVU2
   34 0000 064A     		ldr	r2, .L2
   35 0002 D368     		ldr	r3, [r2, #12]
   36 0004 43F08073 		orr	r3, r3, #16777216
   37 0008 D360     		str	r3, [r2, #12]
-  11:diff_signal/diff_signal.c ****     DWT->CYCCNT = 0;
-  38              		.loc 1 11 5 is_stmt 1 view .LVU3
-  39              		.loc 1 11 17 is_stmt 0 view .LVU4
+  12:diff_signal/diff_signal.c ****     DWT->CYCCNT = 0;
+  38              		.loc 1 12 5 is_stmt 1 view .LVU3
+  39              		.loc 1 12 17 is_stmt 0 view .LVU4
   40 000a 054B     		ldr	r3, .L2+4
   41 000c 0022     		movs	r2, #0
   42 000e 5A60     		str	r2, [r3, #4]
-  12:diff_signal/diff_signal.c ****     DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
-  43              		.loc 1 12 5 is_stmt 1 view .LVU5
-  44              		.loc 1 12 15 is_stmt 0 view .LVU6
+  13:diff_signal/diff_signal.c ****     DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
+  43              		.loc 1 13 5 is_stmt 1 view .LVU5
+  44              		.loc 1 13 15 is_stmt 0 view .LVU6
   45 0010 1A68     		ldr	r2, [r3]
+ARM GAS  /tmp/cc6Hbd9V.s 			page 2
+
+
   46 0012 42F00102 		orr	r2, r2, #1
-ARM GAS  /tmp/cceXbPp1.s 			page 2
-
-
   47 0016 1A60     		str	r2, [r3]
-  13:diff_signal/diff_signal.c **** }
-  48              		.loc 1 13 1 view .LVU7
+  14:diff_signal/diff_signal.c **** }
+  48              		.loc 1 14 1 view .LVU7
   49 0018 7047     		bx	lr
   50              	.L3:
   51 001a 00BF     		.align	2
@@ -82,58 +83,58 @@ ARM GAS  /tmp/cceXbPp1.s 			page 1
   66              	DWT_Delay_us:
   67              	.LVL0:
   68              	.LFB66:
-  14:diff_signal/diff_signal.c **** /**
-  15:diff_signal/diff_signal.c ****  * @brief 使用dwt进行us级延时，已经验证过，没有问题；
-  16:diff_signal/diff_signal.c ****  * 
-  17:diff_signal/diff_signal.c ****  * @param us 
-  18:diff_signal/diff_signal.c ****  */
-  19:diff_signal/diff_signal.c **** void DWT_Delay_us(uint32_t us)
-  20:diff_signal/diff_signal.c **** {
-  69              		.loc 1 20 1 is_stmt 1 view -0
+  15:diff_signal/diff_signal.c **** /**
+  16:diff_signal/diff_signal.c ****  * @brief 使用dwt进行us级延时，已经验证过，没有问题；
+  17:diff_signal/diff_signal.c ****  *
+  18:diff_signal/diff_signal.c ****  * @param us
+  19:diff_signal/diff_signal.c ****  */
+  20:diff_signal/diff_signal.c **** void DWT_Delay_us(uint32_t us)
+  21:diff_signal/diff_signal.c **** {
+  69              		.loc 1 21 1 is_stmt 1 view -0
   70              		.cfi_startproc
   71              		@ args = 0, pretend = 0, frame = 0
   72              		@ frame_needed = 0, uses_anonymous_args = 0
   73              		@ link register save eliminated.
-  21:diff_signal/diff_signal.c ****     uint32_t cycles = (SystemCoreClock / 1000000L) * us;
-  74              		.loc 1 21 5 view .LVU9
-  75              		.loc 1 21 40 is_stmt 0 view .LVU10
+  22:diff_signal/diff_signal.c ****     uint32_t cycles = (SystemCoreClock / 1000000L) * us;
+  74              		.loc 1 22 5 view .LVU9
+  75              		.loc 1 22 40 is_stmt 0 view .LVU10
   76 0000 074B     		ldr	r3, .L6
   77 0002 1B68     		ldr	r3, [r3]
   78 0004 074A     		ldr	r2, .L6+4
   79 0006 A2FB0323 		umull	r2, r3, r2, r3
   80 000a 9B0C     		lsrs	r3, r3, #18
-  81              		.loc 1 21 14 view .LVU11
+  81              		.loc 1 22 14 view .LVU11
   82 000c 00FB03F0 		mul	r0, r0, r3
   83              	.LVL1:
-  22:diff_signal/diff_signal.c ****     uint32_t start = DWT->CYCCNT;
-  84              		.loc 1 22 5 is_stmt 1 view .LVU12
-  85              		.loc 1 22 14 is_stmt 0 view .LVU13
+  23:diff_signal/diff_signal.c ****     uint32_t start = DWT->CYCCNT;
+  84              		.loc 1 23 5 is_stmt 1 view .LVU12
+  85              		.loc 1 23 14 is_stmt 0 view .LVU13
   86 0010 054B     		ldr	r3, .L6+8
   87 0012 5A68     		ldr	r2, [r3, #4]
   88              	.LVL2:
-  23:diff_signal/diff_signal.c ****     while ((DWT->CYCCNT - start) < cycles)
-  89              		.loc 1 23 5 is_stmt 1 view .LVU14
+  24:diff_signal/diff_signal.c ****     while ((DWT->CYCCNT - start) < cycles)
+  89              		.loc 1 24 5 is_stmt 1 view .LVU14
   90              	.L5:
-  24:diff_signal/diff_signal.c ****         ;
-  91              		.loc 1 24 9 discriminator 1 view .LVU15
-  23:diff_signal/diff_signal.c ****     while ((DWT->CYCCNT - start) < cycles)
-  92              		.loc 1 23 11 discriminator 1 view .LVU16
-ARM GAS  /tmp/cceXbPp1.s 			page 3
+  25:diff_signal/diff_signal.c ****         ;
+  91              		.loc 1 25 9 discriminator 1 view .LVU15
+  24:diff_signal/diff_signal.c ****     while ((DWT->CYCCNT - start) < cycles)
+ARM GAS  /tmp/cc6Hbd9V.s 			page 3
 
 
-  23:diff_signal/diff_signal.c ****     while ((DWT->CYCCNT - start) < cycles)
-  93              		.loc 1 23 16 is_stmt 0 discriminator 1 view .LVU17
+  92              		.loc 1 24 11 discriminator 1 view .LVU16
+  24:diff_signal/diff_signal.c ****     while ((DWT->CYCCNT - start) < cycles)
+  93              		.loc 1 24 16 is_stmt 0 discriminator 1 view .LVU17
   94 0014 044B     		ldr	r3, .L6+8
   95 0016 5B68     		ldr	r3, [r3, #4]
-  23:diff_signal/diff_signal.c ****     while ((DWT->CYCCNT - start) < cycles)
-  96              		.loc 1 23 25 discriminator 1 view .LVU18
+  24:diff_signal/diff_signal.c ****     while ((DWT->CYCCNT - start) < cycles)
+  96              		.loc 1 24 25 discriminator 1 view .LVU18
   97 0018 9B1A     		subs	r3, r3, r2
-  23:diff_signal/diff_signal.c ****     while ((DWT->CYCCNT - start) < cycles)
-  98              		.loc 1 23 11 discriminator 1 view .LVU19
+  24:diff_signal/diff_signal.c ****     while ((DWT->CYCCNT - start) < cycles)
+  98              		.loc 1 24 11 discriminator 1 view .LVU19
   99 001a 8342     		cmp	r3, r0
  100 001c FAD3     		bcc	.L5
-  25:diff_signal/diff_signal.c **** }
- 101              		.loc 1 25 1 view .LVU20
+  26:diff_signal/diff_signal.c **** }
+ 101              		.loc 1 26 1 view .LVU20
  102 001e 7047     		bx	lr
  103              	.L7:
  104              		.align	2
@@ -152,478 +153,427 @@ ARM GAS  /tmp/cceXbPp1.s 			page 1
  118              		.fpu softvfp
  120              	DiffSignal_Stop:
  121              	.LFB69:
-  26:diff_signal/diff_signal.c **** 
-  27:diff_signal/diff_signal.c **** void DiffSignal_Init(void)
-  28:diff_signal/diff_signal.c **** {
-  29:diff_signal/diff_signal.c ****    HAL_StatusTypeDef error =  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
-  30:diff_signal/diff_signal.c ****    if(error != HAL_OK )
-  31:diff_signal/diff_signal.c ****    {
-  32:diff_signal/diff_signal.c ****      myprintf("tim11_pwm_start_error\n");
-  33:diff_signal/diff_signal.c ****    }
-  34:diff_signal/diff_signal.c ****      error = HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
-  35:diff_signal/diff_signal.c ****     if(error != HAL_OK)
-  36:diff_signal/diff_signal.c ****     {
-  37:diff_signal/diff_signal.c ****         myprintf("tim33_pwm_start_error\n");
-  38:diff_signal/diff_signal.c ****     }
-  39:diff_signal/diff_signal.c ****      
-  40:diff_signal/diff_signal.c **** 
-  41:diff_signal/diff_signal.c ****     // 反相 PA7 对应的 TIM3_CH2
-  42:diff_signal/diff_signal.c ****     TIM3->CCER &= ~TIM_CCER_CC2P;
-  43:diff_signal/diff_signal.c ****     TIM3->CCER |= TIM_CCER_CC2P;
-  44:diff_signal/diff_signal.c **** 
+  27:diff_signal/diff_signal.c **** 
+  28:diff_signal/diff_signal.c **** void DiffSignal_Init(void)
+  29:diff_signal/diff_signal.c **** {
+  30:diff_signal/diff_signal.c ****     DiffSignal_Stop();
+  31:diff_signal/diff_signal.c ****     // 启用微秒延迟模块
+  32:diff_signal/diff_signal.c ****     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_RESET);
+  33:diff_signal/diff_signal.c ****     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, GPIO_PIN_RESET);
+  34:diff_signal/diff_signal.c ****     DWT_Delay_Init();
+  35:diff_signal/diff_signal.c **** }
+  36:diff_signal/diff_signal.c **** 
+  37:diff_signal/diff_signal.c **** void DiffSignal_Send(uint16_t duration_us)
+  38:diff_signal/diff_signal.c **** {
+  39:diff_signal/diff_signal.c ****     uint32_t arr1   = __HAL_TIM_GET_AUTORELOAD(&htim1);
+  40:diff_signal/diff_signal.c ****     uint32_t pulse1 = (arr1 + 1) / 2;                 // 50% 占空比
+  41:diff_signal/diff_signal.c **** 
+  42:diff_signal/diff_signal.c ****     __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, pulse1); // CH1 与 CH1N 同时受 CCR1 控制
+  43:diff_signal/diff_signal.c **** 
+  44:diff_signal/diff_signal.c ****     DWT_Delay_us(duration_us);
   45:diff_signal/diff_signal.c ****     DiffSignal_Stop();
-  46:diff_signal/diff_signal.c **** 
-  47:diff_signal/diff_signal.c ****     // 启用微秒延迟模块
-  48:diff_signal/diff_signal.c ****     DWT_Delay_Init();
-  49:diff_signal/diff_signal.c **** }
-  50:diff_signal/diff_signal.c **** 
-  51:diff_signal/diff_signal.c **** void DiffSignal_Send(uint16_t duration_us)
-ARM GAS  /tmp/cceXbPp1.s 			page 4
-
-
-  52:diff_signal/diff_signal.c **** {
-  53:diff_signal/diff_signal.c ****     uint32_t pulse = htim1.Init.Period / 2;
-  54:diff_signal/diff_signal.c **** 
-  55:diff_signal/diff_signal.c ****     __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, pulse);
-  56:diff_signal/diff_signal.c ****     __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, pulse);
-  57:diff_signal/diff_signal.c **** 
-  58:diff_signal/diff_signal.c ****     DWT_Delay_us(duration_us);
-  59:diff_signal/diff_signal.c **** 
-  60:diff_signal/diff_signal.c ****     DiffSignal_Stop();
-  61:diff_signal/diff_signal.c **** }
-  62:diff_signal/diff_signal.c **** 
-  63:diff_signal/diff_signal.c **** void DiffSignal_Stop(void)
-  64:diff_signal/diff_signal.c **** {
- 122              		.loc 1 64 1 is_stmt 1 view -0
+  46:diff_signal/diff_signal.c **** }
+  47:diff_signal/diff_signal.c **** 
+  48:diff_signal/diff_signal.c **** void DiffSignal_Stop(void)
+  49:diff_signal/diff_signal.c **** {
+ 122              		.loc 1 49 1 is_stmt 1 view -0
  123              		.cfi_startproc
+ARM GAS  /tmp/cc6Hbd9V.s 			page 4
+
+
  124              		@ args = 0, pretend = 0, frame = 0
  125              		@ frame_needed = 0, uses_anonymous_args = 0
  126              		@ link register save eliminated.
-  65:diff_signal/diff_signal.c ****     __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 0);
- 127              		.loc 1 65 5 view .LVU22
- 128 0000 034B     		ldr	r3, .L9
- 129 0002 1A68     		ldr	r2, [r3]
- 130 0004 0023     		movs	r3, #0
- 131 0006 5363     		str	r3, [r2, #52]
-  66:diff_signal/diff_signal.c ****     __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 0);
- 132              		.loc 1 66 5 view .LVU23
- 133 0008 024A     		ldr	r2, .L9+4
- 134 000a 1268     		ldr	r2, [r2]
- 135 000c 9363     		str	r3, [r2, #56]
-  67:diff_signal/diff_signal.c **** }
- 136              		.loc 1 67 1 is_stmt 0 view .LVU24
- 137 000e 7047     		bx	lr
- 138              	.L10:
- 139              		.align	2
- 140              	.L9:
- 141 0010 00000000 		.word	htim1
- 142 0014 00000000 		.word	htim3
- 143              		.cfi_endproc
- 144              	.LFE69:
- 146              		.section	.rodata.DiffSignal_Init.str1.4,"aMS",%progbits,1
- 147              		.align	2
- 148              	.LC0:
- 149 0000 74696D31 		.ascii	"tim11_pwm_start_error\012\000"
- 149      315F7077 
- 149      6D5F7374 
- 149      6172745F 
- 149      6572726F 
- 150 0017 00       		.align	2
- 151              	.LC1:
- 152 0018 74696D33 		.ascii	"tim33_pwm_start_error\012\000"
- 152      335F7077 
- 152      6D5F7374 
- 152      6172745F 
- 152      6572726F 
- 153              		.section	.text.DiffSignal_Init,"ax",%progbits
- 154              		.align	1
- 155              		.global	DiffSignal_Init
-ARM GAS  /tmp/cceXbPp1.s 			page 5
+  50:diff_signal/diff_signal.c ****     __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 0);  // 置 0% 占空比；CH1/CH1N 同时静默
+ 127              		.loc 1 50 5 view .LVU22
+ 128 0000 024B     		ldr	r3, .L9
+ 129 0002 1B68     		ldr	r3, [r3]
+ 130 0004 0022     		movs	r2, #0
+ 131 0006 5A63     		str	r2, [r3, #52]
+  51:diff_signal/diff_signal.c **** }
+ 132              		.loc 1 51 1 is_stmt 0 view .LVU23
+ 133 0008 7047     		bx	lr
+ 134              	.L10:
+ 135 000a 00BF     		.align	2
+ 136              	.L9:
+ 137 000c 00000000 		.word	htim1
+ 138              		.cfi_endproc
+ 139              	.LFE69:
+ 141              		.section	.text.DiffSignal_Init,"ax",%progbits
+ 142              		.align	1
+ 143              		.global	DiffSignal_Init
+ 144              		.syntax unified
+ 145              		.thumb
+ 146              		.thumb_func
+ 147              		.fpu softvfp
+ 149              	DiffSignal_Init:
+ 150              	.LFB67:
+  29:diff_signal/diff_signal.c ****     DiffSignal_Stop();
+ 151              		.loc 1 29 1 is_stmt 1 view -0
+ 152              		.cfi_startproc
+ 153              		@ args = 0, pretend = 0, frame = 0
+ 154              		@ frame_needed = 0, uses_anonymous_args = 0
+ 155 0000 08B5     		push	{r3, lr}
+ 156              	.LCFI0:
+ 157              		.cfi_def_cfa_offset 8
+ 158              		.cfi_offset 3, -8
+ 159              		.cfi_offset 14, -4
+  30:diff_signal/diff_signal.c ****     // 启用微秒延迟模块
+ 160              		.loc 1 30 5 view .LVU25
+ 161 0002 FFF7FEFF 		bl	DiffSignal_Stop
+ 162              	.LVL3:
+  32:diff_signal/diff_signal.c ****     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, GPIO_PIN_RESET);
+ 163              		.loc 1 32 5 view .LVU26
+ 164 0006 0022     		movs	r2, #0
+ 165 0008 0421     		movs	r1, #4
+ 166 000a 0648     		ldr	r0, .L13
+ 167 000c FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 168              	.LVL4:
+  33:diff_signal/diff_signal.c ****     DWT_Delay_Init();
+ 169              		.loc 1 33 5 view .LVU27
+ 170 0010 0022     		movs	r2, #0
+ 171 0012 4FF48071 		mov	r1, #256
+ 172 0016 0448     		ldr	r0, .L13+4
+ 173 0018 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 174              	.LVL5:
+  34:diff_signal/diff_signal.c **** }
+ 175              		.loc 1 34 5 view .LVU28
+ARM GAS  /tmp/cc6Hbd9V.s 			page 5
 
 
- 156              		.syntax unified
- 157              		.thumb
- 158              		.thumb_func
- 159              		.fpu softvfp
- 161              	DiffSignal_Init:
- 162              	.LFB67:
-  28:diff_signal/diff_signal.c ****    HAL_StatusTypeDef error =  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
- 163              		.loc 1 28 1 is_stmt 1 view -0
- 164              		.cfi_startproc
- 165              		@ args = 0, pretend = 0, frame = 0
- 166              		@ frame_needed = 0, uses_anonymous_args = 0
- 167 0000 08B5     		push	{r3, lr}
- 168              	.LCFI0:
- 169              		.cfi_def_cfa_offset 8
- 170              		.cfi_offset 3, -8
- 171              		.cfi_offset 14, -4
-  29:diff_signal/diff_signal.c ****    if(error != HAL_OK )
- 172              		.loc 1 29 4 view .LVU26
-  29:diff_signal/diff_signal.c ****    if(error != HAL_OK )
- 173              		.loc 1 29 31 is_stmt 0 view .LVU27
- 174 0002 0021     		movs	r1, #0
- 175 0004 1048     		ldr	r0, .L17
- 176 0006 FFF7FEFF 		bl	HAL_TIM_PWM_Start
- 177              	.LVL3:
-  30:diff_signal/diff_signal.c ****    {
- 178              		.loc 1 30 4 is_stmt 1 view .LVU28
-  30:diff_signal/diff_signal.c ****    {
- 179              		.loc 1 30 6 is_stmt 0 view .LVU29
- 180 000a 90B9     		cbnz	r0, .L15
- 181              	.LVL4:
- 182              	.L12:
-  34:diff_signal/diff_signal.c ****     if(error != HAL_OK)
- 183              		.loc 1 34 6 is_stmt 1 view .LVU30
-  34:diff_signal/diff_signal.c ****     if(error != HAL_OK)
- 184              		.loc 1 34 14 is_stmt 0 view .LVU31
- 185 000c 0421     		movs	r1, #4
- 186 000e 0F48     		ldr	r0, .L17+4
- 187 0010 FFF7FEFF 		bl	HAL_TIM_PWM_Start
- 188              	.LVL5:
-  35:diff_signal/diff_signal.c ****     {
- 189              		.loc 1 35 5 is_stmt 1 view .LVU32
-  35:diff_signal/diff_signal.c ****     {
- 190              		.loc 1 35 7 is_stmt 0 view .LVU33
- 191 0014 90B9     		cbnz	r0, .L16
- 192              	.LVL6:
- 193              	.L13:
-  42:diff_signal/diff_signal.c ****     TIM3->CCER |= TIM_CCER_CC2P;
- 194              		.loc 1 42 5 is_stmt 1 view .LVU34
-  42:diff_signal/diff_signal.c ****     TIM3->CCER |= TIM_CCER_CC2P;
- 195              		.loc 1 42 16 is_stmt 0 view .LVU35
- 196 0016 0E4B     		ldr	r3, .L17+8
- 197 0018 1A6A     		ldr	r2, [r3, #32]
- 198 001a 22F02002 		bic	r2, r2, #32
- 199 001e 1A62     		str	r2, [r3, #32]
-  43:diff_signal/diff_signal.c **** 
- 200              		.loc 1 43 5 is_stmt 1 view .LVU36
-  43:diff_signal/diff_signal.c **** 
-ARM GAS  /tmp/cceXbPp1.s 			page 6
+ 176 001c FFF7FEFF 		bl	DWT_Delay_Init
+ 177              	.LVL6:
+  35:diff_signal/diff_signal.c **** 
+ 178              		.loc 1 35 1 is_stmt 0 view .LVU29
+ 179 0020 08BD     		pop	{r3, pc}
+ 180              	.L14:
+ 181 0022 00BF     		.align	2
+ 182              	.L13:
+ 183 0024 00080140 		.word	1073809408
+ 184 0028 00100140 		.word	1073811456
+ 185              		.cfi_endproc
+ 186              	.LFE67:
+ 188              		.section	.text.DiffSignal_Send,"ax",%progbits
+ 189              		.align	1
+ 190              		.global	DiffSignal_Send
+ 191              		.syntax unified
+ 192              		.thumb
+ 193              		.thumb_func
+ 194              		.fpu softvfp
+ 196              	DiffSignal_Send:
+ 197              	.LVL7:
+ 198              	.LFB68:
+  38:diff_signal/diff_signal.c ****     uint32_t arr1   = __HAL_TIM_GET_AUTORELOAD(&htim1);
+ 199              		.loc 1 38 1 is_stmt 1 view -0
+ 200              		.cfi_startproc
+ 201              		@ args = 0, pretend = 0, frame = 0
+ 202              		@ frame_needed = 0, uses_anonymous_args = 0
+  38:diff_signal/diff_signal.c ****     uint32_t arr1   = __HAL_TIM_GET_AUTORELOAD(&htim1);
+ 203              		.loc 1 38 1 is_stmt 0 view .LVU31
+ 204 0000 08B5     		push	{r3, lr}
+ 205              	.LCFI1:
+ 206              		.cfi_def_cfa_offset 8
+ 207              		.cfi_offset 3, -8
+ 208              		.cfi_offset 14, -4
+  39:diff_signal/diff_signal.c ****     uint32_t pulse1 = (arr1 + 1) / 2;                 // 50% 占空比
+ 209              		.loc 1 39 5 is_stmt 1 view .LVU32
+  39:diff_signal/diff_signal.c ****     uint32_t pulse1 = (arr1 + 1) / 2;                 // 50% 占空比
+ 210              		.loc 1 39 23 is_stmt 0 view .LVU33
+ 211 0002 054B     		ldr	r3, .L17
+ 212 0004 1A68     		ldr	r2, [r3]
+  39:diff_signal/diff_signal.c ****     uint32_t pulse1 = (arr1 + 1) / 2;                 // 50% 占空比
+ 213              		.loc 1 39 14 view .LVU34
+ 214 0006 D36A     		ldr	r3, [r2, #44]
+ 215              	.LVL8:
+  40:diff_signal/diff_signal.c **** 
+ 216              		.loc 1 40 5 is_stmt 1 view .LVU35
+  40:diff_signal/diff_signal.c **** 
+ 217              		.loc 1 40 29 is_stmt 0 view .LVU36
+ 218 0008 0133     		adds	r3, r3, #1
+ 219              	.LVL9:
+  40:diff_signal/diff_signal.c **** 
+ 220              		.loc 1 40 14 view .LVU37
+ 221 000a 5B08     		lsrs	r3, r3, #1
+ 222              	.LVL10:
+  42:diff_signal/diff_signal.c **** 
+ 223              		.loc 1 42 5 is_stmt 1 view .LVU38
+ 224 000c 5363     		str	r3, [r2, #52]
+ARM GAS  /tmp/cc6Hbd9V.s 			page 6
 
 
- 201              		.loc 1 43 16 is_stmt 0 view .LVU37
- 202 0020 1A6A     		ldr	r2, [r3, #32]
- 203 0022 42F02002 		orr	r2, r2, #32
- 204 0026 1A62     		str	r2, [r3, #32]
-  45:diff_signal/diff_signal.c **** 
- 205              		.loc 1 45 5 is_stmt 1 view .LVU38
- 206 0028 FFF7FEFF 		bl	DiffSignal_Stop
- 207              	.LVL7:
-  48:diff_signal/diff_signal.c **** }
- 208              		.loc 1 48 5 view .LVU39
- 209 002c FFF7FEFF 		bl	DWT_Delay_Init
- 210              	.LVL8:
-  49:diff_signal/diff_signal.c **** 
- 211              		.loc 1 49 1 is_stmt 0 view .LVU40
- 212 0030 08BD     		pop	{r3, pc}
- 213              	.LVL9:
- 214              	.L15:
-  32:diff_signal/diff_signal.c ****    }
- 215              		.loc 1 32 6 is_stmt 1 view .LVU41
- 216 0032 0849     		ldr	r1, .L17+12
- 217 0034 0020     		movs	r0, #0
- 218              	.LVL10:
-  32:diff_signal/diff_signal.c ****    }
- 219              		.loc 1 32 6 is_stmt 0 view .LVU42
- 220 0036 FFF7FEFF 		bl	SEGGER_RTT_printf
- 221              	.LVL11:
- 222 003a E7E7     		b	.L12
- 223              	.LVL12:
- 224              	.L16:
-  37:diff_signal/diff_signal.c ****     }
- 225              		.loc 1 37 9 is_stmt 1 view .LVU43
- 226 003c 0649     		ldr	r1, .L17+16
- 227 003e 0020     		movs	r0, #0
- 228              	.LVL13:
-  37:diff_signal/diff_signal.c ****     }
- 229              		.loc 1 37 9 is_stmt 0 view .LVU44
- 230 0040 FFF7FEFF 		bl	SEGGER_RTT_printf
- 231              	.LVL14:
- 232 0044 E7E7     		b	.L13
+  44:diff_signal/diff_signal.c ****     DiffSignal_Stop();
+ 225              		.loc 1 44 5 view .LVU39
+ 226 000e FFF7FEFF 		bl	DWT_Delay_us
+ 227              	.LVL11:
+  45:diff_signal/diff_signal.c **** }
+ 228              		.loc 1 45 5 view .LVU40
+ 229 0012 FFF7FEFF 		bl	DiffSignal_Stop
+ 230              	.LVL12:
+  46:diff_signal/diff_signal.c **** 
+ 231              		.loc 1 46 1 is_stmt 0 view .LVU41
+ 232 0016 08BD     		pop	{r3, pc}
  233              	.L18:
- 234 0046 00BF     		.align	2
+ 234              		.align	2
  235              	.L17:
- 236 0048 00000000 		.word	htim1
- 237 004c 00000000 		.word	htim3
- 238 0050 00040040 		.word	1073742848
- 239 0054 00000000 		.word	.LC0
- 240 0058 18000000 		.word	.LC1
- 241              		.cfi_endproc
- 242              	.LFE67:
- 244              		.section	.text.DiffSignal_Send,"ax",%progbits
- 245              		.align	1
- 246              		.global	DiffSignal_Send
- 247              		.syntax unified
- 248              		.thumb
- 249              		.thumb_func
- 250              		.fpu softvfp
- 252              	DiffSignal_Send:
-ARM GAS  /tmp/cceXbPp1.s 			page 7
-
-
- 253              	.LVL15:
- 254              	.LFB68:
-  52:diff_signal/diff_signal.c ****     uint32_t pulse = htim1.Init.Period / 2;
- 255              		.loc 1 52 1 is_stmt 1 view -0
- 256              		.cfi_startproc
- 257              		@ args = 0, pretend = 0, frame = 0
- 258              		@ frame_needed = 0, uses_anonymous_args = 0
-  52:diff_signal/diff_signal.c ****     uint32_t pulse = htim1.Init.Period / 2;
- 259              		.loc 1 52 1 is_stmt 0 view .LVU46
- 260 0000 08B5     		push	{r3, lr}
- 261              	.LCFI1:
- 262              		.cfi_def_cfa_offset 8
- 263              		.cfi_offset 3, -8
+ 236 0018 00000000 		.word	htim1
+ 237              		.cfi_endproc
+ 238              	.LFE68:
+ 240              		.section	.text.DiffSignal_Senddata,"ax",%progbits
+ 241              		.align	1
+ 242              		.global	DiffSignal_Senddata
+ 243              		.syntax unified
+ 244              		.thumb
+ 245              		.thumb_func
+ 246              		.fpu softvfp
+ 248              	DiffSignal_Senddata:
+ 249              	.LVL13:
+ 250              	.LFB70:
+  52:diff_signal/diff_signal.c **** 
+  53:diff_signal/diff_signal.c **** void DiffSignal_Senddata(uint8_t *data, uint16_t length)
+  54:diff_signal/diff_signal.c **** {
+ 251              		.loc 1 54 1 is_stmt 1 view -0
+ 252              		.cfi_startproc
+ 253              		@ args = 0, pretend = 0, frame = 0
+ 254              		@ frame_needed = 0, uses_anonymous_args = 0
+ 255              		.loc 1 54 1 is_stmt 0 view .LVU43
+ 256 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+ 257              	.LCFI2:
+ 258              		.cfi_def_cfa_offset 24
+ 259              		.cfi_offset 4, -24
+ 260              		.cfi_offset 5, -20
+ 261              		.cfi_offset 6, -16
+ 262              		.cfi_offset 7, -12
+ 263              		.cfi_offset 8, -8
  264              		.cfi_offset 14, -4
-  53:diff_signal/diff_signal.c **** 
- 265              		.loc 1 53 5 is_stmt 1 view .LVU47
-  53:diff_signal/diff_signal.c **** 
- 266              		.loc 1 53 32 is_stmt 0 view .LVU48
- 267 0002 064A     		ldr	r2, .L21
- 268 0004 D368     		ldr	r3, [r2, #12]
-  53:diff_signal/diff_signal.c **** 
- 269              		.loc 1 53 14 view .LVU49
- 270 0006 5B08     		lsrs	r3, r3, #1
- 271              	.LVL16:
-  55:diff_signal/diff_signal.c ****     __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, pulse);
- 272              		.loc 1 55 5 is_stmt 1 view .LVU50
- 273 0008 1268     		ldr	r2, [r2]
- 274 000a 5363     		str	r3, [r2, #52]
-  56:diff_signal/diff_signal.c **** 
- 275              		.loc 1 56 5 view .LVU51
- 276 000c 044A     		ldr	r2, .L21+4
- 277 000e 1268     		ldr	r2, [r2]
- 278 0010 9363     		str	r3, [r2, #56]
-  58:diff_signal/diff_signal.c **** 
- 279              		.loc 1 58 5 view .LVU52
- 280 0012 FFF7FEFF 		bl	DWT_Delay_us
+ 265 0004 8046     		mov	r8, r0
+ 266 0006 0F46     		mov	r7, r1
+  55:diff_signal/diff_signal.c ****     // 开启 TIM1 CH1 主路与互补路 CH1N
+  56:diff_signal/diff_signal.c ****     HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
+ 267              		.loc 1 56 5 is_stmt 1 view .LVU44
+ 268 0008 1B4C     		ldr	r4, .L29
+ 269 000a 0021     		movs	r1, #0
+ 270              	.LVL14:
+ 271              		.loc 1 56 5 is_stmt 0 view .LVU45
+ 272 000c 2046     		mov	r0, r4
+ 273              	.LVL15:
+ 274              		.loc 1 56 5 view .LVU46
+ 275 000e FFF7FEFF 		bl	HAL_TIM_PWM_Start
+ARM GAS  /tmp/cc6Hbd9V.s 			page 7
+
+
+ 276              	.LVL16:
+  57:diff_signal/diff_signal.c ****     HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_1);
+ 277              		.loc 1 57 5 is_stmt 1 view .LVU47
+ 278 0012 0021     		movs	r1, #0
+ 279 0014 2046     		mov	r0, r4
+ 280 0016 FFF7FEFF 		bl	HAL_TIMEx_PWMN_Start
  281              	.LVL17:
-  60:diff_signal/diff_signal.c **** }
- 282              		.loc 1 60 5 view .LVU53
- 283 0016 FFF7FEFF 		bl	DiffSignal_Stop
- 284              	.LVL18:
+  58:diff_signal/diff_signal.c **** 
+  59:diff_signal/diff_signal.c ****     for (uint16_t i = 0; i < length; i++)
+ 282              		.loc 1 59 5 view .LVU48
+ 283              	.LBB2:
+ 284              		.loc 1 59 10 view .LVU49
+ 285              		.loc 1 59 19 is_stmt 0 view .LVU50
+ 286 001a 0026     		movs	r6, #0
+ 287              		.loc 1 59 5 view .LVU51
+ 288 001c 16E0     		b	.L20
+ 289              	.LVL18:
+ 290              	.L22:
+ 291              	.LBB3:
+ 292              	.LBB4:
+  60:diff_signal/diff_signal.c ****     {
+  61:diff_signal/diff_signal.c ****         uint8_t byte = data[i];
+  62:diff_signal/diff_signal.c **** 
+  63:diff_signal/diff_signal.c ****         // 起始位 0
+  64:diff_signal/diff_signal.c ****         DWT_Delay_us(BIT_DURATION_US);
+  65:diff_signal/diff_signal.c **** 
+  66:diff_signal/diff_signal.c ****         for (int bit = 0; bit < 8; bit++)
+  67:diff_signal/diff_signal.c ****         {
+  68:diff_signal/diff_signal.c ****             if ((byte >> bit) & 0x01)
+  69:diff_signal/diff_signal.c ****             {
+  70:diff_signal/diff_signal.c ****                 DiffSignal_Send(BIT_DURATION_US);   // 输出一个比特时间的载波（CH1 与 
+  71:diff_signal/diff_signal.c ****             }
+  72:diff_signal/diff_signal.c ****             else
+  73:diff_signal/diff_signal.c ****             {
+  74:diff_signal/diff_signal.c ****                 DWT_Delay_us(BIT_DURATION_US);      // 空闲（0% 占空比）
+ 293              		.loc 1 74 17 is_stmt 1 view .LVU52
+ 294 001e 40F24130 		movw	r0, #833
+ 295 0022 FFF7FEFF 		bl	DWT_Delay_us
+ 296              	.LVL19:
+ 297              	.L23:
+  66:diff_signal/diff_signal.c ****         {
+ 298              		.loc 1 66 36 discriminator 2 view .LVU53
+  66:diff_signal/diff_signal.c ****         {
+ 299              		.loc 1 66 39 is_stmt 0 discriminator 2 view .LVU54
+ 300 0026 0134     		adds	r4, r4, #1
+ 301              	.LVL20:
+ 302              	.L21:
+  66:diff_signal/diff_signal.c ****         {
+ 303              		.loc 1 66 27 is_stmt 1 discriminator 1 view .LVU55
+  66:diff_signal/diff_signal.c ****         {
+ 304              		.loc 1 66 9 is_stmt 0 discriminator 1 view .LVU56
+ 305 0028 072C     		cmp	r4, #7
+ 306 002a 09DC     		bgt	.L27
+  68:diff_signal/diff_signal.c ****             {
+ 307              		.loc 1 68 13 is_stmt 1 view .LVU57
+  68:diff_signal/diff_signal.c ****             {
+ 308              		.loc 1 68 23 is_stmt 0 view .LVU58
+ARM GAS  /tmp/cc6Hbd9V.s 			page 8
+
+
+ 309 002c 45FA04F3 		asr	r3, r5, r4
+  68:diff_signal/diff_signal.c ****             {
+ 310              		.loc 1 68 16 view .LVU59
+ 311 0030 13F0010F 		tst	r3, #1
+ 312 0034 F3D0     		beq	.L22
+  70:diff_signal/diff_signal.c ****             }
+ 313              		.loc 1 70 17 is_stmt 1 view .LVU60
+ 314 0036 40F24130 		movw	r0, #833
+ 315 003a FFF7FEFF 		bl	DiffSignal_Send
+ 316              	.LVL21:
+ 317 003e F2E7     		b	.L23
+ 318              	.L27:
+ 319              	.LBE4:
+  75:diff_signal/diff_signal.c ****             }
+  76:diff_signal/diff_signal.c ****         }
+  77:diff_signal/diff_signal.c ****         // 停止位 1
+  78:diff_signal/diff_signal.c ****         DiffSignal_Send(BIT_DURATION_US);
+ 320              		.loc 1 78 9 discriminator 2 view .LVU61
+ 321 0040 40F24130 		movw	r0, #833
+ 322 0044 FFF7FEFF 		bl	DiffSignal_Send
+ 323              	.LVL22:
+ 324              	.LBE3:
+  59:diff_signal/diff_signal.c ****     {
+ 325              		.loc 1 59 38 discriminator 2 view .LVU62
+  59:diff_signal/diff_signal.c ****     {
+ 326              		.loc 1 59 39 is_stmt 0 discriminator 2 view .LVU63
+ 327 0048 0136     		adds	r6, r6, #1
+ 328              	.LVL23:
+  59:diff_signal/diff_signal.c ****     {
+ 329              		.loc 1 59 39 discriminator 2 view .LVU64
+ 330 004a B6B2     		uxth	r6, r6
+ 331              	.LVL24:
+ 332              	.L20:
+  59:diff_signal/diff_signal.c ****     {
+ 333              		.loc 1 59 26 is_stmt 1 discriminator 1 view .LVU65
+  59:diff_signal/diff_signal.c ****     {
+ 334              		.loc 1 59 5 is_stmt 0 discriminator 1 view .LVU66
+ 335 004c BE42     		cmp	r6, r7
+ 336 004e 07D2     		bcs	.L28
+ 337              	.LBB6:
   61:diff_signal/diff_signal.c **** 
- 285              		.loc 1 61 1 is_stmt 0 view .LVU54
- 286 001a 08BD     		pop	{r3, pc}
- 287              	.L22:
- 288              		.align	2
- 289              	.L21:
- 290 001c 00000000 		.word	htim1
- 291 0020 00000000 		.word	htim3
- 292              		.cfi_endproc
- 293              	.LFE68:
- 295              		.section	.text.DiffSignal_Senddata,"ax",%progbits
- 296              		.align	1
- 297              		.global	DiffSignal_Senddata
- 298              		.syntax unified
- 299              		.thumb
- 300              		.thumb_func
-ARM GAS  /tmp/cceXbPp1.s 			page 8
+ 338              		.loc 1 61 9 is_stmt 1 view .LVU67
+  61:diff_signal/diff_signal.c **** 
+ 339              		.loc 1 61 17 is_stmt 0 view .LVU68
+ 340 0050 18F80650 		ldrb	r5, [r8, r6]	@ zero_extendqisi2
+ 341              	.LVL25:
+  64:diff_signal/diff_signal.c **** 
+ 342              		.loc 1 64 9 is_stmt 1 view .LVU69
+ 343 0054 40F24130 		movw	r0, #833
+ 344 0058 FFF7FEFF 		bl	DWT_Delay_us
+ 345              	.LVL26:
+  66:diff_signal/diff_signal.c ****         {
+ 346              		.loc 1 66 9 view .LVU70
+ 347              	.LBB5:
+  66:diff_signal/diff_signal.c ****         {
+ 348              		.loc 1 66 14 view .LVU71
+  66:diff_signal/diff_signal.c ****         {
+ARM GAS  /tmp/cc6Hbd9V.s 			page 9
 
 
- 301              		.fpu softvfp
- 303              	DiffSignal_Senddata:
- 304              	.LVL19:
- 305              	.LFB70:
-  68:diff_signal/diff_signal.c **** 
-  69:diff_signal/diff_signal.c **** void DiffSignal_Senddata(uint8_t *data, uint16_t length)
-  70:diff_signal/diff_signal.c **** {
- 306              		.loc 1 70 1 is_stmt 1 view -0
- 307              		.cfi_startproc
- 308              		@ args = 0, pretend = 0, frame = 0
- 309              		@ frame_needed = 0, uses_anonymous_args = 0
- 310              		.loc 1 70 1 is_stmt 0 view .LVU56
- 311 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
- 312              	.LCFI2:
- 313              		.cfi_def_cfa_offset 24
- 314              		.cfi_offset 4, -24
- 315              		.cfi_offset 5, -20
- 316              		.cfi_offset 6, -16
- 317              		.cfi_offset 7, -12
- 318              		.cfi_offset 8, -8
- 319              		.cfi_offset 14, -4
- 320 0004 8046     		mov	r8, r0
- 321 0006 0F46     		mov	r7, r1
-  71:diff_signal/diff_signal.c ****     for (uint16_t i = 0; i < length; i++)
- 322              		.loc 1 71 5 is_stmt 1 view .LVU57
- 323              	.LBB2:
- 324              		.loc 1 71 10 view .LVU58
- 325              	.LVL20:
- 326              		.loc 1 71 19 is_stmt 0 view .LVU59
- 327 0008 0026     		movs	r6, #0
- 328              		.loc 1 71 5 view .LVU60
- 329 000a 13E0     		b	.L24
- 330              	.LVL21:
- 331              	.L26:
- 332              	.LBB3:
- 333              	.LBB4:
-  72:diff_signal/diff_signal.c ****     {
-  73:diff_signal/diff_signal.c ****         uint8_t byte = data[i];
-  74:diff_signal/diff_signal.c **** 
-  75:diff_signal/diff_signal.c ****         // 起始位 0
-  76:diff_signal/diff_signal.c ****         DWT_Delay_us(BIT_DURATION_US); 
-  77:diff_signal/diff_signal.c ****  
-  78:diff_signal/diff_signal.c ****         for (int bit = 0; bit < 8; bit++)
-  79:diff_signal/diff_signal.c ****         {
-  80:diff_signal/diff_signal.c ****             if ((byte >> bit) & 0x01)
-  81:diff_signal/diff_signal.c ****             {
-  82:diff_signal/diff_signal.c ****                 DiffSignal_Send(BIT_DURATION_US);
-  83:diff_signal/diff_signal.c ****             }
-  84:diff_signal/diff_signal.c ****             else
-  85:diff_signal/diff_signal.c ****             {
-  86:diff_signal/diff_signal.c ****                 DWT_Delay_us(BIT_DURATION_US);
- 334              		.loc 1 86 17 is_stmt 1 view .LVU61
- 335 000c D020     		movs	r0, #208
- 336 000e FFF7FEFF 		bl	DWT_Delay_us
- 337              	.LVL22:
- 338              	.L27:
-  78:diff_signal/diff_signal.c ****         {
-ARM GAS  /tmp/cceXbPp1.s 			page 9
+ 349              		.loc 1 66 18 is_stmt 0 view .LVU72
+ 350 005c 0024     		movs	r4, #0
+  66:diff_signal/diff_signal.c ****         {
+ 351              		.loc 1 66 9 view .LVU73
+ 352 005e E3E7     		b	.L21
+ 353              	.LVL27:
+ 354              	.L28:
+  66:diff_signal/diff_signal.c ****         {
+ 355              		.loc 1 66 9 view .LVU74
+ 356              	.LBE5:
+ 357              	.LBE6:
+ 358              	.LBE2:
+  79:diff_signal/diff_signal.c ****     }
+  80:diff_signal/diff_signal.c **** 
+  81:diff_signal/diff_signal.c ****     // 全部发完后关闭互补与主通道
+  82:diff_signal/diff_signal.c ****     HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);
+ 359              		.loc 1 82 5 is_stmt 1 view .LVU75
+ 360 0060 054C     		ldr	r4, .L29
+ 361 0062 0021     		movs	r1, #0
+ 362 0064 2046     		mov	r0, r4
+ 363 0066 FFF7FEFF 		bl	HAL_TIM_PWM_Stop
+ 364              	.LVL28:
+  83:diff_signal/diff_signal.c ****     HAL_TIMEx_PWMN_Stop(&htim1, TIM_CHANNEL_1);
+ 365              		.loc 1 83 5 view .LVU76
+ 366 006a 0021     		movs	r1, #0
+ 367 006c 2046     		mov	r0, r4
+ 368 006e FFF7FEFF 		bl	HAL_TIMEx_PWMN_Stop
+ 369              	.LVL29:
+  84:diff_signal/diff_signal.c **** }
+ 370              		.loc 1 84 1 is_stmt 0 view .LVU77
+ 371 0072 BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 372              	.LVL30:
+ 373              	.L30:
+ 374              		.loc 1 84 1 view .LVU78
+ 375 0076 00BF     		.align	2
+ 376              	.L29:
+ 377 0078 00000000 		.word	htim1
+ 378              		.cfi_endproc
+ 379              	.LFE70:
+ 381              		.text
+ 382              	.Letext0:
+ 383              		.file 2 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/machine/_default_types.h"
+ 384              		.file 3 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/_stdint.h"
+ 385              		.file 4 "Drivers/CMSIS/Include/core_cm3.h"
+ 386              		.file 5 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/system_stm32f1xx.h"
+ 387              		.file 6 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xe.h"
+ 388              		.file 7 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f1xx.h"
+ 389              		.file 8 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_def.h"
+ 390              		.file 9 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio.h"
+ 391              		.file 10 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma.h"
+ 392              		.file 11 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_adc.h"
+ 393              		.file 12 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h"
+ 394              		.file 13 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h"
+ 395              		.file 14 "Core/Inc/tim.h"
+ 396              		.file 15 "/opt/gcc-arm-none-eabi-9-2020-q2-update/lib/gcc/arm-none-eabi/9.3.1/include/stddef.h"
+ 397              		.file 16 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/_types.h"
+ 398              		.file 17 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/reent.h"
+ARM GAS  /tmp/cc6Hbd9V.s 			page 10
 
 
- 339              		.loc 1 78 36 discriminator 2 view .LVU62
-  78:diff_signal/diff_signal.c ****         {
- 340              		.loc 1 78 39 is_stmt 0 discriminator 2 view .LVU63
- 341 0012 0134     		adds	r4, r4, #1
- 342              	.LVL23:
- 343              	.L25:
-  78:diff_signal/diff_signal.c ****         {
- 344              		.loc 1 78 27 is_stmt 1 discriminator 1 view .LVU64
-  78:diff_signal/diff_signal.c ****         {
- 345              		.loc 1 78 9 is_stmt 0 discriminator 1 view .LVU65
- 346 0014 072C     		cmp	r4, #7
- 347 0016 08DC     		bgt	.L31
-  80:diff_signal/diff_signal.c ****             {
- 348              		.loc 1 80 13 is_stmt 1 view .LVU66
-  80:diff_signal/diff_signal.c ****             {
- 349              		.loc 1 80 23 is_stmt 0 view .LVU67
- 350 0018 45FA04F3 		asr	r3, r5, r4
-  80:diff_signal/diff_signal.c ****             {
- 351              		.loc 1 80 16 view .LVU68
- 352 001c 13F0010F 		tst	r3, #1
- 353 0020 F4D0     		beq	.L26
-  82:diff_signal/diff_signal.c ****             }
- 354              		.loc 1 82 17 is_stmt 1 view .LVU69
- 355 0022 D020     		movs	r0, #208
- 356 0024 FFF7FEFF 		bl	DiffSignal_Send
- 357              	.LVL24:
- 358 0028 F3E7     		b	.L27
- 359              	.L31:
- 360              	.LBE4:
-  87:diff_signal/diff_signal.c ****             }
-  88:diff_signal/diff_signal.c ****         }
-  89:diff_signal/diff_signal.c ****         // 停止位 1
-  90:diff_signal/diff_signal.c ****         DiffSignal_Send(BIT_DURATION_US);
- 361              		.loc 1 90 9 discriminator 2 view .LVU70
- 362 002a D020     		movs	r0, #208
- 363 002c FFF7FEFF 		bl	DiffSignal_Send
- 364              	.LVL25:
- 365              	.LBE3:
-  71:diff_signal/diff_signal.c ****     {
- 366              		.loc 1 71 38 discriminator 2 view .LVU71
-  71:diff_signal/diff_signal.c ****     {
- 367              		.loc 1 71 39 is_stmt 0 discriminator 2 view .LVU72
- 368 0030 0136     		adds	r6, r6, #1
- 369              	.LVL26:
-  71:diff_signal/diff_signal.c ****     {
- 370              		.loc 1 71 39 discriminator 2 view .LVU73
- 371 0032 B6B2     		uxth	r6, r6
- 372              	.LVL27:
- 373              	.L24:
-  71:diff_signal/diff_signal.c ****     {
- 374              		.loc 1 71 26 is_stmt 1 discriminator 1 view .LVU74
-  71:diff_signal/diff_signal.c ****     {
- 375              		.loc 1 71 5 is_stmt 0 discriminator 1 view .LVU75
- 376 0034 BE42     		cmp	r6, r7
- 377 0036 06D2     		bcs	.L32
- 378              	.LBB6:
-  73:diff_signal/diff_signal.c **** 
-ARM GAS  /tmp/cceXbPp1.s 			page 10
-
-
- 379              		.loc 1 73 9 is_stmt 1 view .LVU76
-  73:diff_signal/diff_signal.c **** 
- 380              		.loc 1 73 17 is_stmt 0 view .LVU77
- 381 0038 18F80650 		ldrb	r5, [r8, r6]	@ zero_extendqisi2
- 382              	.LVL28:
-  76:diff_signal/diff_signal.c ****  
- 383              		.loc 1 76 9 is_stmt 1 view .LVU78
- 384 003c D020     		movs	r0, #208
- 385 003e FFF7FEFF 		bl	DWT_Delay_us
- 386              	.LVL29:
-  78:diff_signal/diff_signal.c ****         {
- 387              		.loc 1 78 9 view .LVU79
- 388              	.LBB5:
-  78:diff_signal/diff_signal.c ****         {
- 389              		.loc 1 78 14 view .LVU80
-  78:diff_signal/diff_signal.c ****         {
- 390              		.loc 1 78 18 is_stmt 0 view .LVU81
- 391 0042 0024     		movs	r4, #0
-  78:diff_signal/diff_signal.c ****         {
- 392              		.loc 1 78 9 view .LVU82
- 393 0044 E6E7     		b	.L25
- 394              	.LVL30:
- 395              	.L32:
-  78:diff_signal/diff_signal.c ****         {
- 396              		.loc 1 78 9 view .LVU83
- 397              	.LBE5:
- 398              	.LBE6:
- 399              	.LBE2:
-  91:diff_signal/diff_signal.c ****     }
-  92:diff_signal/diff_signal.c **** }
- 400              		.loc 1 92 1 view .LVU84
- 401 0046 BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
- 402              		.loc 1 92 1 view .LVU85
- 403              		.cfi_endproc
- 404              	.LFE70:
- 406              		.text
- 407              	.Letext0:
- 408              		.file 2 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/machine/_default_types.h"
- 409              		.file 3 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/_stdint.h"
- 410              		.file 4 "Drivers/CMSIS/Include/core_cm3.h"
- 411              		.file 5 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/system_stm32f1xx.h"
- 412              		.file 6 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xe.h"
- 413              		.file 7 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f1xx.h"
- 414              		.file 8 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_def.h"
- 415              		.file 9 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma.h"
- 416              		.file 10 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_adc.h"
- 417              		.file 11 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h"
- 418              		.file 12 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h"
- 419              		.file 13 "Core/Inc/tim.h"
- 420              		.file 14 "/opt/gcc-arm-none-eabi-9-2020-q2-update/lib/gcc/arm-none-eabi/9.3.1/include/stddef.h"
- 421              		.file 15 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/_types.h"
- 422              		.file 16 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/reent.h"
- 423              		.file 17 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/lock.h"
- 424              		.file 18 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/stdlib.h"
- 425              		.file 19 "diff_signal/diff_signal_rx.h"
- 426              		.file 20 "ARM_SEGGER_RTT/SEGGER_RTT.h"
-ARM GAS  /tmp/cceXbPp1.s 			page 11
+ 399              		.file 18 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/lock.h"
+ 400              		.file 19 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/stdlib.h"
+ 401              		.file 20 "diff_signal/diff_signal_rx.h"
+ 402              		.file 21 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h"
+ARM GAS  /tmp/cc6Hbd9V.s 			page 11
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 diff_signal.c
-     /tmp/cceXbPp1.s:16     .text.DWT_Delay_Init:0000000000000000 $t
-     /tmp/cceXbPp1.s:24     .text.DWT_Delay_Init:0000000000000000 DWT_Delay_Init
-     /tmp/cceXbPp1.s:53     .text.DWT_Delay_Init:000000000000001c $d
-     /tmp/cceXbPp1.s:59     .text.DWT_Delay_us:0000000000000000 $t
-     /tmp/cceXbPp1.s:66     .text.DWT_Delay_us:0000000000000000 DWT_Delay_us
-     /tmp/cceXbPp1.s:106    .text.DWT_Delay_us:0000000000000020 $d
-     /tmp/cceXbPp1.s:113    .text.DiffSignal_Stop:0000000000000000 $t
-     /tmp/cceXbPp1.s:120    .text.DiffSignal_Stop:0000000000000000 DiffSignal_Stop
-     /tmp/cceXbPp1.s:141    .text.DiffSignal_Stop:0000000000000010 $d
-     /tmp/cceXbPp1.s:147    .rodata.DiffSignal_Init.str1.4:0000000000000000 $d
-     /tmp/cceXbPp1.s:154    .text.DiffSignal_Init:0000000000000000 $t
-     /tmp/cceXbPp1.s:161    .text.DiffSignal_Init:0000000000000000 DiffSignal_Init
-     /tmp/cceXbPp1.s:236    .text.DiffSignal_Init:0000000000000048 $d
-     /tmp/cceXbPp1.s:245    .text.DiffSignal_Send:0000000000000000 $t
-     /tmp/cceXbPp1.s:252    .text.DiffSignal_Send:0000000000000000 DiffSignal_Send
-     /tmp/cceXbPp1.s:290    .text.DiffSignal_Send:000000000000001c $d
-     /tmp/cceXbPp1.s:296    .text.DiffSignal_Senddata:0000000000000000 $t
-     /tmp/cceXbPp1.s:303    .text.DiffSignal_Senddata:0000000000000000 DiffSignal_Senddata
+     /tmp/cc6Hbd9V.s:16     .text.DWT_Delay_Init:0000000000000000 $t
+     /tmp/cc6Hbd9V.s:24     .text.DWT_Delay_Init:0000000000000000 DWT_Delay_Init
+     /tmp/cc6Hbd9V.s:53     .text.DWT_Delay_Init:000000000000001c $d
+     /tmp/cc6Hbd9V.s:59     .text.DWT_Delay_us:0000000000000000 $t
+     /tmp/cc6Hbd9V.s:66     .text.DWT_Delay_us:0000000000000000 DWT_Delay_us
+     /tmp/cc6Hbd9V.s:106    .text.DWT_Delay_us:0000000000000020 $d
+     /tmp/cc6Hbd9V.s:113    .text.DiffSignal_Stop:0000000000000000 $t
+     /tmp/cc6Hbd9V.s:120    .text.DiffSignal_Stop:0000000000000000 DiffSignal_Stop
+     /tmp/cc6Hbd9V.s:137    .text.DiffSignal_Stop:000000000000000c $d
+     /tmp/cc6Hbd9V.s:142    .text.DiffSignal_Init:0000000000000000 $t
+     /tmp/cc6Hbd9V.s:149    .text.DiffSignal_Init:0000000000000000 DiffSignal_Init
+     /tmp/cc6Hbd9V.s:183    .text.DiffSignal_Init:0000000000000024 $d
+     /tmp/cc6Hbd9V.s:189    .text.DiffSignal_Send:0000000000000000 $t
+     /tmp/cc6Hbd9V.s:196    .text.DiffSignal_Send:0000000000000000 DiffSignal_Send
+     /tmp/cc6Hbd9V.s:236    .text.DiffSignal_Send:0000000000000018 $d
+     /tmp/cc6Hbd9V.s:241    .text.DiffSignal_Senddata:0000000000000000 $t
+     /tmp/cc6Hbd9V.s:248    .text.DiffSignal_Senddata:0000000000000000 DiffSignal_Senddata
+     /tmp/cc6Hbd9V.s:377    .text.DiffSignal_Senddata:0000000000000078 $d
 
 UNDEFINED SYMBOLS
 SystemCoreClock
 htim1
-htim3
+HAL_GPIO_WritePin
 HAL_TIM_PWM_Start
-SEGGER_RTT_printf
+HAL_TIMEx_PWMN_Start
+HAL_TIM_PWM_Stop
+HAL_TIMEx_PWMN_Stop

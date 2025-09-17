@@ -11,7 +11,7 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc);
 /// 接收到一个完整字节后回调（自行在此处理）
 void DiffSignal_Frame_Handler(uint8_t data);
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim);
-#define BIT_DURATION_US   208   // 与发送端保持一致
+#define BIT_DURATION_US   833u   // 与发送端保持一致
 extern ADC_HandleTypeDef hadc1;
 #endif // __DIFF_SIGNAL_RX_H
      

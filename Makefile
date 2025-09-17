@@ -48,8 +48,12 @@ Core/Src/gpio.c \
 Core/Src/spi.c \
 Core/Src/tim.c \
 Core/Src/usb.c \
+Core/Src/uart3_drv.c\
+Core/Src/battery_adc.c\
 Core/Src/stm32f1xx_it.c \
 Core/Src/stm32f1xx_hal_msp.c \
+Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c\
+Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_usart.c\
 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c \
 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_spi.c \
 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc.c \
@@ -133,7 +137,6 @@ Drivers/STM32F1xx_HAL_Driver/Inc \
 Drivers/STM32F1xx_HAL_Driver/Inc/Legacy \
 Drivers/CMSIS/Device/ST/STM32F1xx/Include \
 Drivers/CMSIS/Include \
-Drivers/CMSIS/Include 
 
 
 C_INCLUDES += $(ALLINC)

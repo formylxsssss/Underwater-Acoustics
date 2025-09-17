@@ -12,6 +12,11 @@
         "soft_spi.h": "c",
         "random": "c",
         "soft_timer.h": "c",
-        "data_collect.h": "c"
+        "data_collect.h": "c",
+        "stm32f1xx_hal_tim.h": "c",
+        "adxl345.h": "c",
+        "battery_adc.h": "c",
+        "eeprom.h": "c",
+        "uart3_drv.h": "c"
     }
 }
