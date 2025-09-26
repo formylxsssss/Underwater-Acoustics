@@ -1,4 +1,4 @@
-ARM GAS  /tmp/cc6Hbd9V.s 			page 1
+ARM GAS  /tmp/ccHIr3bZ.s 			page 1
 
 
    1              		.cpu cortex-m3
@@ -58,7 +58,7 @@ ARM GAS  /tmp/cc6Hbd9V.s 			page 1
   43              		.loc 1 13 5 is_stmt 1 view .LVU5
   44              		.loc 1 13 15 is_stmt 0 view .LVU6
   45 0010 1A68     		ldr	r2, [r3]
-ARM GAS  /tmp/cc6Hbd9V.s 			page 2
+ARM GAS  /tmp/ccHIr3bZ.s 			page 2
 
 
   46 0012 42F00102 		orr	r2, r2, #1
@@ -118,7 +118,7 @@ ARM GAS  /tmp/cc6Hbd9V.s 			page 1
   25:diff_signal/diff_signal.c ****         ;
   91              		.loc 1 25 9 discriminator 1 view .LVU15
   24:diff_signal/diff_signal.c ****     while ((DWT->CYCCNT - start) < cycles)
-ARM GAS  /tmp/cc6Hbd9V.s 			page 3
+ARM GAS  /tmp/ccHIr3bZ.s 			page 3
 
 
   92              		.loc 1 24 11 discriminator 1 view .LVU16
@@ -178,7 +178,7 @@ ARM GAS  /tmp/cc6Hbd9V.s 			page 1
   49:diff_signal/diff_signal.c **** {
  122              		.loc 1 49 1 is_stmt 1 view -0
  123              		.cfi_startproc
-ARM GAS  /tmp/cc6Hbd9V.s 			page 4
+ARM GAS  /tmp/ccHIr3bZ.s 			page 4
 
 
  124              		@ args = 0, pretend = 0, frame = 0
@@ -238,7 +238,7 @@ ARM GAS  /tmp/cc6Hbd9V.s 			page 1
  174              	.LVL5:
   34:diff_signal/diff_signal.c **** }
  175              		.loc 1 34 5 view .LVU28
-ARM GAS  /tmp/cc6Hbd9V.s 			page 5
+ARM GAS  /tmp/ccHIr3bZ.s 			page 5
 
 
  176 001c FFF7FEFF 		bl	DWT_Delay_Init
@@ -298,7 +298,7 @@ ARM GAS  /tmp/cc6Hbd9V.s 			page 1
   42:diff_signal/diff_signal.c **** 
  223              		.loc 1 42 5 is_stmt 1 view .LVU38
  224 000c 5363     		str	r3, [r2, #52]
-ARM GAS  /tmp/cc6Hbd9V.s 			page 6
+ARM GAS  /tmp/ccHIr3bZ.s 			page 6
 
 
   44:diff_signal/diff_signal.c ****     DiffSignal_Stop();
@@ -358,7 +358,7 @@ ARM GAS  /tmp/cc6Hbd9V.s 			page 1
  273              	.LVL15:
  274              		.loc 1 56 5 view .LVU46
  275 000e FFF7FEFF 		bl	HAL_TIM_PWM_Start
-ARM GAS  /tmp/cc6Hbd9V.s 			page 7
+ARM GAS  /tmp/ccHIr3bZ.s 			page 7
 
 
  276              	.LVL16:
@@ -418,7 +418,7 @@ ARM GAS  /tmp/cc6Hbd9V.s 			page 1
  307              		.loc 1 68 13 is_stmt 1 view .LVU57
   68:diff_signal/diff_signal.c ****             {
  308              		.loc 1 68 23 is_stmt 0 view .LVU58
-ARM GAS  /tmp/cc6Hbd9V.s 			page 8
+ARM GAS  /tmp/ccHIr3bZ.s 			page 8
 
 
  309 002c 45FA04F3 		asr	r3, r5, r4
@@ -478,7 +478,7 @@ ARM GAS  /tmp/cc6Hbd9V.s 			page 1
   66:diff_signal/diff_signal.c ****         {
  348              		.loc 1 66 14 view .LVU71
   66:diff_signal/diff_signal.c ****         {
-ARM GAS  /tmp/cc6Hbd9V.s 			page 9
+ARM GAS  /tmp/ccHIr3bZ.s 			page 9
 
 
  349              		.loc 1 66 18 is_stmt 0 view .LVU72
@@ -538,36 +538,36 @@ ARM GAS  /tmp/cc6Hbd9V.s 			page 1
  396              		.file 15 "/opt/gcc-arm-none-eabi-9-2020-q2-update/lib/gcc/arm-none-eabi/9.3.1/include/stddef.h"
  397              		.file 16 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/_types.h"
  398              		.file 17 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/reent.h"
-ARM GAS  /tmp/cc6Hbd9V.s 			page 10
+ARM GAS  /tmp/ccHIr3bZ.s 			page 10
 
 
  399              		.file 18 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/lock.h"
  400              		.file 19 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/stdlib.h"
  401              		.file 20 "diff_signal/diff_signal_rx.h"
  402              		.file 21 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h"
-ARM GAS  /tmp/cc6Hbd9V.s 			page 11
+ARM GAS  /tmp/ccHIr3bZ.s 			page 11
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 diff_signal.c
-     /tmp/cc6Hbd9V.s:16     .text.DWT_Delay_Init:0000000000000000 $t
-     /tmp/cc6Hbd9V.s:24     .text.DWT_Delay_Init:0000000000000000 DWT_Delay_Init
-     /tmp/cc6Hbd9V.s:53     .text.DWT_Delay_Init:000000000000001c $d
-     /tmp/cc6Hbd9V.s:59     .text.DWT_Delay_us:0000000000000000 $t
-     /tmp/cc6Hbd9V.s:66     .text.DWT_Delay_us:0000000000000000 DWT_Delay_us
-     /tmp/cc6Hbd9V.s:106    .text.DWT_Delay_us:0000000000000020 $d
-     /tmp/cc6Hbd9V.s:113    .text.DiffSignal_Stop:0000000000000000 $t
-     /tmp/cc6Hbd9V.s:120    .text.DiffSignal_Stop:0000000000000000 DiffSignal_Stop
-     /tmp/cc6Hbd9V.s:137    .text.DiffSignal_Stop:000000000000000c $d
-     /tmp/cc6Hbd9V.s:142    .text.DiffSignal_Init:0000000000000000 $t
-     /tmp/cc6Hbd9V.s:149    .text.DiffSignal_Init:0000000000000000 DiffSignal_Init
-     /tmp/cc6Hbd9V.s:183    .text.DiffSignal_Init:0000000000000024 $d
-     /tmp/cc6Hbd9V.s:189    .text.DiffSignal_Send:0000000000000000 $t
-     /tmp/cc6Hbd9V.s:196    .text.DiffSignal_Send:0000000000000000 DiffSignal_Send
-     /tmp/cc6Hbd9V.s:236    .text.DiffSignal_Send:0000000000000018 $d
-     /tmp/cc6Hbd9V.s:241    .text.DiffSignal_Senddata:0000000000000000 $t
-     /tmp/cc6Hbd9V.s:248    .text.DiffSignal_Senddata:0000000000000000 DiffSignal_Senddata
-     /tmp/cc6Hbd9V.s:377    .text.DiffSignal_Senddata:0000000000000078 $d
+     /tmp/ccHIr3bZ.s:16     .text.DWT_Delay_Init:0000000000000000 $t
+     /tmp/ccHIr3bZ.s:24     .text.DWT_Delay_Init:0000000000000000 DWT_Delay_Init
+     /tmp/ccHIr3bZ.s:53     .text.DWT_Delay_Init:000000000000001c $d
+     /tmp/ccHIr3bZ.s:59     .text.DWT_Delay_us:0000000000000000 $t
+     /tmp/ccHIr3bZ.s:66     .text.DWT_Delay_us:0000000000000000 DWT_Delay_us
+     /tmp/ccHIr3bZ.s:106    .text.DWT_Delay_us:0000000000000020 $d
+     /tmp/ccHIr3bZ.s:113    .text.DiffSignal_Stop:0000000000000000 $t
+     /tmp/ccHIr3bZ.s:120    .text.DiffSignal_Stop:0000000000000000 DiffSignal_Stop
+     /tmp/ccHIr3bZ.s:137    .text.DiffSignal_Stop:000000000000000c $d
+     /tmp/ccHIr3bZ.s:142    .text.DiffSignal_Init:0000000000000000 $t
+     /tmp/ccHIr3bZ.s:149    .text.DiffSignal_Init:0000000000000000 DiffSignal_Init
+     /tmp/ccHIr3bZ.s:183    .text.DiffSignal_Init:0000000000000024 $d
+     /tmp/ccHIr3bZ.s:189    .text.DiffSignal_Send:0000000000000000 $t
+     /tmp/ccHIr3bZ.s:196    .text.DiffSignal_Send:0000000000000000 DiffSignal_Send
+     /tmp/ccHIr3bZ.s:236    .text.DiffSignal_Send:0000000000000018 $d
+     /tmp/ccHIr3bZ.s:241    .text.DiffSignal_Senddata:0000000000000000 $t
+     /tmp/ccHIr3bZ.s:248    .text.DiffSignal_Senddata:0000000000000000 DiffSignal_Senddata
+     /tmp/ccHIr3bZ.s:377    .text.DiffSignal_Senddata:0000000000000078 $d
 
 UNDEFINED SYMBOLS
 SystemCoreClock

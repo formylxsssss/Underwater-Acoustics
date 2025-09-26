@@ -60,7 +60,6 @@ void USART3_Driver_Init(uint32_t baudrate)
         /* 这里按需处理错误 */
         myprintf("uart_init_error\n");
     }
-
     /* 打开接收中断（RXNE + 错误） */
     __HAL_UART_ENABLE_IT(&huart3, UART_IT_RXNE);
     __HAL_UART_ENABLE_IT(&huart3, UART_IT_ERR);
@@ -73,12 +72,12 @@ void USART3_Write(const uint8_t *data, size_t len)
     HAL_UART_Transmit(&huart3, (uint8_t*)data, (uint16_t)len, HAL_MAX_DELAY);
 }
 
-int USART3_WriteString(const char *s)
+int USART3_WriteString(const char *s , size_t srting_len)
 {
+    
     if (!s) return 0;
-    size_t n = strlen(s);
-    USART3_Write((const uint8_t*)s, n);
-    return (int)n;
+    USART3_Write((const uint8_t*)s, srting_len);
+    return 1;
 }
 
 void USART3_WriteByte(uint8_t b)

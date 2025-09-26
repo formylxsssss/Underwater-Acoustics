@@ -11,6 +11,8 @@
 #include "string.h"
 #include "RTUmodbus_slave.h"
 #include "data_collect.h"
+#include "uart3_drv.h"
+#include "SEGGER_RTT.h"
 static void MODS_SendWithCRC(uint8_t *_pBuf, uint8_t _ucLen);
 static void MODS_SendAckOk(void);
 static void MODS_SendAckErr(uint8_t _ucErrCode);
@@ -54,13 +56,15 @@ void MODS_Poll(void)
 
 	if (g_tModS.RxCount < 4) /* 接收到的数据小于4个字节就认为错误 */
 	{
+		myprintf("RxCount\n");
 		goto err_ret;
 	}
-
+	myprintf("here\n");
 	/* 计算CRC校验和 */
 	crc1 = CRC16_Modbus(g_tModS.RxBuf, g_tModS.RxCount);
 	if (crc1 != 0)
 	{
+		myprintf("err_ret\n");
 		goto err_ret;
 	}
 
@@ -68,11 +72,12 @@ void MODS_Poll(void)
 	addr = g_tModS.RxBuf[0]; /* 第1字节 站号 */
 	if (addr != 0x01)		 /* 判断主机发送的命令地址是否符合 */
 	{
+		myprintf("addr\n");
 		goto err_ret;
 	}
 	/* 分析应用层协议 */
 	MODS_AnalyzeApp();
-
+	myprintf("there\n");
 err_ret:
 	/* 此部分为了串口打印结果,实际运用中可不要 */
 	g_tModS.RxCount = 0; /* 必须清零计数器，方便下次帧同步 */
@@ -128,7 +133,9 @@ void MODS_ReciveNew_no_timer(uint8_t _byte)
 	g_mods_timeout = 0;
 	if (g_tModS.RxCount < S_RX_BUF_SIZE)
 	{
+		myprintf("byte is %x\n",_byte);
 		g_tModS.RxBuf[g_tModS.RxCount++] = _byte;
+		
 	}
 }
 
@@ -164,6 +171,12 @@ static void MODS_SendWithCRC(uint8_t *_pBuf, uint8_t _ucLen)
 	buf[_ucLen++] = crc >> 8;
 	buf[_ucLen++] = crc;
 	#warning 这里需要给出一个发送的接口
+	HAL_GPIO_WritePin(GPIOB,GPIO_PIN_8,GPIO_PIN_SET);
+	HAL_Delay(3);
+	USART3_WriteString(buf,_ucLen);
+	HAL_Delay(5);
+	 HAL_GPIO_WritePin(GPIOB,GPIO_PIN_8,GPIO_PIN_RESET);
+	 //   HAL_GPIO_WritePin(GPIOB,GPIO_PIN_8,GPIO_PIN_RESET);
 	// self_uart_send(buf, _ucLen);
 	/* 此部分为了串口打印结果,实际运用中可不要 */
 }
@@ -185,6 +198,7 @@ static void MODS_SendAckErr(uint8_t _ucErrCode)
 	txbuf[2] = _ucErrCode;				/* 错误代码(01,02,03,04) */
 
 	MODS_SendWithCRC(txbuf, 3);
+	myprintf("send_ack_err\n");
 }
 
 /*
@@ -217,6 +231,7 @@ static void MODS_SendAckOk(void)
 */
 static void MODS_AnalyzeApp(void)
 {
+	myprintf("mods is %d\n ",g_tModS.RxBuf[1]);
 	switch (g_tModS.RxBuf[1]) /* 第2个字节 功能码 */
 	{
 	case 0x01: /* 读取线圈状态（此例程用led代替）*/

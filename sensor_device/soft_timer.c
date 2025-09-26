@@ -1,7 +1,7 @@
 /* soft_timer.c */
 
 #include "soft_timer.h"
-
+#include "SEGGER_RTT.h"
 static SoftTimer_t timers[SOFT_TIMER_MAX];
 
 void SoftTimer_Init(void)
@@ -35,6 +35,7 @@ void SoftTimer_Stop(int8_t id)
     if (id >= 0 && id < SOFT_TIMER_MAX) {
         timers[id].active = false;
     }
+    myprintf("stop_count\n");
 }
 
 void SoftTimer_Tick(void)

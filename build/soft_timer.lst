@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccHspW3M.s 			page 1
+ARM GAS  /tmp/ccV6Dijw.s 			page 1
 
 
    1              		.cpu cortex-m3
@@ -29,7 +29,7 @@ ARM GAS  /tmp/ccHspW3M.s 			page 1
    1:sensor_device/soft_timer.c **** /* soft_timer.c */
    2:sensor_device/soft_timer.c **** 
    3:sensor_device/soft_timer.c **** #include "soft_timer.h"
-   4:sensor_device/soft_timer.c **** 
+   4:sensor_device/soft_timer.c **** #include "SEGGER_RTT.h"
    5:sensor_device/soft_timer.c **** static SoftTimer_t timers[SOFT_TIMER_MAX];
    6:sensor_device/soft_timer.c **** 
    7:sensor_device/soft_timer.c **** void SoftTimer_Init(void)
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccHspW3M.s 			page 1
   46              	.LCFI0:
   47              		.cfi_def_cfa_offset 4
   48              		.cfi_offset 4, -4
-ARM GAS  /tmp/ccHspW3M.s 			page 2
+ARM GAS  /tmp/ccV6Dijw.s 			page 2
 
 
   49              	.L3:
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccHspW3M.s 			page 1
   92              	.L8:
   93 002c 00000000 		.word	.LANCHOR0
   94              		.cfi_endproc
-ARM GAS  /tmp/ccHspW3M.s 			page 3
+ARM GAS  /tmp/ccV6Dijw.s 			page 3
 
 
   95              	.LFE2:
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccHspW3M.s 			page 1
  143 0014 0133     		adds	r3, r3, #1
  144              	.LVL5:
   20:sensor_device/soft_timer.c ****     for (int i = 0; i < SOFT_TIMER_MAX; i++) {
-ARM GAS  /tmp/ccHspW3M.s 			page 4
+ARM GAS  /tmp/ccV6Dijw.s 			page 4
 
 
  145              		.loc 1 20 21 is_stmt 1 discriminator 2 view .LVU35
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccHspW3M.s 			page 1
  181              		.loc 1 25 13 is_stmt 1 view .LVU45
   25:sensor_device/soft_timer.c ****             timers[i].mode      = mode;
  182              		.loc 1 25 33 is_stmt 0 view .LVU46
-ARM GAS  /tmp/ccHspW3M.s 			page 5
+ARM GAS  /tmp/ccV6Dijw.s 			page 5
 
 
  183 0034 E160     		str	r1, [r4, #12]
@@ -279,257 +279,278 @@ ARM GAS  /tmp/ccHspW3M.s 			page 1
  211 0044 00000000 		.word	.LANCHOR0
  212              		.cfi_endproc
  213              	.LFE3:
- 215              		.section	.text.SoftTimer_Stop,"ax",%progbits
- 216              		.align	1
- 217              		.global	SoftTimer_Stop
- 218              		.syntax unified
- 219              		.thumb
- 220              		.thumb_func
- 221              		.fpu softvfp
- 223              	SoftTimer_Stop:
- 224              	.LVL11:
- 225              	.LFB4:
+ 215              		.section	.rodata.SoftTimer_Stop.str1.4,"aMS",%progbits,1
+ 216              		.align	2
+ 217              	.LC0:
+ 218 0000 73746F70 		.ascii	"stop_count\012\000"
+ 218      5F636F75 
+ 218      6E740A00 
+ 219              		.section	.text.SoftTimer_Stop,"ax",%progbits
+ 220              		.align	1
+ 221              		.global	SoftTimer_Stop
+ 222              		.syntax unified
+ 223              		.thumb
+ 224              		.thumb_func
+ 225              		.fpu softvfp
+ 227              	SoftTimer_Stop:
+ 228              	.LVL11:
+ 229              	.LFB4:
   32:sensor_device/soft_timer.c **** 
   33:sensor_device/soft_timer.c **** void SoftTimer_Stop(int8_t id)
   34:sensor_device/soft_timer.c **** {
- 226              		.loc 1 34 1 is_stmt 1 view -0
- 227              		.cfi_startproc
- 228              		@ args = 0, pretend = 0, frame = 0
- 229              		@ frame_needed = 0, uses_anonymous_args = 0
- 230              		@ link register save eliminated.
+ARM GAS  /tmp/ccV6Dijw.s 			page 6
+
+
+ 230              		.loc 1 34 1 is_stmt 1 view -0
+ 231              		.cfi_startproc
+ 232              		@ args = 0, pretend = 0, frame = 0
+ 233              		@ frame_needed = 0, uses_anonymous_args = 0
+ 234              		.loc 1 34 1 is_stmt 0 view .LVU56
+ 235 0000 08B5     		push	{r3, lr}
+ 236              	.LCFI6:
+ 237              		.cfi_def_cfa_offset 8
+ 238              		.cfi_offset 3, -8
+ 239              		.cfi_offset 14, -4
   35:sensor_device/soft_timer.c ****     if (id >= 0 && id < SOFT_TIMER_MAX) {
-ARM GAS  /tmp/ccHspW3M.s 			page 6
-
-
- 231              		.loc 1 35 5 view .LVU56
- 232              		.loc 1 35 17 is_stmt 0 view .LVU57
- 233 0000 C3B2     		uxtb	r3, r0
- 234              		.loc 1 35 8 view .LVU58
- 235 0002 072B     		cmp	r3, #7
- 236 0004 05D8     		bhi	.L24
+ 240              		.loc 1 35 5 is_stmt 1 view .LVU57
+ 241              		.loc 1 35 17 is_stmt 0 view .LVU58
+ 242 0002 C3B2     		uxtb	r3, r0
+ 243              		.loc 1 35 8 view .LVU59
+ 244 0004 072B     		cmp	r3, #7
+ 245 0006 05D8     		bhi	.L25
   36:sensor_device/soft_timer.c ****         timers[id].active = false;
- 237              		.loc 1 36 9 is_stmt 1 view .LVU59
- 238              		.loc 1 36 27 is_stmt 0 view .LVU60
- 239 0006 00EB8000 		add	r0, r0, r0, lsl #2
- 240              	.LVL12:
- 241              		.loc 1 36 27 view .LVU61
- 242 000a 8000     		lsls	r0, r0, #2
- 243 000c 014B     		ldr	r3, .L26
- 244              	.LVL13:
- 245              		.loc 1 36 27 view .LVU62
- 246 000e 0022     		movs	r2, #0
- 247 0010 1A54     		strb	r2, [r3, r0]
- 248              	.L24:
+ 246              		.loc 1 36 9 is_stmt 1 view .LVU60
+ 247              		.loc 1 36 27 is_stmt 0 view .LVU61
+ 248 0008 00EB8000 		add	r0, r0, r0, lsl #2
+ 249              	.LVL12:
+ 250              		.loc 1 36 27 view .LVU62
+ 251 000c 8000     		lsls	r0, r0, #2
+ 252 000e 044B     		ldr	r3, .L27
+ 253              	.LVL13:
+ 254              		.loc 1 36 27 view .LVU63
+ 255 0010 0022     		movs	r2, #0
+ 256 0012 1A54     		strb	r2, [r3, r0]
+ 257              	.L25:
   37:sensor_device/soft_timer.c ****     }
-  38:sensor_device/soft_timer.c **** }
- 249              		.loc 1 38 1 view .LVU63
- 250 0012 7047     		bx	lr
- 251              	.L27:
- 252              		.align	2
- 253              	.L26:
- 254 0014 00000000 		.word	.LANCHOR0
- 255              		.cfi_endproc
- 256              	.LFE4:
- 258              		.section	.text.SoftTimer_Tick,"ax",%progbits
- 259              		.align	1
- 260              		.global	SoftTimer_Tick
- 261              		.syntax unified
- 262              		.thumb
- 263              		.thumb_func
- 264              		.fpu softvfp
- 266              	SoftTimer_Tick:
- 267              	.LFB5:
-  39:sensor_device/soft_timer.c **** 
-  40:sensor_device/soft_timer.c **** void SoftTimer_Tick(void)
-  41:sensor_device/soft_timer.c **** {
- 268              		.loc 1 41 1 is_stmt 1 view -0
- 269              		.cfi_startproc
- 270              		@ args = 0, pretend = 0, frame = 0
- 271              		@ frame_needed = 0, uses_anonymous_args = 0
- 272 0000 10B5     		push	{r4, lr}
- 273              	.LCFI6:
- 274              		.cfi_def_cfa_offset 8
- 275              		.cfi_offset 4, -8
- 276              		.cfi_offset 14, -4
-  42:sensor_device/soft_timer.c ****     for (int i = 0; i < SOFT_TIMER_MAX; i++) {
- 277              		.loc 1 42 5 view .LVU65
- 278              	.LBB7:
- 279              		.loc 1 42 10 view .LVU66
- 280              	.LVL14:
- 281              		.loc 1 42 14 is_stmt 0 view .LVU67
- 282 0002 0024     		movs	r4, #0
-ARM GAS  /tmp/ccHspW3M.s 			page 7
+  38:sensor_device/soft_timer.c ****     myprintf("stop_count\n");
+ 258              		.loc 1 38 5 is_stmt 1 view .LVU64
+ 259 0014 0349     		ldr	r1, .L27+4
+ 260 0016 0020     		movs	r0, #0
+ 261 0018 FFF7FEFF 		bl	SEGGER_RTT_printf
+ 262              	.LVL14:
+  39:sensor_device/soft_timer.c **** }
+ 263              		.loc 1 39 1 is_stmt 0 view .LVU65
+ 264 001c 08BD     		pop	{r3, pc}
+ 265              	.L28:
+ 266 001e 00BF     		.align	2
+ 267              	.L27:
+ 268 0020 00000000 		.word	.LANCHOR0
+ 269 0024 00000000 		.word	.LC0
+ 270              		.cfi_endproc
+ 271              	.LFE4:
+ 273              		.section	.text.SoftTimer_Tick,"ax",%progbits
+ 274              		.align	1
+ 275              		.global	SoftTimer_Tick
+ 276              		.syntax unified
+ 277              		.thumb
+ 278              		.thumb_func
+ 279              		.fpu softvfp
+ 281              	SoftTimer_Tick:
+ 282              	.LFB5:
+  40:sensor_device/soft_timer.c **** 
+ARM GAS  /tmp/ccV6Dijw.s 			page 7
 
 
- 283              		.loc 1 42 5 view .LVU68
- 284 0004 0CE0     		b	.L29
- 285              	.LVL15:
- 286              	.L37:
+  41:sensor_device/soft_timer.c **** void SoftTimer_Tick(void)
+  42:sensor_device/soft_timer.c **** {
+ 283              		.loc 1 42 1 is_stmt 1 view -0
+ 284              		.cfi_startproc
+ 285              		@ args = 0, pretend = 0, frame = 0
+ 286              		@ frame_needed = 0, uses_anonymous_args = 0
+ 287 0000 10B5     		push	{r4, lr}
+ 288              	.LCFI7:
+ 289              		.cfi_def_cfa_offset 8
+ 290              		.cfi_offset 4, -8
+ 291              		.cfi_offset 14, -4
+  43:sensor_device/soft_timer.c ****     for (int i = 0; i < SOFT_TIMER_MAX; i++) {
+ 292              		.loc 1 43 5 view .LVU67
+ 293              	.LBB7:
+ 294              		.loc 1 43 10 view .LVU68
+ 295              	.LVL15:
+ 296              		.loc 1 43 14 is_stmt 0 view .LVU69
+ 297 0002 0024     		movs	r4, #0
+ 298              		.loc 1 43 5 view .LVU70
+ 299 0004 0CE0     		b	.L30
+ 300              	.LVL16:
+ 301              	.L38:
+  44:sensor_device/soft_timer.c ****         if (!timers[i].active) continue;
+  45:sensor_device/soft_timer.c **** 
+  46:sensor_device/soft_timer.c ****         if (timers[i].counter == 0) {
+  47:sensor_device/soft_timer.c ****             // 到期回调
+  48:sensor_device/soft_timer.c ****             if (timers[i].cb) {
+  49:sensor_device/soft_timer.c ****                 timers[i].cb();
+  50:sensor_device/soft_timer.c ****             }
+  51:sensor_device/soft_timer.c ****             // 根据模式决定是否重载
+  52:sensor_device/soft_timer.c ****             if (timers[i].mode == TIMER_MODE_PERIODIC) {
+  53:sensor_device/soft_timer.c ****                 timers[i].counter = timers[i].reload_ms;
+ 302              		.loc 1 53 17 is_stmt 1 view .LVU71
+ 303              		.loc 1 53 46 is_stmt 0 view .LVU72
+ 304 0006 194B     		ldr	r3, .L39
+ 305 0008 1344     		add	r3, r3, r2
+ 306 000a 5A68     		ldr	r2, [r3, #4]
+ 307              		.loc 1 53 35 view .LVU73
+ 308 000c 9A60     		str	r2, [r3, #8]
+ 309 000e 06E0     		b	.L31
+ 310              	.L32:
+  54:sensor_device/soft_timer.c ****             } else {
+  55:sensor_device/soft_timer.c ****                 // 单次模式，执行完后停止该定时器
+  56:sensor_device/soft_timer.c ****                 timers[i].active = false;
+  57:sensor_device/soft_timer.c ****             }
+  58:sensor_device/soft_timer.c ****         } else {
+  59:sensor_device/soft_timer.c ****             timers[i].counter--;
+ 311              		.loc 1 59 13 is_stmt 1 view .LVU74
+ 312              		.loc 1 59 30 is_stmt 0 view .LVU75
+ 313 0010 04EB8402 		add	r2, r4, r4, lsl #2
+ 314 0014 9100     		lsls	r1, r2, #2
+ 315 0016 154A     		ldr	r2, .L39
+ 316 0018 0A44     		add	r2, r2, r1
+ 317 001a 013B     		subs	r3, r3, #1
+ 318 001c 9360     		str	r3, [r2, #8]
+ 319              	.L31:
   43:sensor_device/soft_timer.c ****         if (!timers[i].active) continue;
-  44:sensor_device/soft_timer.c **** 
-  45:sensor_device/soft_timer.c ****         if (timers[i].counter == 0) {
+ARM GAS  /tmp/ccV6Dijw.s 			page 8
+
+
+ 320              		.loc 1 43 41 is_stmt 1 discriminator 2 view .LVU76
+  43:sensor_device/soft_timer.c ****         if (!timers[i].active) continue;
+ 321              		.loc 1 43 42 is_stmt 0 discriminator 2 view .LVU77
+ 322 001e 0134     		adds	r4, r4, #1
+ 323              	.LVL17:
+ 324              	.L30:
+  43:sensor_device/soft_timer.c ****         if (!timers[i].active) continue;
+ 325              		.loc 1 43 21 is_stmt 1 discriminator 1 view .LVU78
+  43:sensor_device/soft_timer.c ****         if (!timers[i].active) continue;
+ 326              		.loc 1 43 5 is_stmt 0 discriminator 1 view .LVU79
+ 327 0020 072C     		cmp	r4, #7
+ 328 0022 22DC     		bgt	.L37
+  44:sensor_device/soft_timer.c ****         if (!timers[i].active) continue;
+ 329              		.loc 1 44 9 is_stmt 1 view .LVU80
+  44:sensor_device/soft_timer.c ****         if (!timers[i].active) continue;
+ 330              		.loc 1 44 23 is_stmt 0 view .LVU81
+ 331 0024 04EB8402 		add	r2, r4, r4, lsl #2
+ 332 0028 9300     		lsls	r3, r2, #2
+ 333 002a 104A     		ldr	r2, .L39
+ 334 002c D35C     		ldrb	r3, [r2, r3]	@ zero_extendqisi2
+  44:sensor_device/soft_timer.c ****         if (!timers[i].active) continue;
+ 335              		.loc 1 44 12 view .LVU82
+ 336 002e 002B     		cmp	r3, #0
+ 337 0030 F5D0     		beq	.L31
   46:sensor_device/soft_timer.c ****             // 到期回调
-  47:sensor_device/soft_timer.c ****             if (timers[i].cb) {
+ 338              		.loc 1 46 9 is_stmt 1 view .LVU83
+  46:sensor_device/soft_timer.c ****             // 到期回调
+ 339              		.loc 1 46 22 is_stmt 0 view .LVU84
+ 340 0032 04EB8403 		add	r3, r4, r4, lsl #2
+ 341 0036 9A00     		lsls	r2, r3, #2
+ 342 0038 0C4B     		ldr	r3, .L39
+ 343 003a 1344     		add	r3, r3, r2
+ 344 003c 9B68     		ldr	r3, [r3, #8]
+  46:sensor_device/soft_timer.c ****             // 到期回调
+ 345              		.loc 1 46 12 view .LVU85
+ 346 003e 002B     		cmp	r3, #0
+ 347 0040 E6D1     		bne	.L32
   48:sensor_device/soft_timer.c ****                 timers[i].cb();
+ 348              		.loc 1 48 13 is_stmt 1 view .LVU86
+  48:sensor_device/soft_timer.c ****                 timers[i].cb();
+ 349              		.loc 1 48 26 is_stmt 0 view .LVU87
+ 350 0042 0A4B     		ldr	r3, .L39
+ 351 0044 1344     		add	r3, r3, r2
+ 352 0046 DB68     		ldr	r3, [r3, #12]
+  48:sensor_device/soft_timer.c ****                 timers[i].cb();
+ 353              		.loc 1 48 16 view .LVU88
+ 354 0048 03B1     		cbz	r3, .L33
   49:sensor_device/soft_timer.c ****             }
-  50:sensor_device/soft_timer.c ****             // 根据模式决定是否重载
-  51:sensor_device/soft_timer.c ****             if (timers[i].mode == TIMER_MODE_PERIODIC) {
+ 355              		.loc 1 49 17 is_stmt 1 view .LVU89
+ 356 004a 9847     		blx	r3
+ 357              	.LVL18:
+ 358              	.L33:
   52:sensor_device/soft_timer.c ****                 timers[i].counter = timers[i].reload_ms;
- 287              		.loc 1 52 17 is_stmt 1 view .LVU69
- 288              		.loc 1 52 46 is_stmt 0 view .LVU70
- 289 0006 194B     		ldr	r3, .L38
- 290 0008 1344     		add	r3, r3, r2
- 291 000a 5A68     		ldr	r2, [r3, #4]
- 292              		.loc 1 52 35 view .LVU71
- 293 000c 9A60     		str	r2, [r3, #8]
- 294 000e 06E0     		b	.L30
- 295              	.L31:
-  53:sensor_device/soft_timer.c ****             } else {
-  54:sensor_device/soft_timer.c ****                 // 单次模式，执行完后停止该定时器
-  55:sensor_device/soft_timer.c ****                 timers[i].active = false;
+ 359              		.loc 1 52 13 view .LVU90
+  52:sensor_device/soft_timer.c ****                 timers[i].counter = timers[i].reload_ms;
+ 360              		.loc 1 52 26 is_stmt 0 view .LVU91
+ 361 004c 04EB8403 		add	r3, r4, r4, lsl #2
+ARM GAS  /tmp/ccV6Dijw.s 			page 9
+
+
+ 362 0050 9A00     		lsls	r2, r3, #2
+ 363 0052 064B     		ldr	r3, .L39
+ 364 0054 1344     		add	r3, r3, r2
+ 365 0056 1B7C     		ldrb	r3, [r3, #16]	@ zero_extendqisi2
+  52:sensor_device/soft_timer.c ****                 timers[i].counter = timers[i].reload_ms;
+ 366              		.loc 1 52 16 view .LVU92
+ 367 0058 012B     		cmp	r3, #1
+ 368 005a D4D0     		beq	.L38
   56:sensor_device/soft_timer.c ****             }
-  57:sensor_device/soft_timer.c ****         } else {
-  58:sensor_device/soft_timer.c ****             timers[i].counter--;
- 296              		.loc 1 58 13 is_stmt 1 view .LVU72
- 297              		.loc 1 58 30 is_stmt 0 view .LVU73
- 298 0010 04EB8402 		add	r2, r4, r4, lsl #2
- 299 0014 9100     		lsls	r1, r2, #2
- 300 0016 154A     		ldr	r2, .L38
- 301 0018 0A44     		add	r2, r2, r1
- 302 001a 013B     		subs	r3, r3, #1
- 303 001c 9360     		str	r3, [r2, #8]
- 304              	.L30:
-  42:sensor_device/soft_timer.c ****         if (!timers[i].active) continue;
- 305              		.loc 1 42 41 is_stmt 1 discriminator 2 view .LVU74
-  42:sensor_device/soft_timer.c ****         if (!timers[i].active) continue;
- 306              		.loc 1 42 42 is_stmt 0 discriminator 2 view .LVU75
- 307 001e 0134     		adds	r4, r4, #1
- 308              	.LVL16:
- 309              	.L29:
-  42:sensor_device/soft_timer.c ****         if (!timers[i].active) continue;
- 310              		.loc 1 42 21 is_stmt 1 discriminator 1 view .LVU76
-  42:sensor_device/soft_timer.c ****         if (!timers[i].active) continue;
- 311              		.loc 1 42 5 is_stmt 0 discriminator 1 view .LVU77
- 312 0020 072C     		cmp	r4, #7
- 313 0022 22DC     		bgt	.L36
-  43:sensor_device/soft_timer.c ****         if (!timers[i].active) continue;
- 314              		.loc 1 43 9 is_stmt 1 view .LVU78
-  43:sensor_device/soft_timer.c ****         if (!timers[i].active) continue;
- 315              		.loc 1 43 23 is_stmt 0 view .LVU79
- 316 0024 04EB8402 		add	r2, r4, r4, lsl #2
- 317 0028 9300     		lsls	r3, r2, #2
-ARM GAS  /tmp/ccHspW3M.s 			page 8
-
-
- 318 002a 104A     		ldr	r2, .L38
- 319 002c D35C     		ldrb	r3, [r2, r3]	@ zero_extendqisi2
-  43:sensor_device/soft_timer.c ****         if (!timers[i].active) continue;
- 320              		.loc 1 43 12 view .LVU80
- 321 002e 002B     		cmp	r3, #0
- 322 0030 F5D0     		beq	.L30
-  45:sensor_device/soft_timer.c ****             // 到期回调
- 323              		.loc 1 45 9 is_stmt 1 view .LVU81
-  45:sensor_device/soft_timer.c ****             // 到期回调
- 324              		.loc 1 45 22 is_stmt 0 view .LVU82
- 325 0032 04EB8403 		add	r3, r4, r4, lsl #2
- 326 0036 9A00     		lsls	r2, r3, #2
- 327 0038 0C4B     		ldr	r3, .L38
- 328 003a 1344     		add	r3, r3, r2
- 329 003c 9B68     		ldr	r3, [r3, #8]
-  45:sensor_device/soft_timer.c ****             // 到期回调
- 330              		.loc 1 45 12 view .LVU83
- 331 003e 002B     		cmp	r3, #0
- 332 0040 E6D1     		bne	.L31
-  47:sensor_device/soft_timer.c ****                 timers[i].cb();
- 333              		.loc 1 47 13 is_stmt 1 view .LVU84
-  47:sensor_device/soft_timer.c ****                 timers[i].cb();
- 334              		.loc 1 47 26 is_stmt 0 view .LVU85
- 335 0042 0A4B     		ldr	r3, .L38
- 336 0044 1344     		add	r3, r3, r2
- 337 0046 DB68     		ldr	r3, [r3, #12]
-  47:sensor_device/soft_timer.c ****                 timers[i].cb();
- 338              		.loc 1 47 16 view .LVU86
- 339 0048 03B1     		cbz	r3, .L32
-  48:sensor_device/soft_timer.c ****             }
- 340              		.loc 1 48 17 is_stmt 1 view .LVU87
- 341 004a 9847     		blx	r3
- 342              	.LVL17:
- 343              	.L32:
-  51:sensor_device/soft_timer.c ****                 timers[i].counter = timers[i].reload_ms;
- 344              		.loc 1 51 13 view .LVU88
-  51:sensor_device/soft_timer.c ****                 timers[i].counter = timers[i].reload_ms;
- 345              		.loc 1 51 26 is_stmt 0 view .LVU89
- 346 004c 04EB8403 		add	r3, r4, r4, lsl #2
- 347 0050 9A00     		lsls	r2, r3, #2
- 348 0052 064B     		ldr	r3, .L38
- 349 0054 1344     		add	r3, r3, r2
- 350 0056 1B7C     		ldrb	r3, [r3, #16]	@ zero_extendqisi2
-  51:sensor_device/soft_timer.c ****                 timers[i].counter = timers[i].reload_ms;
- 351              		.loc 1 51 16 view .LVU90
- 352 0058 012B     		cmp	r3, #1
- 353 005a D4D0     		beq	.L37
-  55:sensor_device/soft_timer.c ****             }
- 354              		.loc 1 55 17 is_stmt 1 view .LVU91
-  55:sensor_device/soft_timer.c ****             }
- 355              		.loc 1 55 34 is_stmt 0 view .LVU92
- 356 005c 04EB8402 		add	r2, r4, r4, lsl #2
- 357 0060 9300     		lsls	r3, r2, #2
- 358 0062 024A     		ldr	r2, .L38
- 359 0064 0021     		movs	r1, #0
- 360 0066 D154     		strb	r1, [r2, r3]
- 361 0068 D9E7     		b	.L30
-ARM GAS  /tmp/ccHspW3M.s 			page 9
-
-
- 362              	.L36:
-  55:sensor_device/soft_timer.c ****             }
- 363              		.loc 1 55 34 view .LVU93
- 364              	.LBE7:
-  59:sensor_device/soft_timer.c ****         }
-  60:sensor_device/soft_timer.c ****     }
-  61:sensor_device/soft_timer.c **** }
- 365              		.loc 1 61 1 view .LVU94
- 366 006a 10BD     		pop	{r4, pc}
- 367              	.LVL18:
- 368              	.L39:
- 369              		.loc 1 61 1 view .LVU95
- 370              		.align	2
- 371              	.L38:
- 372 006c 00000000 		.word	.LANCHOR0
- 373              		.cfi_endproc
- 374              	.LFE5:
- 376              		.section	.bss.timers,"aw",%nobits
- 377              		.align	2
- 378              		.set	.LANCHOR0,. + 0
- 381              	timers:
- 382 0000 00000000 		.space	160
- 382      00000000 
- 382      00000000 
- 382      00000000 
- 382      00000000 
- 383              		.text
- 384              	.Letext0:
- 385              		.file 2 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/machine/_default_types.h"
- 386              		.file 3 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/_stdint.h"
- 387              		.file 4 "sensor_device/soft_timer.h"
-ARM GAS  /tmp/ccHspW3M.s 			page 10
+ 369              		.loc 1 56 17 is_stmt 1 view .LVU93
+  56:sensor_device/soft_timer.c ****             }
+ 370              		.loc 1 56 34 is_stmt 0 view .LVU94
+ 371 005c 04EB8402 		add	r2, r4, r4, lsl #2
+ 372 0060 9300     		lsls	r3, r2, #2
+ 373 0062 024A     		ldr	r2, .L39
+ 374 0064 0021     		movs	r1, #0
+ 375 0066 D154     		strb	r1, [r2, r3]
+ 376 0068 D9E7     		b	.L31
+ 377              	.L37:
+  56:sensor_device/soft_timer.c ****             }
+ 378              		.loc 1 56 34 view .LVU95
+ 379              	.LBE7:
+  60:sensor_device/soft_timer.c ****         }
+  61:sensor_device/soft_timer.c ****     }
+  62:sensor_device/soft_timer.c **** }
+ 380              		.loc 1 62 1 view .LVU96
+ 381 006a 10BD     		pop	{r4, pc}
+ 382              	.LVL19:
+ 383              	.L40:
+ 384              		.loc 1 62 1 view .LVU97
+ 385              		.align	2
+ 386              	.L39:
+ 387 006c 00000000 		.word	.LANCHOR0
+ 388              		.cfi_endproc
+ 389              	.LFE5:
+ 391              		.section	.bss.timers,"aw",%nobits
+ 392              		.align	2
+ 393              		.set	.LANCHOR0,. + 0
+ 396              	timers:
+ 397 0000 00000000 		.space	160
+ 397      00000000 
+ 397      00000000 
+ 397      00000000 
+ 397      00000000 
+ 398              		.text
+ 399              	.Letext0:
+ 400              		.file 2 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/machine/_default_types.h"
+ 401              		.file 3 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/_stdint.h"
+ 402              		.file 4 "sensor_device/soft_timer.h"
+ 403              		.file 5 "ARM_SEGGER_RTT/SEGGER_RTT.h"
+ARM GAS  /tmp/ccV6Dijw.s 			page 10
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 soft_timer.c
-     /tmp/ccHspW3M.s:16     .text.SoftTimer_Init:0000000000000000 $t
-     /tmp/ccHspW3M.s:24     .text.SoftTimer_Init:0000000000000000 SoftTimer_Init
-     /tmp/ccHspW3M.s:93     .text.SoftTimer_Init:000000000000002c $d
-     /tmp/ccHspW3M.s:98     .text.SoftTimer_Start:0000000000000000 $t
-     /tmp/ccHspW3M.s:105    .text.SoftTimer_Start:0000000000000000 SoftTimer_Start
-     /tmp/ccHspW3M.s:211    .text.SoftTimer_Start:0000000000000044 $d
-     /tmp/ccHspW3M.s:216    .text.SoftTimer_Stop:0000000000000000 $t
-     /tmp/ccHspW3M.s:223    .text.SoftTimer_Stop:0000000000000000 SoftTimer_Stop
-     /tmp/ccHspW3M.s:254    .text.SoftTimer_Stop:0000000000000014 $d
-     /tmp/ccHspW3M.s:259    .text.SoftTimer_Tick:0000000000000000 $t
-     /tmp/ccHspW3M.s:266    .text.SoftTimer_Tick:0000000000000000 SoftTimer_Tick
-     /tmp/ccHspW3M.s:372    .text.SoftTimer_Tick:000000000000006c $d
-     /tmp/ccHspW3M.s:377    .bss.timers:0000000000000000 $d
-     /tmp/ccHspW3M.s:381    .bss.timers:0000000000000000 timers
+     /tmp/ccV6Dijw.s:16     .text.SoftTimer_Init:0000000000000000 $t
+     /tmp/ccV6Dijw.s:24     .text.SoftTimer_Init:0000000000000000 SoftTimer_Init
+     /tmp/ccV6Dijw.s:93     .text.SoftTimer_Init:000000000000002c $d
+     /tmp/ccV6Dijw.s:98     .text.SoftTimer_Start:0000000000000000 $t
+     /tmp/ccV6Dijw.s:105    .text.SoftTimer_Start:0000000000000000 SoftTimer_Start
+     /tmp/ccV6Dijw.s:211    .text.SoftTimer_Start:0000000000000044 $d
+     /tmp/ccV6Dijw.s:216    .rodata.SoftTimer_Stop.str1.4:0000000000000000 $d
+     /tmp/ccV6Dijw.s:220    .text.SoftTimer_Stop:0000000000000000 $t
+     /tmp/ccV6Dijw.s:227    .text.SoftTimer_Stop:0000000000000000 SoftTimer_Stop
+     /tmp/ccV6Dijw.s:268    .text.SoftTimer_Stop:0000000000000020 $d
+     /tmp/ccV6Dijw.s:274    .text.SoftTimer_Tick:0000000000000000 $t
+     /tmp/ccV6Dijw.s:281    .text.SoftTimer_Tick:0000000000000000 SoftTimer_Tick
+     /tmp/ccV6Dijw.s:387    .text.SoftTimer_Tick:000000000000006c $d
+     /tmp/ccV6Dijw.s:392    .bss.timers:0000000000000000 $d
+     /tmp/ccV6Dijw.s:396    .bss.timers:0000000000000000 timers
 
-NO UNDEFINED SYMBOLS
+UNDEFINED SYMBOLS
+SEGGER_RTT_printf

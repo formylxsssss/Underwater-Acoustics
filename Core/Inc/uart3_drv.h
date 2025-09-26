@@ -26,7 +26,7 @@ void    USART3_Driver_Init(uint32_t baudrate);
 
 /* 发送 */
 void    USART3_Write(const uint8_t *data, size_t len);
-int     USART3_WriteString(const char *s);     // 返回已发送字节数
+int USART3_WriteString(const char *s , size_t srting_len);
 void    USART3_WriteByte(uint8_t b);
 
 /* 接收（中断环形缓冲区） */

@@ -1,4 +1,4 @@
-ARM GAS  /tmp/cc7QU3tQ.s 			page 1
+ARM GAS  /tmp/cc2JKGHd.s 			page 1
 
 
    1              		.cpu cortex-m3
@@ -58,7 +58,7 @@ ARM GAS  /tmp/cc7QU3tQ.s 			page 1
   38              		.cfi_def_cfa_offset 48
   19:Core/Src/uart3_drv.c ****     /* 时钟 */
   20:Core/Src/uart3_drv.c ****     __HAL_RCC_AFIO_CLK_ENABLE();
-ARM GAS  /tmp/cc7QU3tQ.s 			page 2
+ARM GAS  /tmp/cc2JKGHd.s 			page 2
 
 
   39              		.loc 1 20 5 view .LVU1
@@ -118,7 +118,7 @@ ARM GAS  /tmp/cc7QU3tQ.s 			page 1
   87 003c 0024     		movs	r4, #0
   88 003e 0694     		str	r4, [sp, #24]
   27:Core/Src/uart3_drv.c ****     GPIO_InitStruct.Pin   = UART3_TX_PIN;
-ARM GAS  /tmp/cc7QU3tQ.s 			page 3
+ARM GAS  /tmp/cc2JKGHd.s 			page 3
 
 
   89              		.loc 1 27 5 is_stmt 1 view .LVU21
@@ -178,7 +178,7 @@ ARM GAS  /tmp/cc7QU3tQ.s 			page 1
  130 0076 FFF7FEFF 		bl	HAL_NVIC_EnableIRQ
  131              	.LVL3:
   41:Core/Src/uart3_drv.c **** }
-ARM GAS  /tmp/cc7QU3tQ.s 			page 4
+ARM GAS  /tmp/cc2JKGHd.s 			page 4
 
 
  132              		.loc 1 41 1 is_stmt 0 view .LVU37
@@ -238,7 +238,7 @@ ARM GAS  /tmp/cc7QU3tQ.s 			page 1
  176              		.loc 1 49 30 is_stmt 0 view .LVU42
  177 0008 0F48     		ldr	r0, .L9
  178 000a 104B     		ldr	r3, .L9+4
-ARM GAS  /tmp/cc7QU3tQ.s 			page 5
+ARM GAS  /tmp/cc2JKGHd.s 			page 5
 
 
  179 000c 0360     		str	r3, [r0]
@@ -285,25 +285,24 @@ ARM GAS  /tmp/cc7QU3tQ.s 			page 1
   60:Core/Src/uart3_drv.c ****         /* 这里按需处理错误 */
   61:Core/Src/uart3_drv.c ****         myprintf("uart_init_error\n");
   62:Core/Src/uart3_drv.c ****     }
-  63:Core/Src/uart3_drv.c **** 
-  64:Core/Src/uart3_drv.c ****     /* 打开接收中断（RXNE + 错误） */
-  65:Core/Src/uart3_drv.c ****     __HAL_UART_ENABLE_IT(&huart3, UART_IT_RXNE);
- 210              		.loc 1 65 5 is_stmt 1 view .LVU60
+  63:Core/Src/uart3_drv.c ****     /* 打开接收中断（RXNE + 错误） */
+  64:Core/Src/uart3_drv.c ****     __HAL_UART_ENABLE_IT(&huart3, UART_IT_RXNE);
+ 210              		.loc 1 64 5 is_stmt 1 view .LVU60
  211 0026 084B     		ldr	r3, .L9
  212 0028 1B68     		ldr	r3, [r3]
  213 002a DA68     		ldr	r2, [r3, #12]
  214 002c 42F02002 		orr	r2, r2, #32
  215 0030 DA60     		str	r2, [r3, #12]
-  66:Core/Src/uart3_drv.c ****     __HAL_UART_ENABLE_IT(&huart3, UART_IT_ERR);
- 216              		.loc 1 66 5 view .LVU61
+  65:Core/Src/uart3_drv.c ****     __HAL_UART_ENABLE_IT(&huart3, UART_IT_ERR);
+ 216              		.loc 1 65 5 view .LVU61
  217 0032 5A69     		ldr	r2, [r3, #20]
  218 0034 42F00102 		orr	r2, r2, #1
-ARM GAS  /tmp/cc7QU3tQ.s 			page 6
-
-
  219 0038 5A61     		str	r2, [r3, #20]
-  67:Core/Src/uart3_drv.c **** }
- 220              		.loc 1 67 1 is_stmt 0 view .LVU62
+ARM GAS  /tmp/cc2JKGHd.s 			page 6
+
+
+  66:Core/Src/uart3_drv.c **** }
+ 220              		.loc 1 66 1 is_stmt 0 view .LVU62
  221 003a 10BD     		pop	{r4, pc}
  222              	.LVL7:
  223              	.L8:
@@ -332,52 +331,52 @@ ARM GAS  /tmp/cc7QU3tQ.s 			page 1
  247              	USART3_Write:
  248              	.LVL9:
  249              	.LFB67:
-  68:Core/Src/uart3_drv.c **** 
-  69:Core/Src/uart3_drv.c **** /* 阻塞发送 */
-  70:Core/Src/uart3_drv.c **** void USART3_Write(const uint8_t *data, size_t len)
-  71:Core/Src/uart3_drv.c **** {
- 250              		.loc 1 71 1 view -0
+  67:Core/Src/uart3_drv.c **** 
+  68:Core/Src/uart3_drv.c **** /* 阻塞发送 */
+  69:Core/Src/uart3_drv.c **** void USART3_Write(const uint8_t *data, size_t len)
+  70:Core/Src/uart3_drv.c **** {
+ 250              		.loc 1 70 1 view -0
  251              		.cfi_startproc
  252              		@ args = 0, pretend = 0, frame = 0
  253              		@ frame_needed = 0, uses_anonymous_args = 0
-  72:Core/Src/uart3_drv.c ****     if (!data || !len) return;
- 254              		.loc 1 72 5 view .LVU65
- 255              		.loc 1 72 8 is_stmt 0 view .LVU66
+  71:Core/Src/uart3_drv.c ****     if (!data || !len) return;
+ 254              		.loc 1 71 5 view .LVU65
+ 255              		.loc 1 71 8 is_stmt 0 view .LVU66
  256 0000 10B1     		cbz	r0, .L14
  257 0002 0A46     		mov	r2, r1
  258 0004 0146     		mov	r1, r0
  259              	.LVL10:
- 260              		.loc 1 72 15 discriminator 2 view .LVU67
+ 260              		.loc 1 71 15 discriminator 2 view .LVU67
  261 0006 02B9     		cbnz	r2, .L17
  262              	.LVL11:
  263              	.L14:
- 264              		.loc 1 72 15 discriminator 2 view .LVU68
+ 264              		.loc 1 71 15 discriminator 2 view .LVU68
  265 0008 7047     		bx	lr
  266              	.LVL12:
  267              	.L17:
-  71:Core/Src/uart3_drv.c ****     if (!data || !len) return;
- 268              		.loc 1 71 1 view .LVU69
+  70:Core/Src/uart3_drv.c ****     if (!data || !len) return;
+ 268              		.loc 1 70 1 view .LVU69
  269 000a 08B5     		push	{r3, lr}
-ARM GAS  /tmp/cc7QU3tQ.s 			page 7
-
-
  270              	.LCFI4:
+ARM GAS  /tmp/cc2JKGHd.s 			page 7
+
+
  271              		.cfi_def_cfa_offset 8
  272              		.cfi_offset 3, -8
  273              		.cfi_offset 14, -4
-  73:Core/Src/uart3_drv.c ****     HAL_UART_Transmit(&huart3, (uint8_t*)data, (uint16_t)len, HAL_MAX_DELAY);
- 274              		.loc 1 73 5 is_stmt 1 view .LVU70
+  72:Core/Src/uart3_drv.c ****     HAL_UART_Transmit(&huart3, (uint8_t*)data, (uint16_t)len, HAL_MAX_DELAY);
+ 274              		.loc 1 72 5 is_stmt 1 view .LVU70
  275 000c 4FF0FF33 		mov	r3, #-1
  276 0010 92B2     		uxth	r2, r2
  277              	.LVL13:
- 278              		.loc 1 73 5 is_stmt 0 view .LVU71
+ 278              		.loc 1 72 5 is_stmt 0 view .LVU71
  279 0012 0248     		ldr	r0, .L18
  280              	.LVL14:
- 281              		.loc 1 73 5 view .LVU72
+ 281              		.loc 1 72 5 view .LVU72
  282 0014 FFF7FEFF 		bl	HAL_UART_Transmit
  283              	.LVL15:
-  74:Core/Src/uart3_drv.c **** }
- 284              		.loc 1 74 1 view .LVU73
+  73:Core/Src/uart3_drv.c **** }
+ 284              		.loc 1 73 1 view .LVU73
  285 0018 08BD     		pop	{r3, pc}
  286              	.L19:
  287 001a 00BF     		.align	2
@@ -395,592 +394,575 @@ ARM GAS  /tmp/cc7QU3tQ.s 			page 1
  301              	USART3_WriteString:
  302              	.LVL16:
  303              	.LFB68:
-  75:Core/Src/uart3_drv.c **** 
-  76:Core/Src/uart3_drv.c **** int USART3_WriteString(const char *s)
-  77:Core/Src/uart3_drv.c **** {
- 304              		.loc 1 77 1 is_stmt 1 view -0
+  74:Core/Src/uart3_drv.c **** 
+  75:Core/Src/uart3_drv.c **** int USART3_WriteString(const char *s , size_t srting_len)
+  76:Core/Src/uart3_drv.c **** {
+ 304              		.loc 1 76 1 is_stmt 1 view -0
  305              		.cfi_startproc
  306              		@ args = 0, pretend = 0, frame = 0
  307              		@ frame_needed = 0, uses_anonymous_args = 0
+  77:Core/Src/uart3_drv.c ****     
   78:Core/Src/uart3_drv.c ****     if (!s) return 0;
  308              		.loc 1 78 5 view .LVU75
  309              		.loc 1 78 8 is_stmt 0 view .LVU76
- 310 0000 50B1     		cbz	r0, .L22
-  77:Core/Src/uart3_drv.c ****     if (!s) return 0;
- 311              		.loc 1 77 1 view .LVU77
- 312 0002 38B5     		push	{r3, r4, r5, lr}
+ 310 0000 20B1     		cbz	r0, .L22
+  76:Core/Src/uart3_drv.c ****     
+ 311              		.loc 1 76 1 view .LVU77
+ 312 0002 08B5     		push	{r3, lr}
  313              	.LCFI5:
- 314              		.cfi_def_cfa_offset 16
- 315              		.cfi_offset 3, -16
- 316              		.cfi_offset 4, -12
- 317              		.cfi_offset 5, -8
- 318              		.cfi_offset 14, -4
- 319 0004 0546     		mov	r5, r0
-  79:Core/Src/uart3_drv.c ****     size_t n = strlen(s);
- 320              		.loc 1 79 5 is_stmt 1 view .LVU78
-ARM GAS  /tmp/cc7QU3tQ.s 			page 8
+ 314              		.cfi_def_cfa_offset 8
+ 315              		.cfi_offset 3, -8
+ 316              		.cfi_offset 14, -4
+  79:Core/Src/uart3_drv.c ****     USART3_Write((const uint8_t*)s, srting_len);
+ 317              		.loc 1 79 5 is_stmt 1 view .LVU78
+ 318 0004 FFF7FEFF 		bl	USART3_Write
+ 319              	.LVL17:
+  80:Core/Src/uart3_drv.c ****     return 1;
+ARM GAS  /tmp/cc2JKGHd.s 			page 8
 
 
- 321              		.loc 1 79 16 is_stmt 0 view .LVU79
- 322 0006 FFF7FEFF 		bl	strlen
- 323              	.LVL17:
- 324              		.loc 1 79 16 view .LVU80
- 325 000a 0446     		mov	r4, r0
- 326              	.LVL18:
-  80:Core/Src/uart3_drv.c ****     USART3_Write((const uint8_t*)s, n);
- 327              		.loc 1 80 5 is_stmt 1 view .LVU81
- 328 000c 0146     		mov	r1, r0
- 329 000e 2846     		mov	r0, r5
- 330              	.LVL19:
- 331              		.loc 1 80 5 is_stmt 0 view .LVU82
- 332 0010 FFF7FEFF 		bl	USART3_Write
- 333              	.LVL20:
-  81:Core/Src/uart3_drv.c ****     return (int)n;
- 334              		.loc 1 81 5 is_stmt 1 view .LVU83
- 335              		.loc 1 81 12 is_stmt 0 view .LVU84
- 336 0014 2046     		mov	r0, r4
-  82:Core/Src/uart3_drv.c **** }
- 337              		.loc 1 82 1 view .LVU85
- 338 0016 38BD     		pop	{r3, r4, r5, pc}
- 339              	.LVL21:
- 340              	.L22:
- 341              	.LCFI6:
- 342              		.cfi_def_cfa_offset 0
- 343              		.cfi_restore 3
- 344              		.cfi_restore 4
- 345              		.cfi_restore 5
- 346              		.cfi_restore 14
-  78:Core/Src/uart3_drv.c ****     size_t n = strlen(s);
- 347              		.loc 1 78 20 view .LVU86
- 348 0018 0020     		movs	r0, #0
- 349              	.LVL22:
- 350              		.loc 1 82 1 view .LVU87
- 351 001a 7047     		bx	lr
- 352              		.cfi_endproc
- 353              	.LFE68:
- 355              		.section	.text.USART3_WriteByte,"ax",%progbits
- 356              		.align	1
- 357              		.global	USART3_WriteByte
- 358              		.syntax unified
- 359              		.thumb
- 360              		.thumb_func
- 361              		.fpu softvfp
- 363              	USART3_WriteByte:
- 364              	.LVL23:
- 365              	.LFB69:
-  83:Core/Src/uart3_drv.c **** 
-  84:Core/Src/uart3_drv.c **** void USART3_WriteByte(uint8_t b)
-  85:Core/Src/uart3_drv.c **** {
- 366              		.loc 1 85 1 is_stmt 1 view -0
- 367              		.cfi_startproc
- 368              		@ args = 0, pretend = 0, frame = 8
- 369              		@ frame_needed = 0, uses_anonymous_args = 0
- 370              		.loc 1 85 1 is_stmt 0 view .LVU89
- 371 0000 00B5     		push	{lr}
- 372              	.LCFI7:
-ARM GAS  /tmp/cc7QU3tQ.s 			page 9
+ 320              		.loc 1 80 5 view .LVU79
+ 321              		.loc 1 80 12 is_stmt 0 view .LVU80
+ 322 0008 0120     		movs	r0, #1
+  81:Core/Src/uart3_drv.c **** }
+ 323              		.loc 1 81 1 view .LVU81
+ 324 000a 08BD     		pop	{r3, pc}
+ 325              	.LVL18:
+ 326              	.L22:
+ 327              	.LCFI6:
+ 328              		.cfi_def_cfa_offset 0
+ 329              		.cfi_restore 3
+ 330              		.cfi_restore 14
+  78:Core/Src/uart3_drv.c ****     USART3_Write((const uint8_t*)s, srting_len);
+ 331              		.loc 1 78 20 view .LVU82
+ 332 000c 0020     		movs	r0, #0
+ 333              	.LVL19:
+ 334              		.loc 1 81 1 view .LVU83
+ 335 000e 7047     		bx	lr
+ 336              		.cfi_endproc
+ 337              	.LFE68:
+ 339              		.section	.text.USART3_WriteByte,"ax",%progbits
+ 340              		.align	1
+ 341              		.global	USART3_WriteByte
+ 342              		.syntax unified
+ 343              		.thumb
+ 344              		.thumb_func
+ 345              		.fpu softvfp
+ 347              	USART3_WriteByte:
+ 348              	.LVL20:
+ 349              	.LFB69:
+  82:Core/Src/uart3_drv.c **** 
+  83:Core/Src/uart3_drv.c **** void USART3_WriteByte(uint8_t b)
+  84:Core/Src/uart3_drv.c **** {
+ 350              		.loc 1 84 1 is_stmt 1 view -0
+ 351              		.cfi_startproc
+ 352              		@ args = 0, pretend = 0, frame = 8
+ 353              		@ frame_needed = 0, uses_anonymous_args = 0
+ 354              		.loc 1 84 1 is_stmt 0 view .LVU85
+ 355 0000 00B5     		push	{lr}
+ 356              	.LCFI7:
+ 357              		.cfi_def_cfa_offset 4
+ 358              		.cfi_offset 14, -4
+ 359 0002 83B0     		sub	sp, sp, #12
+ 360              	.LCFI8:
+ 361              		.cfi_def_cfa_offset 16
+ 362 0004 8DF80700 		strb	r0, [sp, #7]
+  85:Core/Src/uart3_drv.c ****     HAL_UART_Transmit(&huart3, &b, 1, HAL_MAX_DELAY);
+ 363              		.loc 1 85 5 is_stmt 1 view .LVU86
+ 364 0008 4FF0FF33 		mov	r3, #-1
+ 365 000c 0122     		movs	r2, #1
+ 366 000e 0DF10701 		add	r1, sp, #7
+ 367 0012 0348     		ldr	r0, .L29
+ 368              	.LVL21:
+ 369              		.loc 1 85 5 is_stmt 0 view .LVU87
+ 370 0014 FFF7FEFF 		bl	HAL_UART_Transmit
+ 371              	.LVL22:
+  86:Core/Src/uart3_drv.c **** }
+ARM GAS  /tmp/cc2JKGHd.s 			page 9
 
 
- 373              		.cfi_def_cfa_offset 4
- 374              		.cfi_offset 14, -4
- 375 0002 83B0     		sub	sp, sp, #12
- 376              	.LCFI8:
- 377              		.cfi_def_cfa_offset 16
- 378 0004 8DF80700 		strb	r0, [sp, #7]
-  86:Core/Src/uart3_drv.c ****     HAL_UART_Transmit(&huart3, &b, 1, HAL_MAX_DELAY);
- 379              		.loc 1 86 5 is_stmt 1 view .LVU90
- 380 0008 4FF0FF33 		mov	r3, #-1
- 381 000c 0122     		movs	r2, #1
- 382 000e 0DF10701 		add	r1, sp, #7
- 383 0012 0348     		ldr	r0, .L29
- 384              	.LVL24:
- 385              		.loc 1 86 5 is_stmt 0 view .LVU91
- 386 0014 FFF7FEFF 		bl	HAL_UART_Transmit
- 387              	.LVL25:
-  87:Core/Src/uart3_drv.c **** }
- 388              		.loc 1 87 1 view .LVU92
- 389 0018 03B0     		add	sp, sp, #12
- 390              	.LCFI9:
- 391              		.cfi_def_cfa_offset 4
- 392              		@ sp needed
- 393 001a 5DF804FB 		ldr	pc, [sp], #4
- 394              	.L30:
- 395 001e 00BF     		.align	2
- 396              	.L29:
- 397 0020 00000000 		.word	huart3
- 398              		.cfi_endproc
- 399              	.LFE69:
- 401              		.section	.text.USART3_Available,"ax",%progbits
- 402              		.align	1
- 403              		.global	USART3_Available
- 404              		.syntax unified
- 405              		.thumb
- 406              		.thumb_func
- 407              		.fpu softvfp
- 409              	USART3_Available:
- 410              	.LFB70:
-  88:Core/Src/uart3_drv.c **** 
-  89:Core/Src/uart3_drv.c **** /* 可读字节数 */
-  90:Core/Src/uart3_drv.c **** size_t USART3_Available(void)
-  91:Core/Src/uart3_drv.c **** {
- 411              		.loc 1 91 1 is_stmt 1 view -0
- 412              		.cfi_startproc
- 413              		@ args = 0, pretend = 0, frame = 0
- 414              		@ frame_needed = 0, uses_anonymous_args = 0
- 415              		@ link register save eliminated.
-  92:Core/Src/uart3_drv.c ****     uint16_t head = rx_head;
- 416              		.loc 1 92 5 view .LVU94
- 417              		.loc 1 92 14 is_stmt 0 view .LVU95
- 418 0000 064B     		ldr	r3, .L34
- 419 0002 1888     		ldrh	r0, [r3]
- 420 0004 83B2     		uxth	r3, r0
+ 372              		.loc 1 86 1 view .LVU88
+ 373 0018 03B0     		add	sp, sp, #12
+ 374              	.LCFI9:
+ 375              		.cfi_def_cfa_offset 4
+ 376              		@ sp needed
+ 377 001a 5DF804FB 		ldr	pc, [sp], #4
+ 378              	.L30:
+ 379 001e 00BF     		.align	2
+ 380              	.L29:
+ 381 0020 00000000 		.word	huart3
+ 382              		.cfi_endproc
+ 383              	.LFE69:
+ 385              		.section	.text.USART3_Available,"ax",%progbits
+ 386              		.align	1
+ 387              		.global	USART3_Available
+ 388              		.syntax unified
+ 389              		.thumb
+ 390              		.thumb_func
+ 391              		.fpu softvfp
+ 393              	USART3_Available:
+ 394              	.LFB70:
+  87:Core/Src/uart3_drv.c **** 
+  88:Core/Src/uart3_drv.c **** /* 可读字节数 */
+  89:Core/Src/uart3_drv.c **** size_t USART3_Available(void)
+  90:Core/Src/uart3_drv.c **** {
+ 395              		.loc 1 90 1 is_stmt 1 view -0
+ 396              		.cfi_startproc
+ 397              		@ args = 0, pretend = 0, frame = 0
+ 398              		@ frame_needed = 0, uses_anonymous_args = 0
+ 399              		@ link register save eliminated.
+  91:Core/Src/uart3_drv.c ****     uint16_t head = rx_head;
+ 400              		.loc 1 91 5 view .LVU90
+ 401              		.loc 1 91 14 is_stmt 0 view .LVU91
+ 402 0000 064B     		ldr	r3, .L34
+ 403 0002 1888     		ldrh	r0, [r3]
+ 404 0004 83B2     		uxth	r3, r0
+ 405              	.LVL23:
+  92:Core/Src/uart3_drv.c ****     uint16_t tail = rx_tail;
+ 406              		.loc 1 92 5 is_stmt 1 view .LVU92
+ 407              		.loc 1 92 14 is_stmt 0 view .LVU93
+ 408 0006 064A     		ldr	r2, .L34+4
+ 409 0008 1088     		ldrh	r0, [r2]
+ 410 000a 80B2     		uxth	r0, r0
+ 411              	.LVL24:
+  93:Core/Src/uart3_drv.c ****     return (head >= tail) ? (head - tail) : (UART3_RX_BUF_SIZE - (tail - head));
+ 412              		.loc 1 93 5 is_stmt 1 view .LVU94
+ 413              		.loc 1 93 43 is_stmt 0 view .LVU95
+ 414 000c 8342     		cmp	r3, r0
+ 415 000e 01D3     		bcc	.L32
+ 416              		.loc 1 93 35 discriminator 1 view .LVU96
+ 417 0010 181A     		subs	r0, r3, r0
+ 418              	.LVL25:
+ 419              		.loc 1 93 35 discriminator 1 view .LVU97
+ 420 0012 7047     		bx	lr
  421              	.LVL26:
-  93:Core/Src/uart3_drv.c ****     uint16_t tail = rx_tail;
- 422              		.loc 1 93 5 is_stmt 1 view .LVU96
- 423              		.loc 1 93 14 is_stmt 0 view .LVU97
-ARM GAS  /tmp/cc7QU3tQ.s 			page 10
+ 422              	.L32:
+ 423              		.loc 1 93 72 discriminator 2 view .LVU98
+ARM GAS  /tmp/cc2JKGHd.s 			page 10
 
 
- 424 0006 064A     		ldr	r2, .L34+4
- 425 0008 1088     		ldrh	r0, [r2]
- 426 000a 80B2     		uxth	r0, r0
- 427              	.LVL27:
-  94:Core/Src/uart3_drv.c ****     return (head >= tail) ? (head - tail) : (UART3_RX_BUF_SIZE - (tail - head));
- 428              		.loc 1 94 5 is_stmt 1 view .LVU98
- 429              		.loc 1 94 43 is_stmt 0 view .LVU99
- 430 000c 8342     		cmp	r3, r0
- 431 000e 01D3     		bcc	.L32
- 432              		.loc 1 94 35 discriminator 1 view .LVU100
- 433 0010 181A     		subs	r0, r3, r0
- 434              	.LVL28:
- 435              		.loc 1 94 35 discriminator 1 view .LVU101
- 436 0012 7047     		bx	lr
- 437              	.LVL29:
- 438              	.L32:
- 439              		.loc 1 94 72 discriminator 2 view .LVU102
- 440 0014 C01A     		subs	r0, r0, r3
- 441              	.LVL30:
- 442              		.loc 1 94 64 discriminator 2 view .LVU103
- 443 0016 C0F50070 		rsb	r0, r0, #512
-  95:Core/Src/uart3_drv.c **** }
- 444              		.loc 1 95 1 discriminator 2 view .LVU104
- 445 001a 7047     		bx	lr
- 446              	.L35:
- 447              		.align	2
- 448              	.L34:
- 449 001c 00000000 		.word	.LANCHOR0
- 450 0020 00000000 		.word	.LANCHOR1
- 451              		.cfi_endproc
- 452              	.LFE70:
- 454              		.section	.text.USART3_GetChar,"ax",%progbits
- 455              		.align	1
- 456              		.global	USART3_GetChar
- 457              		.syntax unified
- 458              		.thumb
- 459              		.thumb_func
- 460              		.fpu softvfp
- 462              	USART3_GetChar:
- 463              	.LFB71:
-  96:Core/Src/uart3_drv.c **** 
-  97:Core/Src/uart3_drv.c **** /* 取 1 字节（没数据返回 -1） */
-  98:Core/Src/uart3_drv.c **** int USART3_GetChar(void)
-  99:Core/Src/uart3_drv.c **** {
- 464              		.loc 1 99 1 is_stmt 1 view -0
- 465              		.cfi_startproc
- 466              		@ args = 0, pretend = 0, frame = 0
- 467              		@ frame_needed = 0, uses_anonymous_args = 0
- 468              		@ link register save eliminated.
- 100:Core/Src/uart3_drv.c ****     if (rx_head == rx_tail) return -1;
- 469              		.loc 1 100 5 view .LVU106
- 470              		.loc 1 100 17 is_stmt 0 view .LVU107
- 471 0000 0E4B     		ldr	r3, .L39
- 472 0002 1A88     		ldrh	r2, [r3]
- 473 0004 92B2     		uxth	r2, r2
- 474 0006 0E4B     		ldr	r3, .L39+4
- 475 0008 1B88     		ldrh	r3, [r3]
-ARM GAS  /tmp/cc7QU3tQ.s 			page 11
-
-
- 476 000a 9BB2     		uxth	r3, r3
- 477              		.loc 1 100 8 view .LVU108
- 478 000c 9A42     		cmp	r2, r3
- 479 000e 11D0     		beq	.L38
- 101:Core/Src/uart3_drv.c ****     uint8_t b = rx_buf[rx_tail];
- 480              		.loc 1 101 5 is_stmt 1 view .LVU109
- 481              		.loc 1 101 23 is_stmt 0 view .LVU110
- 482 0010 0B4A     		ldr	r2, .L39+4
- 483 0012 1388     		ldrh	r3, [r2]
- 484 0014 9BB2     		uxth	r3, r3
- 485              		.loc 1 101 13 view .LVU111
- 486 0016 0B49     		ldr	r1, .L39+8
- 487 0018 C85C     		ldrb	r0, [r1, r3]	@ zero_extendqisi2
- 488              	.LVL31:
- 102:Core/Src/uart3_drv.c ****     rx_tail = (uint16_t)((rx_tail + 1) % UART3_RX_BUF_SIZE);
- 489              		.loc 1 102 5 is_stmt 1 view .LVU112
- 490              		.loc 1 102 35 is_stmt 0 view .LVU113
- 491 001a 1388     		ldrh	r3, [r2]
- 492 001c 9BB2     		uxth	r3, r3
- 493 001e 0133     		adds	r3, r3, #1
- 494              		.loc 1 102 40 view .LVU114
- 495 0020 5942     		rsbs	r1, r3, #0
- 496 0022 C3F30803 		ubfx	r3, r3, #0, #9
- 497 0026 C1F30801 		ubfx	r1, r1, #0, #9
- 498 002a 58BF     		it	pl
- 499 002c 4B42     		rsbpl	r3, r1, #0
- 500              		.loc 1 102 15 view .LVU115
- 501 002e 9BB2     		uxth	r3, r3
- 502              		.loc 1 102 13 view .LVU116
- 503 0030 1380     		strh	r3, [r2]	@ movhi
- 103:Core/Src/uart3_drv.c ****     return (int)b;
- 504              		.loc 1 103 5 is_stmt 1 view .LVU117
- 505              		.loc 1 103 12 is_stmt 0 view .LVU118
- 506 0032 7047     		bx	lr
- 507              	.LVL32:
- 508              	.L38:
+ 424 0014 C01A     		subs	r0, r0, r3
+ 425              	.LVL27:
+ 426              		.loc 1 93 64 discriminator 2 view .LVU99
+ 427 0016 C0F50070 		rsb	r0, r0, #512
+  94:Core/Src/uart3_drv.c **** }
+ 428              		.loc 1 94 1 discriminator 2 view .LVU100
+ 429 001a 7047     		bx	lr
+ 430              	.L35:
+ 431              		.align	2
+ 432              	.L34:
+ 433 001c 00000000 		.word	.LANCHOR0
+ 434 0020 00000000 		.word	.LANCHOR1
+ 435              		.cfi_endproc
+ 436              	.LFE70:
+ 438              		.section	.text.USART3_GetChar,"ax",%progbits
+ 439              		.align	1
+ 440              		.global	USART3_GetChar
+ 441              		.syntax unified
+ 442              		.thumb
+ 443              		.thumb_func
+ 444              		.fpu softvfp
+ 446              	USART3_GetChar:
+ 447              	.LFB71:
+  95:Core/Src/uart3_drv.c **** 
+  96:Core/Src/uart3_drv.c **** /* 取 1 字节（没数据返回 -1） */
+  97:Core/Src/uart3_drv.c **** int USART3_GetChar(void)
+  98:Core/Src/uart3_drv.c **** {
+ 448              		.loc 1 98 1 is_stmt 1 view -0
+ 449              		.cfi_startproc
+ 450              		@ args = 0, pretend = 0, frame = 0
+ 451              		@ frame_needed = 0, uses_anonymous_args = 0
+ 452              		@ link register save eliminated.
+  99:Core/Src/uart3_drv.c ****     if (rx_head == rx_tail) return -1;
+ 453              		.loc 1 99 5 view .LVU102
+ 454              		.loc 1 99 17 is_stmt 0 view .LVU103
+ 455 0000 0E4B     		ldr	r3, .L39
+ 456 0002 1A88     		ldrh	r2, [r3]
+ 457 0004 92B2     		uxth	r2, r2
+ 458 0006 0E4B     		ldr	r3, .L39+4
+ 459 0008 1B88     		ldrh	r3, [r3]
+ 460 000a 9BB2     		uxth	r3, r3
+ 461              		.loc 1 99 8 view .LVU104
+ 462 000c 9A42     		cmp	r2, r3
+ 463 000e 11D0     		beq	.L38
  100:Core/Src/uart3_drv.c ****     uint8_t b = rx_buf[rx_tail];
- 509              		.loc 1 100 36 view .LVU119
- 510 0034 4FF0FF30 		mov	r0, #-1
- 104:Core/Src/uart3_drv.c **** }
- 511              		.loc 1 104 1 view .LVU120
- 512 0038 7047     		bx	lr
- 513              	.L40:
- 514 003a 00BF     		.align	2
- 515              	.L39:
- 516 003c 00000000 		.word	.LANCHOR0
- 517 0040 00000000 		.word	.LANCHOR1
- 518 0044 00000000 		.word	.LANCHOR2
- 519              		.cfi_endproc
- 520              	.LFE71:
- 522              		.section	.text.USART3_ReadByte,"ax",%progbits
- 523              		.align	1
- 524              		.global	USART3_ReadByte
- 525              		.syntax unified
- 526              		.thumb
- 527              		.thumb_func
- 528              		.fpu softvfp
-ARM GAS  /tmp/cc7QU3tQ.s 			page 12
+ 464              		.loc 1 100 5 is_stmt 1 view .LVU105
+ 465              		.loc 1 100 23 is_stmt 0 view .LVU106
+ 466 0010 0B4A     		ldr	r2, .L39+4
+ 467 0012 1388     		ldrh	r3, [r2]
+ 468 0014 9BB2     		uxth	r3, r3
+ 469              		.loc 1 100 13 view .LVU107
+ 470 0016 0B49     		ldr	r1, .L39+8
+ 471 0018 C85C     		ldrb	r0, [r1, r3]	@ zero_extendqisi2
+ 472              	.LVL28:
+ 101:Core/Src/uart3_drv.c ****     rx_tail = (uint16_t)((rx_tail + 1) % UART3_RX_BUF_SIZE);
+ 473              		.loc 1 101 5 is_stmt 1 view .LVU108
+ 474              		.loc 1 101 35 is_stmt 0 view .LVU109
+ARM GAS  /tmp/cc2JKGHd.s 			page 11
 
 
- 530              	USART3_ReadByte:
- 531              	.LVL33:
- 532              	.LFB72:
- 105:Core/Src/uart3_drv.c **** 
- 106:Core/Src/uart3_drv.c **** /* 取 1 字节（成功1/无数据0） */
- 107:Core/Src/uart3_drv.c **** int USART3_ReadByte(uint8_t *out)
- 108:Core/Src/uart3_drv.c **** {
- 533              		.loc 1 108 1 is_stmt 1 view -0
- 534              		.cfi_startproc
- 535              		@ args = 0, pretend = 0, frame = 0
- 536              		@ frame_needed = 0, uses_anonymous_args = 0
- 109:Core/Src/uart3_drv.c ****     if (!out) return 0;
- 537              		.loc 1 109 5 view .LVU122
- 538              		.loc 1 109 8 is_stmt 0 view .LVU123
- 539 0000 40B1     		cbz	r0, .L43
+ 475 001a 1388     		ldrh	r3, [r2]
+ 476 001c 9BB2     		uxth	r3, r3
+ 477 001e 0133     		adds	r3, r3, #1
+ 478              		.loc 1 101 40 view .LVU110
+ 479 0020 5942     		rsbs	r1, r3, #0
+ 480 0022 C3F30803 		ubfx	r3, r3, #0, #9
+ 481 0026 C1F30801 		ubfx	r1, r1, #0, #9
+ 482 002a 58BF     		it	pl
+ 483 002c 4B42     		rsbpl	r3, r1, #0
+ 484              		.loc 1 101 15 view .LVU111
+ 485 002e 9BB2     		uxth	r3, r3
+ 486              		.loc 1 101 13 view .LVU112
+ 487 0030 1380     		strh	r3, [r2]	@ movhi
+ 102:Core/Src/uart3_drv.c ****     return (int)b;
+ 488              		.loc 1 102 5 is_stmt 1 view .LVU113
+ 489              		.loc 1 102 12 is_stmt 0 view .LVU114
+ 490 0032 7047     		bx	lr
+ 491              	.LVL29:
+ 492              	.L38:
+  99:Core/Src/uart3_drv.c ****     uint8_t b = rx_buf[rx_tail];
+ 493              		.loc 1 99 36 view .LVU115
+ 494 0034 4FF0FF30 		mov	r0, #-1
+ 103:Core/Src/uart3_drv.c **** }
+ 495              		.loc 1 103 1 view .LVU116
+ 496 0038 7047     		bx	lr
+ 497              	.L40:
+ 498 003a 00BF     		.align	2
+ 499              	.L39:
+ 500 003c 00000000 		.word	.LANCHOR0
+ 501 0040 00000000 		.word	.LANCHOR1
+ 502 0044 00000000 		.word	.LANCHOR2
+ 503              		.cfi_endproc
+ 504              	.LFE71:
+ 506              		.section	.text.USART3_ReadByte,"ax",%progbits
+ 507              		.align	1
+ 508              		.global	USART3_ReadByte
+ 509              		.syntax unified
+ 510              		.thumb
+ 511              		.thumb_func
+ 512              		.fpu softvfp
+ 514              	USART3_ReadByte:
+ 515              	.LVL30:
+ 516              	.LFB72:
+ 104:Core/Src/uart3_drv.c **** 
+ 105:Core/Src/uart3_drv.c **** /* 取 1 字节（成功1/无数据0） */
+ 106:Core/Src/uart3_drv.c **** int USART3_ReadByte(uint8_t *out)
+ 107:Core/Src/uart3_drv.c **** {
+ 517              		.loc 1 107 1 is_stmt 1 view -0
+ 518              		.cfi_startproc
+ 519              		@ args = 0, pretend = 0, frame = 0
+ 520              		@ frame_needed = 0, uses_anonymous_args = 0
  108:Core/Src/uart3_drv.c ****     if (!out) return 0;
- 540              		.loc 1 108 1 view .LVU124
- 541 0002 10B5     		push	{r4, lr}
- 542              	.LCFI10:
- 543              		.cfi_def_cfa_offset 8
- 544              		.cfi_offset 4, -8
- 545              		.cfi_offset 14, -4
- 546 0004 0446     		mov	r4, r0
- 110:Core/Src/uart3_drv.c ****     int c = USART3_GetChar();
- 547              		.loc 1 110 5 is_stmt 1 view .LVU125
- 548              		.loc 1 110 13 is_stmt 0 view .LVU126
- 549 0006 FFF7FEFF 		bl	USART3_GetChar
- 550              	.LVL34:
- 111:Core/Src/uart3_drv.c ****     if (c < 0) return 0;
- 551              		.loc 1 111 5 is_stmt 1 view .LVU127
- 552              		.loc 1 111 8 is_stmt 0 view .LVU128
- 553 000a 0028     		cmp	r0, #0
- 554              		.loc 1 111 8 view .LVU129
- 555 000c 04DB     		blt	.L44
- 112:Core/Src/uart3_drv.c ****     *out = (uint8_t)c;
- 556              		.loc 1 112 5 is_stmt 1 view .LVU130
- 557              		.loc 1 112 10 is_stmt 0 view .LVU131
- 558 000e 2070     		strb	r0, [r4]
- 113:Core/Src/uart3_drv.c ****     return 1;
- 559              		.loc 1 113 5 is_stmt 1 view .LVU132
- 560              		.loc 1 113 12 is_stmt 0 view .LVU133
- 561 0010 0120     		movs	r0, #1
- 562              	.LVL35:
- 563              	.L41:
- 114:Core/Src/uart3_drv.c **** }
- 564              		.loc 1 114 1 view .LVU134
- 565 0012 10BD     		pop	{r4, pc}
- 566              	.LVL36:
- 567              	.L43:
- 568              	.LCFI11:
- 569              		.cfi_def_cfa_offset 0
- 570              		.cfi_restore 4
- 571              		.cfi_restore 14
+ 521              		.loc 1 108 5 view .LVU118
+ 522              		.loc 1 108 8 is_stmt 0 view .LVU119
+ 523 0000 40B1     		cbz	r0, .L43
+ 107:Core/Src/uart3_drv.c ****     if (!out) return 0;
+ 524              		.loc 1 107 1 view .LVU120
+ARM GAS  /tmp/cc2JKGHd.s 			page 12
+
+
+ 525 0002 10B5     		push	{r4, lr}
+ 526              	.LCFI10:
+ 527              		.cfi_def_cfa_offset 8
+ 528              		.cfi_offset 4, -8
+ 529              		.cfi_offset 14, -4
+ 530 0004 0446     		mov	r4, r0
  109:Core/Src/uart3_drv.c ****     int c = USART3_GetChar();
- 572              		.loc 1 109 22 view .LVU135
- 573 0014 0020     		movs	r0, #0
- 574              	.LVL37:
-ARM GAS  /tmp/cc7QU3tQ.s 			page 13
-
-
- 575              		.loc 1 114 1 view .LVU136
- 576 0016 7047     		bx	lr
- 577              	.LVL38:
- 578              	.L44:
- 579              	.LCFI12:
- 580              		.cfi_def_cfa_offset 8
- 581              		.cfi_offset 4, -8
- 582              		.cfi_offset 14, -4
+ 531              		.loc 1 109 5 is_stmt 1 view .LVU121
+ 532              		.loc 1 109 13 is_stmt 0 view .LVU122
+ 533 0006 FFF7FEFF 		bl	USART3_GetChar
+ 534              	.LVL31:
+ 110:Core/Src/uart3_drv.c ****     if (c < 0) return 0;
+ 535              		.loc 1 110 5 is_stmt 1 view .LVU123
+ 536              		.loc 1 110 8 is_stmt 0 view .LVU124
+ 537 000a 0028     		cmp	r0, #0
+ 538              		.loc 1 110 8 view .LVU125
+ 539 000c 04DB     		blt	.L44
  111:Core/Src/uart3_drv.c ****     *out = (uint8_t)c;
- 583              		.loc 1 111 23 view .LVU137
- 584 0018 0020     		movs	r0, #0
- 585              	.LVL39:
- 111:Core/Src/uart3_drv.c ****     *out = (uint8_t)c;
- 586              		.loc 1 111 23 view .LVU138
- 587 001a FAE7     		b	.L41
- 588              		.cfi_endproc
- 589              	.LFE72:
- 591              		.section	.text.USART3_FlushRx,"ax",%progbits
- 592              		.align	1
- 593              		.global	USART3_FlushRx
- 594              		.syntax unified
- 595              		.thumb
- 596              		.thumb_func
- 597              		.fpu softvfp
- 599              	USART3_FlushRx:
- 600              	.LFB73:
- 115:Core/Src/uart3_drv.c **** 
- 116:Core/Src/uart3_drv.c **** /* 清空 RX 缓冲 */
- 117:Core/Src/uart3_drv.c **** void USART3_FlushRx(void)
- 118:Core/Src/uart3_drv.c **** {
- 601              		.loc 1 118 1 is_stmt 1 view -0
- 602              		.cfi_startproc
- 603              		@ args = 0, pretend = 0, frame = 0
- 604              		@ frame_needed = 0, uses_anonymous_args = 0
- 605              		@ link register save eliminated.
- 119:Core/Src/uart3_drv.c ****     rx_head = rx_tail = 0;
- 606              		.loc 1 119 5 view .LVU140
- 607              		.loc 1 119 23 is_stmt 0 view .LVU141
- 608 0000 0023     		movs	r3, #0
- 609 0002 024A     		ldr	r2, .L50
- 610 0004 1380     		strh	r3, [r2]	@ movhi
- 611              		.loc 1 119 13 view .LVU142
- 612 0006 024A     		ldr	r2, .L50+4
- 613 0008 1380     		strh	r3, [r2]	@ movhi
- 120:Core/Src/uart3_drv.c **** }
- 614              		.loc 1 120 1 view .LVU143
- 615 000a 7047     		bx	lr
- 616              	.L51:
- 617              		.align	2
- 618              	.L50:
- 619 000c 00000000 		.word	.LANCHOR1
- 620 0010 00000000 		.word	.LANCHOR0
- 621              		.cfi_endproc
- 622              	.LFE73:
- 624              		.section	.text.USART3_IRQHandler,"ax",%progbits
- 625              		.align	1
- 626              		.global	USART3_IRQHandler
-ARM GAS  /tmp/cc7QU3tQ.s 			page 14
+ 540              		.loc 1 111 5 is_stmt 1 view .LVU126
+ 541              		.loc 1 111 10 is_stmt 0 view .LVU127
+ 542 000e 2070     		strb	r0, [r4]
+ 112:Core/Src/uart3_drv.c ****     return 1;
+ 543              		.loc 1 112 5 is_stmt 1 view .LVU128
+ 544              		.loc 1 112 12 is_stmt 0 view .LVU129
+ 545 0010 0120     		movs	r0, #1
+ 546              	.LVL32:
+ 547              	.L41:
+ 113:Core/Src/uart3_drv.c **** }
+ 548              		.loc 1 113 1 view .LVU130
+ 549 0012 10BD     		pop	{r4, pc}
+ 550              	.LVL33:
+ 551              	.L43:
+ 552              	.LCFI11:
+ 553              		.cfi_def_cfa_offset 0
+ 554              		.cfi_restore 4
+ 555              		.cfi_restore 14
+ 108:Core/Src/uart3_drv.c ****     int c = USART3_GetChar();
+ 556              		.loc 1 108 22 view .LVU131
+ 557 0014 0020     		movs	r0, #0
+ 558              	.LVL34:
+ 559              		.loc 1 113 1 view .LVU132
+ 560 0016 7047     		bx	lr
+ 561              	.LVL35:
+ 562              	.L44:
+ 563              	.LCFI12:
+ 564              		.cfi_def_cfa_offset 8
+ 565              		.cfi_offset 4, -8
+ 566              		.cfi_offset 14, -4
+ 110:Core/Src/uart3_drv.c ****     *out = (uint8_t)c;
+ 567              		.loc 1 110 23 view .LVU133
+ 568 0018 0020     		movs	r0, #0
+ 569              	.LVL36:
+ 110:Core/Src/uart3_drv.c ****     *out = (uint8_t)c;
+ 570              		.loc 1 110 23 view .LVU134
+ 571 001a FAE7     		b	.L41
+ 572              		.cfi_endproc
+ 573              	.LFE72:
+ARM GAS  /tmp/cc2JKGHd.s 			page 13
 
 
- 627              		.syntax unified
- 628              		.thumb
- 629              		.thumb_func
- 630              		.fpu softvfp
- 632              	USART3_IRQHandler:
- 633              	.LFB74:
- 121:Core/Src/uart3_drv.c **** 
- 122:Core/Src/uart3_drv.c **** /* ===== 中断服务函数（放这里即可，启动文件里有弱定义，会被此处覆盖）
- 123:Core/Src/uart3_drv.c **** void USART3_IRQHandler(void)
- 124:Core/Src/uart3_drv.c **** {
- 634              		.loc 1 124 1 is_stmt 1 view -0
- 635              		.cfi_startproc
- 636              		@ args = 0, pretend = 0, frame = 0
- 637              		@ frame_needed = 0, uses_anonymous_args = 0
- 638              		@ link register save eliminated.
- 125:Core/Src/uart3_drv.c ****     uint32_t isr = huart3.Instance->SR;   // SR 先读
- 639              		.loc 1 125 5 view .LVU145
- 640              		.loc 1 125 26 is_stmt 0 view .LVU146
- 641 0000 114B     		ldr	r3, .L58
- 642 0002 1B68     		ldr	r3, [r3]
- 643              		.loc 1 125 14 view .LVU147
- 644 0004 1A68     		ldr	r2, [r3]
- 645              	.LVL40:
- 126:Core/Src/uart3_drv.c ****     if (isr & (USART_SR_RXNE | USART_SR_ORE | USART_SR_NE | USART_SR_FE | USART_SR_PE))
- 646              		.loc 1 126 5 is_stmt 1 view .LVU148
- 647              		.loc 1 126 8 is_stmt 0 view .LVU149
- 648 0006 12F02F0F 		tst	r2, #47
- 649 000a 1BD0     		beq	.L55
- 650              	.LBB5:
- 127:Core/Src/uart3_drv.c ****     {
- 128:Core/Src/uart3_drv.c ****         uint8_t d = (uint8_t)(huart3.Instance->DR & 0xFF); // 读 DR 清 RXNE/错误
- 651              		.loc 1 128 9 is_stmt 1 view .LVU150
- 652              		.loc 1 128 46 is_stmt 0 view .LVU151
- 653 000c 5968     		ldr	r1, [r3, #4]
- 654              		.loc 1 128 17 view .LVU152
- 655 000e C9B2     		uxtb	r1, r1
- 656              	.LVL41:
- 129:Core/Src/uart3_drv.c ****         uint16_t next = (uint16_t)((rx_head + 1) % UART3_RX_BUF_SIZE);
- 657              		.loc 1 129 9 is_stmt 1 view .LVU153
- 658              		.loc 1 129 45 is_stmt 0 view .LVU154
- 659 0010 0E4B     		ldr	r3, .L58+4
- 660 0012 1B88     		ldrh	r3, [r3]
- 661 0014 9BB2     		uxth	r3, r3
- 662 0016 0133     		adds	r3, r3, #1
- 663              		.loc 1 129 50 view .LVU155
- 664 0018 5A42     		rsbs	r2, r3, #0
- 665              	.LVL42:
- 666              		.loc 1 129 50 view .LVU156
- 667 001a C3F30803 		ubfx	r3, r3, #0, #9
- 668 001e C2F30802 		ubfx	r2, r2, #0, #9
- 669 0022 58BF     		it	pl
- 670 0024 5342     		rsbpl	r3, r2, #0
- 671              		.loc 1 129 18 view .LVU157
- 672 0026 9BB2     		uxth	r3, r3
- 673              	.LVL43:
- 130:Core/Src/uart3_drv.c ****         if (next != rx_tail) {            // 缓冲未满
- 674              		.loc 1 130 9 is_stmt 1 view .LVU158
-ARM GAS  /tmp/cc7QU3tQ.s 			page 15
-
-
- 675              		.loc 1 130 18 is_stmt 0 view .LVU159
- 676 0028 094A     		ldr	r2, .L58+8
- 677 002a 1288     		ldrh	r2, [r2]
- 678 002c 92B2     		uxth	r2, r2
- 679              		.loc 1 130 12 view .LVU160
- 680 002e 9A42     		cmp	r2, r3
- 681 0030 08D0     		beq	.L55
- 682              	.LBE5:
+ 575              		.section	.text.USART3_FlushRx,"ax",%progbits
+ 576              		.align	1
+ 577              		.global	USART3_FlushRx
+ 578              		.syntax unified
+ 579              		.thumb
+ 580              		.thumb_func
+ 581              		.fpu softvfp
+ 583              	USART3_FlushRx:
+ 584              	.LFB73:
+ 114:Core/Src/uart3_drv.c **** 
+ 115:Core/Src/uart3_drv.c **** /* 清空 RX 缓冲 */
+ 116:Core/Src/uart3_drv.c **** void USART3_FlushRx(void)
+ 117:Core/Src/uart3_drv.c **** {
+ 585              		.loc 1 117 1 is_stmt 1 view -0
+ 586              		.cfi_startproc
+ 587              		@ args = 0, pretend = 0, frame = 0
+ 588              		@ frame_needed = 0, uses_anonymous_args = 0
+ 589              		@ link register save eliminated.
+ 118:Core/Src/uart3_drv.c ****     rx_head = rx_tail = 0;
+ 590              		.loc 1 118 5 view .LVU136
+ 591              		.loc 1 118 23 is_stmt 0 view .LVU137
+ 592 0000 0023     		movs	r3, #0
+ 593 0002 024A     		ldr	r2, .L50
+ 594 0004 1380     		strh	r3, [r2]	@ movhi
+ 595              		.loc 1 118 13 view .LVU138
+ 596 0006 024A     		ldr	r2, .L50+4
+ 597 0008 1380     		strh	r3, [r2]	@ movhi
+ 119:Core/Src/uart3_drv.c **** }
+ 598              		.loc 1 119 1 view .LVU139
+ 599 000a 7047     		bx	lr
+ 600              	.L51:
+ 601              		.align	2
+ 602              	.L50:
+ 603 000c 00000000 		.word	.LANCHOR1
+ 604 0010 00000000 		.word	.LANCHOR0
+ 605              		.cfi_endproc
+ 606              	.LFE73:
+ 608              		.section	.text.USART3_IRQHandler,"ax",%progbits
+ 609              		.align	1
+ 610              		.global	USART3_IRQHandler
+ 611              		.syntax unified
+ 612              		.thumb
+ 613              		.thumb_func
+ 614              		.fpu softvfp
+ 616              	USART3_IRQHandler:
+ 617              	.LFB74:
+ 120:Core/Src/uart3_drv.c **** 
+ 121:Core/Src/uart3_drv.c **** /* ===== 中断服务函数（放这里即可，启动文件里有弱定义，会被此处覆盖）
+ 122:Core/Src/uart3_drv.c **** void USART3_IRQHandler(void)
+ 123:Core/Src/uart3_drv.c **** {
+ 618              		.loc 1 123 1 is_stmt 1 view -0
+ 619              		.cfi_startproc
+ 620              		@ args = 0, pretend = 0, frame = 0
+ 621              		@ frame_needed = 0, uses_anonymous_args = 0
+ 622              		@ link register save eliminated.
  124:Core/Src/uart3_drv.c ****     uint32_t isr = huart3.Instance->SR;   // SR 先读
- 683              		.loc 1 124 1 view .LVU161
- 684 0032 10B4     		push	{r4}
- 685              	.LCFI13:
- 686              		.cfi_def_cfa_offset 4
- 687              		.cfi_offset 4, -4
- 688              	.LBB6:
- 131:Core/Src/uart3_drv.c ****             rx_buf[rx_head] = d;
- 689              		.loc 1 131 13 is_stmt 1 view .LVU162
- 690              		.loc 1 131 19 is_stmt 0 view .LVU163
- 691 0034 0548     		ldr	r0, .L58+4
- 692 0036 0288     		ldrh	r2, [r0]
- 693 0038 92B2     		uxth	r2, r2
- 694              		.loc 1 131 29 view .LVU164
- 695 003a 064C     		ldr	r4, .L58+12
- 696 003c A154     		strb	r1, [r4, r2]
- 132:Core/Src/uart3_drv.c ****             rx_head = next;
- 697              		.loc 1 132 13 is_stmt 1 view .LVU165
- 698              		.loc 1 132 21 is_stmt 0 view .LVU166
- 699 003e 0380     		strh	r3, [r0]	@ movhi
- 133:Core/Src/uart3_drv.c ****         } else {
- 134:Core/Src/uart3_drv.c ****             /* 缓冲溢出：可在此丢弃、计数或覆盖旧数据 */
- 135:Core/Src/uart3_drv.c ****         }
- 700              		.loc 1 135 9 is_stmt 1 view .LVU167
- 701              	.LBE6:
- 136:Core/Src/uart3_drv.c ****     }
- 137:Core/Src/uart3_drv.c **** 
- 138:Core/Src/uart3_drv.c ****     /* TXE/TC 如需做非阻塞发送，可在此扩展 */
- 139:Core/Src/uart3_drv.c ****     /* 清其它可能的标志（一般读SR后读DR已清除常见错误位） */
- 140:Core/Src/uart3_drv.c **** }
- 702              		.loc 1 140 1 is_stmt 0 view .LVU168
- 703 0040 10BC     		pop	{r4}
- 704              	.LCFI14:
- 705              		.cfi_restore 4
- 706              		.cfi_def_cfa_offset 0
- 707 0042 7047     		bx	lr
- 708              	.LVL44:
- 709              	.L55:
- 710              		.loc 1 140 1 view .LVU169
- 711 0044 7047     		bx	lr
- 712              	.L59:
- 713 0046 00BF     		.align	2
- 714              	.L58:
- 715 0048 00000000 		.word	huart3
- 716 004c 00000000 		.word	.LANCHOR0
- 717 0050 00000000 		.word	.LANCHOR1
- 718 0054 00000000 		.word	.LANCHOR2
- 719              		.cfi_endproc
- 720              	.LFE74:
-ARM GAS  /tmp/cc7QU3tQ.s 			page 16
+ 623              		.loc 1 124 5 view .LVU141
+ARM GAS  /tmp/cc2JKGHd.s 			page 14
 
 
- 722              		.comm	huart3,68,4
- 723              		.section	.bss.rx_buf,"aw",%nobits
- 724              		.align	2
- 725              		.set	.LANCHOR2,. + 0
- 728              	rx_buf:
- 729 0000 00000000 		.space	512
- 729      00000000 
- 729      00000000 
- 729      00000000 
- 729      00000000 
- 730              		.section	.bss.rx_head,"aw",%nobits
- 731              		.align	1
- 732              		.set	.LANCHOR0,. + 0
- 735              	rx_head:
- 736 0000 0000     		.space	2
- 737              		.section	.bss.rx_tail,"aw",%nobits
- 738              		.align	1
- 739              		.set	.LANCHOR1,. + 0
- 742              	rx_tail:
- 743 0000 0000     		.space	2
- 744              		.text
- 745              	.Letext0:
- 746              		.file 2 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/machine/_default_types.h"
- 747              		.file 3 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/_stdint.h"
- 748              		.file 4 "Drivers/CMSIS/Include/core_cm3.h"
- 749              		.file 5 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/system_stm32f1xx.h"
- 750              		.file 6 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xe.h"
- 751              		.file 7 "/opt/gcc-arm-none-eabi-9-2020-q2-update/lib/gcc/arm-none-eabi/9.3.1/include/stddef.h"
- 752              		.file 8 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_def.h"
- 753              		.file 9 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio.h"
- 754              		.file 10 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma.h"
- 755              		.file 11 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h"
- 756              		.file 12 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h"
- 757              		.file 13 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/_types.h"
- 758              		.file 14 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/reent.h"
- 759              		.file 15 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/lock.h"
- 760              		.file 16 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/string.h"
- 761              		.file 17 "ARM_SEGGER_RTT/SEGGER_RTT.h"
- 762              		.file 18 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_cortex.h"
-ARM GAS  /tmp/cc7QU3tQ.s 			page 17
+ 624              		.loc 1 124 26 is_stmt 0 view .LVU142
+ 625 0000 114B     		ldr	r3, .L58
+ 626 0002 1B68     		ldr	r3, [r3]
+ 627              		.loc 1 124 14 view .LVU143
+ 628 0004 1A68     		ldr	r2, [r3]
+ 629              	.LVL37:
+ 125:Core/Src/uart3_drv.c ****     if (isr & (USART_SR_RXNE | USART_SR_ORE | USART_SR_NE | USART_SR_FE | USART_SR_PE))
+ 630              		.loc 1 125 5 is_stmt 1 view .LVU144
+ 631              		.loc 1 125 8 is_stmt 0 view .LVU145
+ 632 0006 12F02F0F 		tst	r2, #47
+ 633 000a 1BD0     		beq	.L55
+ 634              	.LBB5:
+ 126:Core/Src/uart3_drv.c ****     {
+ 127:Core/Src/uart3_drv.c ****         uint8_t d = (uint8_t)(huart3.Instance->DR & 0xFF); // 读 DR 清 RXNE/错误
+ 635              		.loc 1 127 9 is_stmt 1 view .LVU146
+ 636              		.loc 1 127 46 is_stmt 0 view .LVU147
+ 637 000c 5968     		ldr	r1, [r3, #4]
+ 638              		.loc 1 127 17 view .LVU148
+ 639 000e C9B2     		uxtb	r1, r1
+ 640              	.LVL38:
+ 128:Core/Src/uart3_drv.c ****         uint16_t next = (uint16_t)((rx_head + 1) % UART3_RX_BUF_SIZE);
+ 641              		.loc 1 128 9 is_stmt 1 view .LVU149
+ 642              		.loc 1 128 45 is_stmt 0 view .LVU150
+ 643 0010 0E4B     		ldr	r3, .L58+4
+ 644 0012 1B88     		ldrh	r3, [r3]
+ 645 0014 9BB2     		uxth	r3, r3
+ 646 0016 0133     		adds	r3, r3, #1
+ 647              		.loc 1 128 50 view .LVU151
+ 648 0018 5A42     		rsbs	r2, r3, #0
+ 649              	.LVL39:
+ 650              		.loc 1 128 50 view .LVU152
+ 651 001a C3F30803 		ubfx	r3, r3, #0, #9
+ 652 001e C2F30802 		ubfx	r2, r2, #0, #9
+ 653 0022 58BF     		it	pl
+ 654 0024 5342     		rsbpl	r3, r2, #0
+ 655              		.loc 1 128 18 view .LVU153
+ 656 0026 9BB2     		uxth	r3, r3
+ 657              	.LVL40:
+ 129:Core/Src/uart3_drv.c ****         if (next != rx_tail) {            // 缓冲未满
+ 658              		.loc 1 129 9 is_stmt 1 view .LVU154
+ 659              		.loc 1 129 18 is_stmt 0 view .LVU155
+ 660 0028 094A     		ldr	r2, .L58+8
+ 661 002a 1288     		ldrh	r2, [r2]
+ 662 002c 92B2     		uxth	r2, r2
+ 663              		.loc 1 129 12 view .LVU156
+ 664 002e 9A42     		cmp	r2, r3
+ 665 0030 08D0     		beq	.L55
+ 666              	.LBE5:
+ 123:Core/Src/uart3_drv.c ****     uint32_t isr = huart3.Instance->SR;   // SR 先读
+ 667              		.loc 1 123 1 view .LVU157
+ 668 0032 10B4     		push	{r4}
+ 669              	.LCFI13:
+ 670              		.cfi_def_cfa_offset 4
+ 671              		.cfi_offset 4, -4
+ 672              	.LBB6:
+ 130:Core/Src/uart3_drv.c ****             rx_buf[rx_head] = d;
+ 673              		.loc 1 130 13 is_stmt 1 view .LVU158
+ARM GAS  /tmp/cc2JKGHd.s 			page 15
+
+
+ 674              		.loc 1 130 19 is_stmt 0 view .LVU159
+ 675 0034 0548     		ldr	r0, .L58+4
+ 676 0036 0288     		ldrh	r2, [r0]
+ 677 0038 92B2     		uxth	r2, r2
+ 678              		.loc 1 130 29 view .LVU160
+ 679 003a 064C     		ldr	r4, .L58+12
+ 680 003c A154     		strb	r1, [r4, r2]
+ 131:Core/Src/uart3_drv.c ****             rx_head = next;
+ 681              		.loc 1 131 13 is_stmt 1 view .LVU161
+ 682              		.loc 1 131 21 is_stmt 0 view .LVU162
+ 683 003e 0380     		strh	r3, [r0]	@ movhi
+ 132:Core/Src/uart3_drv.c ****         } else {
+ 133:Core/Src/uart3_drv.c ****             /* 缓冲溢出：可在此丢弃、计数或覆盖旧数据 */
+ 134:Core/Src/uart3_drv.c ****         }
+ 684              		.loc 1 134 9 is_stmt 1 view .LVU163
+ 685              	.LBE6:
+ 135:Core/Src/uart3_drv.c ****     }
+ 136:Core/Src/uart3_drv.c **** 
+ 137:Core/Src/uart3_drv.c ****     /* TXE/TC 如需做非阻塞发送，可在此扩展 */
+ 138:Core/Src/uart3_drv.c ****     /* 清其它可能的标志（一般读SR后读DR已清除常见错误位） */
+ 139:Core/Src/uart3_drv.c **** }
+ 686              		.loc 1 139 1 is_stmt 0 view .LVU164
+ 687 0040 10BC     		pop	{r4}
+ 688              	.LCFI14:
+ 689              		.cfi_restore 4
+ 690              		.cfi_def_cfa_offset 0
+ 691 0042 7047     		bx	lr
+ 692              	.LVL41:
+ 693              	.L55:
+ 694              		.loc 1 139 1 view .LVU165
+ 695 0044 7047     		bx	lr
+ 696              	.L59:
+ 697 0046 00BF     		.align	2
+ 698              	.L58:
+ 699 0048 00000000 		.word	huart3
+ 700 004c 00000000 		.word	.LANCHOR0
+ 701 0050 00000000 		.word	.LANCHOR1
+ 702 0054 00000000 		.word	.LANCHOR2
+ 703              		.cfi_endproc
+ 704              	.LFE74:
+ 706              		.comm	huart3,68,4
+ 707              		.section	.bss.rx_buf,"aw",%nobits
+ 708              		.align	2
+ 709              		.set	.LANCHOR2,. + 0
+ 712              	rx_buf:
+ 713 0000 00000000 		.space	512
+ 713      00000000 
+ 713      00000000 
+ 713      00000000 
+ 713      00000000 
+ 714              		.section	.bss.rx_head,"aw",%nobits
+ 715              		.align	1
+ 716              		.set	.LANCHOR0,. + 0
+ 719              	rx_head:
+ 720 0000 0000     		.space	2
+ 721              		.section	.bss.rx_tail,"aw",%nobits
+ 722              		.align	1
+ARM GAS  /tmp/cc2JKGHd.s 			page 16
+
+
+ 723              		.set	.LANCHOR1,. + 0
+ 726              	rx_tail:
+ 727 0000 0000     		.space	2
+ 728              		.text
+ 729              	.Letext0:
+ 730              		.file 2 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/machine/_default_types.h"
+ 731              		.file 3 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/_stdint.h"
+ 732              		.file 4 "Drivers/CMSIS/Include/core_cm3.h"
+ 733              		.file 5 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/system_stm32f1xx.h"
+ 734              		.file 6 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xe.h"
+ 735              		.file 7 "/opt/gcc-arm-none-eabi-9-2020-q2-update/lib/gcc/arm-none-eabi/9.3.1/include/stddef.h"
+ 736              		.file 8 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_def.h"
+ 737              		.file 9 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio.h"
+ 738              		.file 10 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma.h"
+ 739              		.file 11 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h"
+ 740              		.file 12 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h"
+ 741              		.file 13 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/_types.h"
+ 742              		.file 14 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/reent.h"
+ 743              		.file 15 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/lock.h"
+ 744              		.file 16 "ARM_SEGGER_RTT/SEGGER_RTT.h"
+ 745              		.file 17 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_cortex.h"
+ARM GAS  /tmp/cc2JKGHd.s 			page 17
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 uart3_drv.c
-     /tmp/cc7QU3tQ.s:16     .text.UART3_GPIO_Clock_NVIC_Init:0000000000000000 $t
-     /tmp/cc7QU3tQ.s:23     .text.UART3_GPIO_Clock_NVIC_Init:0000000000000000 UART3_GPIO_Clock_NVIC_Init
-     /tmp/cc7QU3tQ.s:141    .text.UART3_GPIO_Clock_NVIC_Init:0000000000000080 $d
-     /tmp/cc7QU3tQ.s:147    .rodata.USART3_Driver_Init.str1.4:0000000000000000 $d
-     /tmp/cc7QU3tQ.s:151    .text.USART3_Driver_Init:0000000000000000 $t
-     /tmp/cc7QU3tQ.s:158    .text.USART3_Driver_Init:0000000000000000 USART3_Driver_Init
-     /tmp/cc7QU3tQ.s:233    .text.USART3_Driver_Init:0000000000000048 $d
+     /tmp/cc2JKGHd.s:16     .text.UART3_GPIO_Clock_NVIC_Init:0000000000000000 $t
+     /tmp/cc2JKGHd.s:23     .text.UART3_GPIO_Clock_NVIC_Init:0000000000000000 UART3_GPIO_Clock_NVIC_Init
+     /tmp/cc2JKGHd.s:141    .text.UART3_GPIO_Clock_NVIC_Init:0000000000000080 $d
+     /tmp/cc2JKGHd.s:147    .rodata.USART3_Driver_Init.str1.4:0000000000000000 $d
+     /tmp/cc2JKGHd.s:151    .text.USART3_Driver_Init:0000000000000000 $t
+     /tmp/cc2JKGHd.s:158    .text.USART3_Driver_Init:0000000000000000 USART3_Driver_Init
+     /tmp/cc2JKGHd.s:233    .text.USART3_Driver_Init:0000000000000048 $d
                             *COM*:0000000000000044 huart3
-     /tmp/cc7QU3tQ.s:240    .text.USART3_Write:0000000000000000 $t
-     /tmp/cc7QU3tQ.s:247    .text.USART3_Write:0000000000000000 USART3_Write
-     /tmp/cc7QU3tQ.s:289    .text.USART3_Write:000000000000001c $d
-     /tmp/cc7QU3tQ.s:294    .text.USART3_WriteString:0000000000000000 $t
-     /tmp/cc7QU3tQ.s:301    .text.USART3_WriteString:0000000000000000 USART3_WriteString
-     /tmp/cc7QU3tQ.s:356    .text.USART3_WriteByte:0000000000000000 $t
-     /tmp/cc7QU3tQ.s:363    .text.USART3_WriteByte:0000000000000000 USART3_WriteByte
-     /tmp/cc7QU3tQ.s:397    .text.USART3_WriteByte:0000000000000020 $d
-     /tmp/cc7QU3tQ.s:402    .text.USART3_Available:0000000000000000 $t
-     /tmp/cc7QU3tQ.s:409    .text.USART3_Available:0000000000000000 USART3_Available
-     /tmp/cc7QU3tQ.s:449    .text.USART3_Available:000000000000001c $d
-     /tmp/cc7QU3tQ.s:455    .text.USART3_GetChar:0000000000000000 $t
-     /tmp/cc7QU3tQ.s:462    .text.USART3_GetChar:0000000000000000 USART3_GetChar
-     /tmp/cc7QU3tQ.s:516    .text.USART3_GetChar:000000000000003c $d
-     /tmp/cc7QU3tQ.s:523    .text.USART3_ReadByte:0000000000000000 $t
-     /tmp/cc7QU3tQ.s:530    .text.USART3_ReadByte:0000000000000000 USART3_ReadByte
-     /tmp/cc7QU3tQ.s:592    .text.USART3_FlushRx:0000000000000000 $t
-     /tmp/cc7QU3tQ.s:599    .text.USART3_FlushRx:0000000000000000 USART3_FlushRx
-     /tmp/cc7QU3tQ.s:619    .text.USART3_FlushRx:000000000000000c $d
-     /tmp/cc7QU3tQ.s:625    .text.USART3_IRQHandler:0000000000000000 $t
-     /tmp/cc7QU3tQ.s:632    .text.USART3_IRQHandler:0000000000000000 USART3_IRQHandler
-     /tmp/cc7QU3tQ.s:715    .text.USART3_IRQHandler:0000000000000048 $d
-     /tmp/cc7QU3tQ.s:724    .bss.rx_buf:0000000000000000 $d
-     /tmp/cc7QU3tQ.s:728    .bss.rx_buf:0000000000000000 rx_buf
-     /tmp/cc7QU3tQ.s:731    .bss.rx_head:0000000000000000 $d
-     /tmp/cc7QU3tQ.s:735    .bss.rx_head:0000000000000000 rx_head
-     /tmp/cc7QU3tQ.s:738    .bss.rx_tail:0000000000000000 $d
-     /tmp/cc7QU3tQ.s:742    .bss.rx_tail:0000000000000000 rx_tail
+     /tmp/cc2JKGHd.s:240    .text.USART3_Write:0000000000000000 $t
+     /tmp/cc2JKGHd.s:247    .text.USART3_Write:0000000000000000 USART3_Write
+     /tmp/cc2JKGHd.s:289    .text.USART3_Write:000000000000001c $d
+     /tmp/cc2JKGHd.s:294    .text.USART3_WriteString:0000000000000000 $t
+     /tmp/cc2JKGHd.s:301    .text.USART3_WriteString:0000000000000000 USART3_WriteString
+     /tmp/cc2JKGHd.s:340    .text.USART3_WriteByte:0000000000000000 $t
+     /tmp/cc2JKGHd.s:347    .text.USART3_WriteByte:0000000000000000 USART3_WriteByte
+     /tmp/cc2JKGHd.s:381    .text.USART3_WriteByte:0000000000000020 $d
+     /tmp/cc2JKGHd.s:386    .text.USART3_Available:0000000000000000 $t
+     /tmp/cc2JKGHd.s:393    .text.USART3_Available:0000000000000000 USART3_Available
+     /tmp/cc2JKGHd.s:433    .text.USART3_Available:000000000000001c $d
+     /tmp/cc2JKGHd.s:439    .text.USART3_GetChar:0000000000000000 $t
+     /tmp/cc2JKGHd.s:446    .text.USART3_GetChar:0000000000000000 USART3_GetChar
+     /tmp/cc2JKGHd.s:500    .text.USART3_GetChar:000000000000003c $d
+     /tmp/cc2JKGHd.s:507    .text.USART3_ReadByte:0000000000000000 $t
+     /tmp/cc2JKGHd.s:514    .text.USART3_ReadByte:0000000000000000 USART3_ReadByte
+     /tmp/cc2JKGHd.s:576    .text.USART3_FlushRx:0000000000000000 $t
+     /tmp/cc2JKGHd.s:583    .text.USART3_FlushRx:0000000000000000 USART3_FlushRx
+     /tmp/cc2JKGHd.s:603    .text.USART3_FlushRx:000000000000000c $d
+     /tmp/cc2JKGHd.s:609    .text.USART3_IRQHandler:0000000000000000 $t
+     /tmp/cc2JKGHd.s:616    .text.USART3_IRQHandler:0000000000000000 USART3_IRQHandler
+     /tmp/cc2JKGHd.s:699    .text.USART3_IRQHandler:0000000000000048 $d
+     /tmp/cc2JKGHd.s:708    .bss.rx_buf:0000000000000000 $d
+     /tmp/cc2JKGHd.s:712    .bss.rx_buf:0000000000000000 rx_buf
+     /tmp/cc2JKGHd.s:715    .bss.rx_head:0000000000000000 $d
+     /tmp/cc2JKGHd.s:719    .bss.rx_head:0000000000000000 rx_head
+     /tmp/cc2JKGHd.s:722    .bss.rx_tail:0000000000000000 $d
+     /tmp/cc2JKGHd.s:726    .bss.rx_tail:0000000000000000 rx_tail
 
 UNDEFINED SYMBOLS
 HAL_GPIO_Init
@@ -989,4 +971,3 @@ HAL_NVIC_EnableIRQ
 HAL_UART_Init
 SEGGER_RTT_printf
 HAL_UART_Transmit
-strlen

@@ -36,6 +36,7 @@
 #include "eeprom.h"
 #include "soft_timer.h"
 #include "data_collect.h"
+#include "RTUmodbus_slave.h"
 #include "stm32f1xx_hal_tim.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -66,6 +67,8 @@
 void SystemClock_Config(void);
 void dht22_data_read_callback(void);
 void ADXL345_data_read_call_back(void);
+void test_rx_Data_call_back(void);
+volatile uint8_t modbus_analyze_status = 0x01;
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -125,11 +128,22 @@ int main(void)
   SoftTimer_StartPeriodic(2000, ADXL345_data_read_call_back);
   /* USER CODE BEGIN 2 */
   /* USER CODE BEGIN WHILE */
+  uint8_t buf[10] = {0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09};
   while (1)
   {
-  
-    /* USER CODE END WHILE */
-    /* USER CODE BEGIN 3 */
+    int ch = USART3_GetChar();
+    if (ch >= 0)
+    {
+      if (modbus_analyze_status == 0x01)
+      {
+        modbus_analyze_status = 0x00;
+        SoftTimer_StartOneShot(20, test_rx_Data_call_back);
+      }
+      uint8_t b = (uint8_t)ch;
+      myprintf("data is %x\n", b);
+      MODS_ReciveNew_no_timer(b);
+    }
+      MODS_Poll();
   }
   /* USER CODE END 3 */
 }
@@ -138,7 +152,7 @@ void dht22_data_read_callback(void)
 {
   float temp, hum = 0;
   DHT22_ReadData(&temp, &hum);
-  myprintf("temper is %f hum is %f\n", temp, hum);
+  // myprintf("temper is %f hum is %f\n", temp, hum);
   set_local_dht22_data(temp, hum);
 }
 
@@ -146,10 +160,16 @@ void ADXL345_data_read_call_back(void)
 {
   float x_data, y_data, z_data;
   ADXL345_ReadXYZ(&x_data, &y_data, &z_data);
-  myprintf("xdata is %f,ydata is %f,zdata is %f\n", x_data, y_data, z_data);
+  // myprintf("xdata is %f,ydata is %f,zdata is %f\n", x_data, y_data, z_data);
   set_local_adxl_345_data(x_data, y_data, z_data);
 }
 
+void test_rx_Data_call_back(void)
+{
+  modbus_analyze_status = 0x01;
+  MODS_RxTimeOut();
+  myprintf("test_reloe\n");
+}
 /**
  * @brief System Clock Configuration
  * @retval None
