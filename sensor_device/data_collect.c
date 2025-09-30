@@ -32,3 +32,12 @@ void get_local_adxl_345_data(float *x_data,float *y_data,float *z_data)
     *z_data = all_data_gather.z_data;
 
 }
+
+void set_local_power_data(uint8_t power_data )
+{
+    all_data_gather.power = power_data;
+}
+void get_local_power_data(uint8_t *power_data)
+{
+    *power_data = all_data_gather.power;
+}

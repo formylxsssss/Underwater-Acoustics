@@ -9,6 +9,7 @@ typedef struct
     float x_data;
     float y_data;
     float z_data;
+    uint8_t power;
 
 }DATA_GATHER;
 
@@ -20,6 +21,7 @@ void set_local_dht22_data(float temp,float hum);
 void get_local_dht22_data(float *temp,float *hum);
 void set_local_adxl_345_data(float x_data,float y_data,float z_data);
 void get_local_adxl_345_data(float *x_data,float *y_data,float *z_data);
-
+void set_local_power_data(uint8_t power_data );
+void get_local_power_data(uint8_t *power_data);
 
 #endif

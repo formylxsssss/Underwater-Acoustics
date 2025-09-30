@@ -128,32 +128,51 @@ int main(void)
   SoftTimer_StartPeriodic(2000, ADXL345_data_read_call_back);
   /* USER CODE BEGIN 2 */
   /* USER CODE BEGIN WHILE */
-  uint8_t buf[10] = {0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09};
   while (1)
   {
-    int ch = USART3_GetChar();
-    if (ch >= 0)
-    {
-      if (modbus_analyze_status == 0x01)
-      {
-        modbus_analyze_status = 0x00;
-        SoftTimer_StartOneShot(20, test_rx_Data_call_back);
-      }
-      uint8_t b = (uint8_t)ch;
-      myprintf("data is %x\n", b);
-      MODS_ReciveNew_no_timer(b);
-    }
-      MODS_Poll();
+    uart_modbus_poll(modbus_analyze_status,test_rx_Data_call_back); 
+    
   }
-  /* USER CODE END 3 */
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 void dht22_data_read_callback(void)
 {
-  float temp, hum = 0;
+  float temp, hum = 0x00;
+  uint8_t power = 0x00;
   DHT22_ReadData(&temp, &hum);
+  power = BatteryADC_ReadPercent();
   // myprintf("temper is %f hum is %f\n", temp, hum);
   set_local_dht22_data(temp, hum);
+  set_local_power_data(power);
 }
 
 void ADXL345_data_read_call_back(void)
@@ -168,7 +187,6 @@ void test_rx_Data_call_back(void)
 {
   modbus_analyze_status = 0x01;
   MODS_RxTimeOut();
-  myprintf("test_reloe\n");
 }
 /**
  * @brief System Clock Configuration

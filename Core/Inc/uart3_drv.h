@@ -23,7 +23,7 @@ extern "C" {
 
 /* ====== 对外 API ====== */
 void    USART3_Driver_Init(uint32_t baudrate);
-
+void uart_modbus_poll(uint8_t poll_status,void *call_back);
 /* 发送 */
 void    USART3_Write(const uint8_t *data, size_t len);
 int USART3_WriteString(const char *s , size_t srting_len);

@@ -2,6 +2,8 @@
 #include <string.h>
 #include "stm32f1xx_hal_uart.h"
 #include "SEGGER_RTT.h"
+#include "RTUmodbus_slave.h"
+#include "soft_timer.h"
 /* ==== 句柄 ==== */
 UART_HandleTypeDef huart3;
 
@@ -74,7 +76,7 @@ void USART3_Write(const uint8_t *data, size_t len)
 
 int USART3_WriteString(const char *s , size_t srting_len)
 {
-    
+
     if (!s) return 0;
     USART3_Write((const uint8_t*)s, srting_len);
     return 1;
@@ -136,4 +138,21 @@ void USART3_IRQHandler(void)
 
     /* TXE/TC 如需做非阻塞发送，可在此扩展 */
     /* 清其它可能的标志（一般读SR后读DR已清除常见错误位） */
+}
+
+
+void uart_modbus_poll(uint8_t poll_status,void *call_back)
+{
+     int ch = USART3_GetChar();
+    if (ch >= 0)
+    {
+      if (poll_status == 0x01)
+      {
+        poll_status = 0x00;
+        SoftTimer_StartOneShot(20, call_back);
+      }
+      uint8_t b = (uint8_t)ch;
+      MODS_ReciveNew_no_timer(b);
+    }
+      MODS_Poll();
 }

@@ -56,10 +56,8 @@ void MODS_Poll(void)
 
 	if (g_tModS.RxCount < 4) /* 接收到的数据小于4个字节就认为错误 */
 	{
-		myprintf("RxCount\n");
 		goto err_ret;
 	}
-	myprintf("here\n");
 	/* 计算CRC校验和 */
 	crc1 = CRC16_Modbus(g_tModS.RxBuf, g_tModS.RxCount);
 	if (crc1 != 0)
@@ -77,7 +75,6 @@ void MODS_Poll(void)
 	}
 	/* 分析应用层协议 */
 	MODS_AnalyzeApp();
-	myprintf("there\n");
 err_ret:
 	/* 此部分为了串口打印结果,实际运用中可不要 */
 	g_tModS.RxCount = 0; /* 必须清零计数器，方便下次帧同步 */
@@ -133,7 +130,6 @@ void MODS_ReciveNew_no_timer(uint8_t _byte)
 	g_mods_timeout = 0;
 	if (g_tModS.RxCount < S_RX_BUF_SIZE)
 	{
-		myprintf("byte is %x\n",_byte);
 		g_tModS.RxBuf[g_tModS.RxCount++] = _byte;
 		
 	}
@@ -170,15 +166,11 @@ static void MODS_SendWithCRC(uint8_t *_pBuf, uint8_t _ucLen)
 	crc = CRC16_Modbus(_pBuf, _ucLen);
 	buf[_ucLen++] = crc >> 8;
 	buf[_ucLen++] = crc;
-	#warning 这里需要给出一个发送的接口
 	HAL_GPIO_WritePin(GPIOB,GPIO_PIN_8,GPIO_PIN_SET);
 	HAL_Delay(3);
-	USART3_WriteString(buf,_ucLen);
+	USART3_WriteString((char*)buf,_ucLen);
 	HAL_Delay(5);
 	 HAL_GPIO_WritePin(GPIOB,GPIO_PIN_8,GPIO_PIN_RESET);
-	 //   HAL_GPIO_WritePin(GPIOB,GPIO_PIN_8,GPIO_PIN_RESET);
-	// self_uart_send(buf, _ucLen);
-	/* 此部分为了串口打印结果,实际运用中可不要 */
 }
 
 /*
@@ -231,7 +223,6 @@ static void MODS_SendAckOk(void)
 */
 static void MODS_AnalyzeApp(void)
 {
-	myprintf("mods is %d\n ",g_tModS.RxBuf[1]);
 	switch (g_tModS.RxBuf[1]) /* 第2个字节 功能码 */
 	{
 	case 0x01: /* 读取线圈状态（此例程用led代替）*/
@@ -481,6 +472,7 @@ static void MODS_02H(void)
 static uint8_t MODS_ReadRegValue(uint16_t reg_addr, uint8_t *reg_value)
 {
 	uint16_t value;
+	uint8_t power_data;
 	float temp, hum = 0;
 	float x_data, y_data, z_data = 0;
 	switch (reg_addr) /* 判断寄存器地址 */
@@ -558,9 +550,11 @@ static uint8_t MODS_ReadRegValue(uint16_t reg_addr, uint8_t *reg_value)
 		break;
 	}
 	case SLAVE_REG_P000A:
-	
-		value = 0x0000;
+	{
+		get_local_power_data(&power_data);
+		value = (uint16_t) power_data;
 		break;
+	}
 	default:
 		return 0; /* 参数异常，返回 0 */
 	}
@@ -747,12 +741,12 @@ static void MODS_04H(void)
 			01 04 2201 0001 6A72  --- 读 2201H
 
 	*/
-	uint16_t reg;
-	uint16_t num;
-	uint16_t i;
-	uint16_t status[10];
+	uint16_t reg = 0x00;
+	uint16_t num = 0x00;
+	uint16_t i = 0x00;
+	uint16_t status[10] = {0x00};
 
-	memset(status, 0, 10);
+	memset(status, 0, sizeof status);
 
 	g_tModS.RspCode = RSP_OK;
 
