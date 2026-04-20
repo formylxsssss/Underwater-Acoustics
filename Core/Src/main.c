@@ -38,6 +38,7 @@
 #include "data_collect.h"
 #include "stm32f1xx_hal_tim.h"
 #include "rs485_port.h"
+#include "uw_link_rx.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -67,12 +68,23 @@
 void SystemClock_Config(void);
 void dht22_data_read_callback(void);
 void ADXL345_data_read_call_back(void);
+static void Debug_PrintAcousticRxFrame(uint8_t device_id, const uint8_t *payload, uint16_t payload_len);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+static void Debug_PrintAcousticRxFrame(uint8_t device_id, const uint8_t *payload, uint16_t payload_len)
+{
+  uint16_t i;
+  myprintf("[UW_RX] device=0x%02X len=%u\r\n", device_id, payload_len);
+  for (i = 0u; i < payload_len; i++)
+  {
+    myprintf("[UW_RX] payload[%u]=0x%02X\r\n", i, payload[i]);
+  }
+}
 
 /* USER CODE END 0 */
 
@@ -111,10 +123,12 @@ int main(void)
   MX_TIM6_Init(); // CubeMX 生成的 TIM6 初始化
   MX_TIM4_Init();
   MX_TIM8_Init();
+  HAL_TIM_Base_Start_IT(&htim6);
   BatteryADC_Init();
   HAL_Delay(100);
   DiffSignal_Init();
   DiffSignal_SetBitRate(100);
+  UW_LinkRx_Init(0x01u);
   USART3_Driver_Init(9600);
   BridgeApp_Init();
   HAL_Delay(2000);
@@ -123,6 +137,18 @@ int main(void)
   while (1)
   {
     BridgeApp_Process();
+    if (UW_LinkRx_FrameReady())
+    {
+      uint8_t device_id = 0u;
+      uint8_t payload[UW_LINK_RX_PAYLOAD_MAX_LEN];
+      uint16_t payload_len = 0u;
+      if (UW_LinkRx_GetFrame(&device_id, payload, &payload_len))
+      {
+        Debug_PrintAcousticRxFrame(device_id, payload, payload_len);
+        (void)device_id;
+        (void)BridgeApp_PushAcousticRxPacket(payload, (uint8_t)payload_len);
+      }
+    }
   }
 }
 
