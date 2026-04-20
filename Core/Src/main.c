@@ -69,6 +69,7 @@ void SystemClock_Config(void);
 void dht22_data_read_callback(void);
 void ADXL345_data_read_call_back(void);
 static void Debug_PrintAcousticRxFrame(uint8_t device_id, const uint8_t *payload, uint16_t payload_len);
+static void ForwardAcousticRxToBridge(const uint8_t *payload, uint16_t payload_len);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -83,6 +84,32 @@ static void Debug_PrintAcousticRxFrame(uint8_t device_id, const uint8_t *payload
   for (i = 0u; i < payload_len; i++)
   {
     myprintf("[UW_RX] payload[%u]=0x%02X\r\n", i, payload[i]);
+  }
+}
+
+/* slave 分支有时不会导出该接口，使用 weak 避免接口名差异导致链接失败 */
+extern bool BridgeApp_PushAcousticRxPacket(const uint8_t *data, uint8_t len) __attribute__((weak));
+
+static void ForwardAcousticRxToBridge(const uint8_t *payload, uint16_t payload_len)
+{
+  if ((payload == NULL) || (payload_len == 0u))
+  {
+    return;
+  }
+
+  if (payload_len > 255u)
+  {
+    myprintf("[UW_RX] drop: payload too long (%u)\r\n", payload_len);
+    return;
+  }
+
+  if (BridgeApp_PushAcousticRxPacket != 0)
+  {
+    (void)BridgeApp_PushAcousticRxPacket(payload, (uint8_t)payload_len);
+  }
+  else
+  {
+    myprintf("[UW_RX] BridgeApp_PushAcousticRxPacket not exported\r\n");
   }
 }
 
@@ -146,7 +173,7 @@ int main(void)
       {
         Debug_PrintAcousticRxFrame(device_id, payload, payload_len);
         (void)device_id;
-        (void)BridgeApp_PushAcousticRxPacket(payload, (uint8_t)payload_len);
+        ForwardAcousticRxToBridge(payload, payload_len);
       }
     }
   }
