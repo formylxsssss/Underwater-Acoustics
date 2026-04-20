@@ -5,6 +5,7 @@
 #include "bridge_app.h"
 #include "tim.h"
 #include "diff_signal.h"
+#include "uw_link_rx.h"
 void NMI_Handler(void)
 {
 }
@@ -58,6 +59,21 @@ void SysTick_Handler(void)
 void USART3_IRQHandler(void)
 {
     HAL_UART_IRQHandler(&huart3);
+}
+
+void EXTI0_IRQHandler(void)
+{
+    HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
+}
+
+void EXTI1_IRQHandler(void)
+{
+    HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_1);
+}
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+    UW_LinkRx_EXTI_Callback(GPIO_Pin);
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
