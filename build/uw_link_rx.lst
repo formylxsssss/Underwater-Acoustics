@@ -1,0 +1,2442 @@
+ARM GAS  /tmp/cckgvJqr.s 			page 1
+
+
+   1              		.cpu cortex-m3
+   2              		.eabi_attribute 20, 1
+   3              		.eabi_attribute 21, 1
+   4              		.eabi_attribute 23, 3
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 1
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"uw_link_rx.c"
+  12              		.text
+  13              	.Ltext0:
+  14              		.cfi_sections	.debug_frame
+  15              		.section	.text.UW_LinkRx_ResetVotes,"ax",%progbits
+  16              		.align	1
+  17              		.arch armv7-m
+  18              		.syntax unified
+  19              		.thumb
+  20              		.thumb_func
+  21              		.fpu softvfp
+  23              	UW_LinkRx_ResetVotes:
+  24              	.LFB67:
+  25              		.file 1 "diff_signal/uw_link_rx.c"
+   1:diff_signal/uw_link_rx.c **** #include "uw_link_rx.h"
+   2:diff_signal/uw_link_rx.c **** #include "uw_link_proto.h"
+   3:diff_signal/uw_link_rx.c **** #include <string.h>
+   4:diff_signal/uw_link_rx.c **** #include "SEGGER_RTT.h"
+   5:diff_signal/uw_link_rx.c **** 
+   6:diff_signal/uw_link_rx.c **** typedef enum
+   7:diff_signal/uw_link_rx.c **** {
+   8:diff_signal/uw_link_rx.c ****     UW_TONE_NONE = 0,
+   9:diff_signal/uw_link_rx.c ****     UW_TONE_BIT0,
+  10:diff_signal/uw_link_rx.c ****     UW_TONE_BIT1,
+  11:diff_signal/uw_link_rx.c ****     UW_TONE_ERROR
+  12:diff_signal/uw_link_rx.c **** } UW_ToneState_t;
+  13:diff_signal/uw_link_rx.c **** 
+  14:diff_signal/uw_link_rx.c **** typedef enum
+  15:diff_signal/uw_link_rx.c **** {
+  16:diff_signal/uw_link_rx.c ****     UW_RX_IDLE = 0,
+  17:diff_signal/uw_link_rx.c ****     UW_RX_START_COMP,
+  18:diff_signal/uw_link_rx.c ****     UW_RX_RECV
+  19:diff_signal/uw_link_rx.c **** } UW_RxState_t;
+  20:diff_signal/uw_link_rx.c **** 
+  21:diff_signal/uw_link_rx.c **** typedef enum
+  22:diff_signal/uw_link_rx.c **** {
+  23:diff_signal/uw_link_rx.c ****     UW_PARSE_WAIT_PREAMBLE = 0,
+  24:diff_signal/uw_link_rx.c ****     UW_PARSE_WAIT_SYNC,
+  25:diff_signal/uw_link_rx.c ****     UW_PARSE_READ_ID,
+  26:diff_signal/uw_link_rx.c ****     UW_PARSE_READ_LEN,
+  27:diff_signal/uw_link_rx.c ****     UW_PARSE_READ_PAYLOAD,
+  28:diff_signal/uw_link_rx.c ****     UW_PARSE_READ_CRC_L,
+  29:diff_signal/uw_link_rx.c ****     UW_PARSE_READ_CRC_H,
+  30:diff_signal/uw_link_rx.c ****     UW_PARSE_WAIT_TAIL0_A,
+  31:diff_signal/uw_link_rx.c ****     UW_PARSE_WAIT_TAIL0_B
+  32:diff_signal/uw_link_rx.c **** } UW_ParseState_t;
+  33:diff_signal/uw_link_rx.c **** 
+ARM GAS  /tmp/cckgvJqr.s 			page 2
+
+
+  34:diff_signal/uw_link_rx.c **** typedef struct
+  35:diff_signal/uw_link_rx.c **** {
+  36:diff_signal/uw_link_rx.c ****     UW_RxState_t state;
+  37:diff_signal/uw_link_rx.c ****     UW_ParseState_t parse_state;
+  38:diff_signal/uw_link_rx.c **** 
+  39:diff_signal/uw_link_rx.c ****     uint32_t tick_ms;
+  40:diff_signal/uw_link_rx.c ****     uint32_t last_valid_tone_ms;
+  41:diff_signal/uw_link_rx.c **** 
+  42:diff_signal/uw_link_rx.c ****     uint8_t start_comp_ms_left;
+  43:diff_signal/uw_link_rx.c ****     uint8_t bit_ms_index; /* 当前 bit 窗口内已经过去了多少 ms，范围 0~9 */
+  44:diff_signal/uw_link_rx.c **** 
+  45:diff_signal/uw_link_rx.c ****     /* 多次采样投票 */
+  46:diff_signal/uw_link_rx.c ****     uint8_t bit0_votes;
+  47:diff_signal/uw_link_rx.c ****     uint8_t bit1_votes;
+  48:diff_signal/uw_link_rx.c ****     uint8_t err_votes;
+  49:diff_signal/uw_link_rx.c **** 
+  50:diff_signal/uw_link_rx.c ****     /* 0 的重点判断时刻命中记录 */
+  51:diff_signal/uw_link_rx.c ****     uint8_t zero_judge_bit0_seen;
+  52:diff_signal/uw_link_rx.c ****     uint8_t zero_judge_bit1_seen;
+  53:diff_signal/uw_link_rx.c **** 
+  54:diff_signal/uw_link_rx.c ****     /* 前导 1 计数 */
+  55:diff_signal/uw_link_rx.c ****     uint8_t preamble_one_count;
+  56:diff_signal/uw_link_rx.c **** 
+  57:diff_signal/uw_link_rx.c ****     /* SYNC(0x55) 检测移位寄存器 */
+  58:diff_signal/uw_link_rx.c ****     uint8_t shift_reg;
+  59:diff_signal/uw_link_rx.c ****     uint8_t sync_bit_count;
+  60:diff_signal/uw_link_rx.c **** 
+  61:diff_signal/uw_link_rx.c ****     /* 当前组字节 */
+  62:diff_signal/uw_link_rx.c ****     uint8_t current_byte;
+  63:diff_signal/uw_link_rx.c ****     int8_t bit_index; /* 7 -> 0, MSB first */
+  64:diff_signal/uw_link_rx.c **** 
+  65:diff_signal/uw_link_rx.c ****     /* 当前正在接收的一帧 */
+  66:diff_signal/uw_link_rx.c ****     uint8_t local_device_id;
+  67:diff_signal/uw_link_rx.c ****     uint8_t rx_device_id;
+  68:diff_signal/uw_link_rx.c ****     uint8_t rx_len;
+  69:diff_signal/uw_link_rx.c ****     uint8_t rx_payload[UW_LINK_RX_PAYLOAD_MAX_LEN];
+  70:diff_signal/uw_link_rx.c ****     uint8_t rx_payload_index;
+  71:diff_signal/uw_link_rx.c **** 
+  72:diff_signal/uw_link_rx.c ****     uint8_t crc_l;
+  73:diff_signal/uw_link_rx.c ****     uint8_t crc_h;
+  74:diff_signal/uw_link_rx.c **** 
+  75:diff_signal/uw_link_rx.c ****     /* 已完成帧 */
+  76:diff_signal/uw_link_rx.c ****     uint8_t ready_device_id;
+  77:diff_signal/uw_link_rx.c ****     uint8_t ready_payload[UW_LINK_RX_PAYLOAD_MAX_LEN];
+  78:diff_signal/uw_link_rx.c ****     uint16_t ready_len;
+  79:diff_signal/uw_link_rx.c ****     bool frame_ready;
+  80:diff_signal/uw_link_rx.c **** } UW_LinkRx_t;
+  81:diff_signal/uw_link_rx.c **** 
+  82:diff_signal/uw_link_rx.c **** static UW_LinkRx_t s_rx;
+  83:diff_signal/uw_link_rx.c **** 
+  84:diff_signal/uw_link_rx.c **** /* ========================= 内部辅助函数 ========================= */
+  85:diff_signal/uw_link_rx.c **** 
+  86:diff_signal/uw_link_rx.c **** static inline bool UW_LinkRx_IsSamplePoint(uint8_t bit_ms_index)
+  87:diff_signal/uw_link_rx.c **** {
+  88:diff_signal/uw_link_rx.c ****     /* 10ms 窗口内取 5 个采样点：2,4,5,6,8ms */
+  89:diff_signal/uw_link_rx.c ****     return (bit_ms_index == 2u) ||
+  90:diff_signal/uw_link_rx.c ****            (bit_ms_index == 4u) ||
+ARM GAS  /tmp/cckgvJqr.s 			page 3
+
+
+  91:diff_signal/uw_link_rx.c ****            (bit_ms_index == 5u) ||
+  92:diff_signal/uw_link_rx.c ****            (bit_ms_index == 6u) ||
+  93:diff_signal/uw_link_rx.c ****            (bit_ms_index == 8u);
+  94:diff_signal/uw_link_rx.c **** }
+  95:diff_signal/uw_link_rx.c **** 
+  96:diff_signal/uw_link_rx.c **** static UW_ToneState_t UW_LinkRx_ReadTone(void)
+  97:diff_signal/uw_link_rx.c **** {
+  98:diff_signal/uw_link_rx.c ****     GPIO_PinState pc0 = HAL_GPIO_ReadPin(UW_LINK_BIT0_GPIO_PORT, UW_LINK_BIT0_GPIO_PIN);
+  99:diff_signal/uw_link_rx.c ****     GPIO_PinState pc1 = HAL_GPIO_ReadPin(UW_LINK_BIT1_GPIO_PORT, UW_LINK_BIT1_GPIO_PIN);
+ 100:diff_signal/uw_link_rx.c **** 
+ 101:diff_signal/uw_link_rx.c ****     /* LM567: 匹配到频率时输出低电平 */
+ 102:diff_signal/uw_link_rx.c ****     bool bit0_active = (pc0 == GPIO_PIN_RESET);
+ 103:diff_signal/uw_link_rx.c ****     bool bit1_active = (pc1 == GPIO_PIN_RESET);
+ 104:diff_signal/uw_link_rx.c **** 
+ 105:diff_signal/uw_link_rx.c ****     if (bit0_active && (!bit1_active))
+ 106:diff_signal/uw_link_rx.c ****     {
+ 107:diff_signal/uw_link_rx.c ****         return UW_TONE_BIT0;
+ 108:diff_signal/uw_link_rx.c ****     }
+ 109:diff_signal/uw_link_rx.c ****     else if (bit1_active && (!bit0_active))
+ 110:diff_signal/uw_link_rx.c ****     {
+ 111:diff_signal/uw_link_rx.c ****         return UW_TONE_BIT1;
+ 112:diff_signal/uw_link_rx.c ****     }
+ 113:diff_signal/uw_link_rx.c ****     else if ((!bit0_active) && (!bit1_active))
+ 114:diff_signal/uw_link_rx.c ****     {
+ 115:diff_signal/uw_link_rx.c ****         return UW_TONE_NONE;
+ 116:diff_signal/uw_link_rx.c ****     }
+ 117:diff_signal/uw_link_rx.c ****     else
+ 118:diff_signal/uw_link_rx.c ****     {
+ 119:diff_signal/uw_link_rx.c ****         return UW_TONE_ERROR;
+ 120:diff_signal/uw_link_rx.c ****     }
+ 121:diff_signal/uw_link_rx.c **** }
+ 122:diff_signal/uw_link_rx.c **** 
+ 123:diff_signal/uw_link_rx.c **** static void UW_LinkRx_ResetVotes(void)
+ 124:diff_signal/uw_link_rx.c **** {
+  26              		.loc 1 124 1 view -0
+  27              		.cfi_startproc
+  28              		@ args = 0, pretend = 0, frame = 0
+  29              		@ frame_needed = 0, uses_anonymous_args = 0
+  30              		@ link register save eliminated.
+ 125:diff_signal/uw_link_rx.c ****     s_rx.bit0_votes = 0u;
+  31              		.loc 1 125 5 view .LVU1
+  32              		.loc 1 125 21 is_stmt 0 view .LVU2
+  33 0000 034B     		ldr	r3, .L2
+  34 0002 0022     		movs	r2, #0
+  35 0004 9A73     		strb	r2, [r3, #14]
+ 126:diff_signal/uw_link_rx.c ****     s_rx.bit1_votes = 0u;
+  36              		.loc 1 126 5 is_stmt 1 view .LVU3
+  37              		.loc 1 126 21 is_stmt 0 view .LVU4
+  38 0006 DA73     		strb	r2, [r3, #15]
+ 127:diff_signal/uw_link_rx.c ****     s_rx.err_votes = 0u;
+  39              		.loc 1 127 5 is_stmt 1 view .LVU5
+  40              		.loc 1 127 20 is_stmt 0 view .LVU6
+  41 0008 1A74     		strb	r2, [r3, #16]
+ 128:diff_signal/uw_link_rx.c **** 
+ 129:diff_signal/uw_link_rx.c ****     s_rx.zero_judge_bit0_seen = 0u;
+  42              		.loc 1 129 5 is_stmt 1 view .LVU7
+  43              		.loc 1 129 31 is_stmt 0 view .LVU8
+ARM GAS  /tmp/cckgvJqr.s 			page 4
+
+
+  44 000a 5A74     		strb	r2, [r3, #17]
+ 130:diff_signal/uw_link_rx.c ****     s_rx.zero_judge_bit1_seen = 0u;
+  45              		.loc 1 130 5 is_stmt 1 view .LVU9
+  46              		.loc 1 130 31 is_stmt 0 view .LVU10
+  47 000c 9A74     		strb	r2, [r3, #18]
+ 131:diff_signal/uw_link_rx.c **** }
+  48              		.loc 1 131 1 view .LVU11
+  49 000e 7047     		bx	lr
+  50              	.L3:
+  51              		.align	2
+  52              	.L2:
+  53 0010 00000000 		.word	.LANCHOR0
+  54              		.cfi_endproc
+  55              	.LFE67:
+  57              		.section	.text.UW_LinkRx_ResetByteAssembler,"ax",%progbits
+  58              		.align	1
+  59              		.syntax unified
+  60              		.thumb
+  61              		.thumb_func
+  62              		.fpu softvfp
+  64              	UW_LinkRx_ResetByteAssembler:
+  65              	.LFB68:
+ 132:diff_signal/uw_link_rx.c **** 
+ 133:diff_signal/uw_link_rx.c **** static void UW_LinkRx_ResetByteAssembler(void)
+ 134:diff_signal/uw_link_rx.c **** {
+  66              		.loc 1 134 1 is_stmt 1 view -0
+  67              		.cfi_startproc
+  68              		@ args = 0, pretend = 0, frame = 0
+  69              		@ frame_needed = 0, uses_anonymous_args = 0
+  70              		@ link register save eliminated.
+ 135:diff_signal/uw_link_rx.c ****     s_rx.current_byte = 0u;
+  71              		.loc 1 135 5 view .LVU13
+  72              		.loc 1 135 23 is_stmt 0 view .LVU14
+  73 0000 024B     		ldr	r3, .L5
+  74 0002 0022     		movs	r2, #0
+  75 0004 9A75     		strb	r2, [r3, #22]
+ 136:diff_signal/uw_link_rx.c ****     s_rx.bit_index = 7;
+  76              		.loc 1 136 5 is_stmt 1 view .LVU15
+  77              		.loc 1 136 20 is_stmt 0 view .LVU16
+  78 0006 0722     		movs	r2, #7
+  79 0008 DA75     		strb	r2, [r3, #23]
+ 137:diff_signal/uw_link_rx.c **** }
+  80              		.loc 1 137 1 view .LVU17
+  81 000a 7047     		bx	lr
+  82              	.L6:
+  83              		.align	2
+  84              	.L5:
+  85 000c 00000000 		.word	.LANCHOR0
+  86              		.cfi_endproc
+  87              	.LFE68:
+  89              		.section	.text.UW_LinkRx_ResetParser,"ax",%progbits
+  90              		.align	1
+  91              		.syntax unified
+  92              		.thumb
+  93              		.thumb_func
+  94              		.fpu softvfp
+  96              	UW_LinkRx_ResetParser:
+ARM GAS  /tmp/cckgvJqr.s 			page 5
+
+
+  97              	.LFB69:
+ 138:diff_signal/uw_link_rx.c **** 
+ 139:diff_signal/uw_link_rx.c **** static void UW_LinkRx_ResetParser(void)
+ 140:diff_signal/uw_link_rx.c **** {
+  98              		.loc 1 140 1 is_stmt 1 view -0
+  99              		.cfi_startproc
+ 100              		@ args = 0, pretend = 0, frame = 0
+ 101              		@ frame_needed = 0, uses_anonymous_args = 0
+ 102 0000 08B5     		push	{r3, lr}
+ 103              	.LCFI0:
+ 104              		.cfi_def_cfa_offset 8
+ 105              		.cfi_offset 3, -8
+ 106              		.cfi_offset 14, -4
+ 141:diff_signal/uw_link_rx.c ****     s_rx.parse_state = UW_PARSE_WAIT_PREAMBLE;
+ 107              		.loc 1 141 5 view .LVU19
+ 108              		.loc 1 141 22 is_stmt 0 view .LVU20
+ 109 0002 084B     		ldr	r3, .L9
+ 110 0004 0022     		movs	r2, #0
+ 111 0006 5A70     		strb	r2, [r3, #1]
+ 142:diff_signal/uw_link_rx.c ****     s_rx.preamble_one_count = 0u;
+ 112              		.loc 1 142 5 is_stmt 1 view .LVU21
+ 113              		.loc 1 142 29 is_stmt 0 view .LVU22
+ 114 0008 DA74     		strb	r2, [r3, #19]
+ 143:diff_signal/uw_link_rx.c ****     s_rx.shift_reg = 0u;
+ 115              		.loc 1 143 5 is_stmt 1 view .LVU23
+ 116              		.loc 1 143 20 is_stmt 0 view .LVU24
+ 117 000a 1A75     		strb	r2, [r3, #20]
+ 144:diff_signal/uw_link_rx.c ****     s_rx.sync_bit_count = 0u;
+ 118              		.loc 1 144 5 is_stmt 1 view .LVU25
+ 119              		.loc 1 144 25 is_stmt 0 view .LVU26
+ 120 000c 5A75     		strb	r2, [r3, #21]
+ 145:diff_signal/uw_link_rx.c **** 
+ 146:diff_signal/uw_link_rx.c ****     s_rx.rx_device_id = 0u;
+ 121              		.loc 1 146 5 is_stmt 1 view .LVU27
+ 122              		.loc 1 146 23 is_stmt 0 view .LVU28
+ 123 000e 5A76     		strb	r2, [r3, #25]
+ 147:diff_signal/uw_link_rx.c ****     s_rx.rx_len = 0u;
+ 124              		.loc 1 147 5 is_stmt 1 view .LVU29
+ 125              		.loc 1 147 17 is_stmt 0 view .LVU30
+ 126 0010 9A76     		strb	r2, [r3, #26]
+ 148:diff_signal/uw_link_rx.c ****     s_rx.rx_payload_index = 0u;
+ 127              		.loc 1 148 5 is_stmt 1 view .LVU31
+ 128              		.loc 1 148 27 is_stmt 0 view .LVU32
+ 129 0012 83F89B20 		strb	r2, [r3, #155]
+ 149:diff_signal/uw_link_rx.c **** 
+ 150:diff_signal/uw_link_rx.c ****     s_rx.crc_l = 0u;
+ 130              		.loc 1 150 5 is_stmt 1 view .LVU33
+ 131              		.loc 1 150 16 is_stmt 0 view .LVU34
+ 132 0016 83F89C20 		strb	r2, [r3, #156]
+ 151:diff_signal/uw_link_rx.c ****     s_rx.crc_h = 0u;
+ 133              		.loc 1 151 5 is_stmt 1 view .LVU35
+ 134              		.loc 1 151 16 is_stmt 0 view .LVU36
+ 135 001a 83F89D20 		strb	r2, [r3, #157]
+ 152:diff_signal/uw_link_rx.c **** 
+ 153:diff_signal/uw_link_rx.c ****     UW_LinkRx_ResetByteAssembler();
+ 136              		.loc 1 153 5 is_stmt 1 view .LVU37
+ 137 001e FFF7FEFF 		bl	UW_LinkRx_ResetByteAssembler
+ARM GAS  /tmp/cckgvJqr.s 			page 6
+
+
+ 138              	.LVL0:
+ 154:diff_signal/uw_link_rx.c **** }
+ 139              		.loc 1 154 1 is_stmt 0 view .LVU38
+ 140 0022 08BD     		pop	{r3, pc}
+ 141              	.L10:
+ 142              		.align	2
+ 143              	.L9:
+ 144 0024 00000000 		.word	.LANCHOR0
+ 145              		.cfi_endproc
+ 146              	.LFE69:
+ 148              		.section	.text.UW_LinkRx_Abort,"ax",%progbits
+ 149              		.align	1
+ 150              		.syntax unified
+ 151              		.thumb
+ 152              		.thumb_func
+ 153              		.fpu softvfp
+ 155              	UW_LinkRx_Abort:
+ 156              	.LFB70:
+ 155:diff_signal/uw_link_rx.c **** 
+ 156:diff_signal/uw_link_rx.c **** static void UW_LinkRx_Abort(void)
+ 157:diff_signal/uw_link_rx.c **** {
+ 157              		.loc 1 157 1 is_stmt 1 view -0
+ 158              		.cfi_startproc
+ 159              		@ args = 0, pretend = 0, frame = 0
+ 160              		@ frame_needed = 0, uses_anonymous_args = 0
+ 161 0000 08B5     		push	{r3, lr}
+ 162              	.LCFI1:
+ 163              		.cfi_def_cfa_offset 8
+ 164              		.cfi_offset 3, -8
+ 165              		.cfi_offset 14, -4
+ 158:diff_signal/uw_link_rx.c ****     s_rx.state = UW_RX_IDLE;
+ 166              		.loc 1 158 5 view .LVU40
+ 167              		.loc 1 158 16 is_stmt 0 view .LVU41
+ 168 0002 054B     		ldr	r3, .L13
+ 169 0004 0022     		movs	r2, #0
+ 170 0006 1A70     		strb	r2, [r3]
+ 159:diff_signal/uw_link_rx.c ****     s_rx.start_comp_ms_left = 0u;
+ 171              		.loc 1 159 5 is_stmt 1 view .LVU42
+ 172              		.loc 1 159 29 is_stmt 0 view .LVU43
+ 173 0008 1A73     		strb	r2, [r3, #12]
+ 160:diff_signal/uw_link_rx.c ****     s_rx.bit_ms_index = 0u;
+ 174              		.loc 1 160 5 is_stmt 1 view .LVU44
+ 175              		.loc 1 160 23 is_stmt 0 view .LVU45
+ 176 000a 5A73     		strb	r2, [r3, #13]
+ 161:diff_signal/uw_link_rx.c **** 
+ 162:diff_signal/uw_link_rx.c ****     UW_LinkRx_ResetVotes();
+ 177              		.loc 1 162 5 is_stmt 1 view .LVU46
+ 178 000c FFF7FEFF 		bl	UW_LinkRx_ResetVotes
+ 179              	.LVL1:
+ 163:diff_signal/uw_link_rx.c ****     UW_LinkRx_ResetParser();
+ 180              		.loc 1 163 5 view .LVU47
+ 181 0010 FFF7FEFF 		bl	UW_LinkRx_ResetParser
+ 182              	.LVL2:
+ 164:diff_signal/uw_link_rx.c **** }
+ 183              		.loc 1 164 1 is_stmt 0 view .LVU48
+ 184 0014 08BD     		pop	{r3, pc}
+ 185              	.L14:
+ARM GAS  /tmp/cckgvJqr.s 			page 7
+
+
+ 186 0016 00BF     		.align	2
+ 187              	.L13:
+ 188 0018 00000000 		.word	.LANCHOR0
+ 189              		.cfi_endproc
+ 190              	.LFE70:
+ 192              		.section	.text.UW_LinkRx_DecideBit,"ax",%progbits
+ 193              		.align	1
+ 194              		.syntax unified
+ 195              		.thumb
+ 196              		.thumb_func
+ 197              		.fpu softvfp
+ 199              	UW_LinkRx_DecideBit:
+ 200              	.LVL3:
+ 201              	.LFB72:
+ 165:diff_signal/uw_link_rx.c **** 
+ 166:diff_signal/uw_link_rx.c **** static void UW_LinkRx_Finish(uint8_t device_id, const uint8_t *payload, uint8_t len)
+ 167:diff_signal/uw_link_rx.c **** {
+ 168:diff_signal/uw_link_rx.c ****     s_rx.ready_device_id = device_id;
+ 169:diff_signal/uw_link_rx.c ****     memcpy(s_rx.ready_payload, payload, len);
+ 170:diff_signal/uw_link_rx.c ****     s_rx.ready_len = len;
+ 171:diff_signal/uw_link_rx.c ****     s_rx.frame_ready = true;
+ 172:diff_signal/uw_link_rx.c **** 
+ 173:diff_signal/uw_link_rx.c ****     UW_LinkRx_Abort();
+ 174:diff_signal/uw_link_rx.c **** }
+ 175:diff_signal/uw_link_rx.c **** 
+ 176:diff_signal/uw_link_rx.c **** static bool UW_LinkRx_DecideBit(uint8_t *out_bit)
+ 177:diff_signal/uw_link_rx.c **** {
+ 202              		.loc 1 177 1 is_stmt 1 view -0
+ 203              		.cfi_startproc
+ 204              		@ args = 0, pretend = 0, frame = 0
+ 205              		@ frame_needed = 0, uses_anonymous_args = 0
+ 206              		@ link register save eliminated.
+ 178:diff_signal/uw_link_rx.c ****     /* 先判 1：优先按多数票 */
+ 179:diff_signal/uw_link_rx.c ****     if ((s_rx.bit1_votes >= UW_LINK_RX_MIN_MAJORITY) &&
+ 207              		.loc 1 179 5 view .LVU50
+ 208              		.loc 1 179 14 is_stmt 0 view .LVU51
+ 209 0000 114B     		ldr	r3, .L24
+ 210 0002 DB7B     		ldrb	r3, [r3, #15]	@ zero_extendqisi2
+ 211              		.loc 1 179 8 view .LVU52
+ 212 0004 012B     		cmp	r3, #1
+ 213 0006 03D9     		bls	.L16
+ 180:diff_signal/uw_link_rx.c ****         (s_rx.bit1_votes > s_rx.bit0_votes))
+ 214              		.loc 1 180 32 discriminator 1 view .LVU53
+ 215 0008 0F4A     		ldr	r2, .L24
+ 216 000a 927B     		ldrb	r2, [r2, #14]	@ zero_extendqisi2
+ 179:diff_signal/uw_link_rx.c ****         (s_rx.bit1_votes > s_rx.bit0_votes))
+ 217              		.loc 1 179 54 discriminator 1 view .LVU54
+ 218 000c 9342     		cmp	r3, r2
+ 219 000e 0DD8     		bhi	.L21
+ 220              	.L16:
+ 181:diff_signal/uw_link_rx.c ****     {
+ 182:diff_signal/uw_link_rx.c ****         *out_bit = 1u;
+ 183:diff_signal/uw_link_rx.c ****         return true;
+ 184:diff_signal/uw_link_rx.c ****     }
+ 185:diff_signal/uw_link_rx.c **** 
+ 186:diff_signal/uw_link_rx.c ****     /* 再判 0：如果在“0重点判断时刻”命中 bit0，则优先偏向判 0 */
+ 187:diff_signal/uw_link_rx.c ****     if ((s_rx.zero_judge_bit0_seen != 0u) &&
+ARM GAS  /tmp/cckgvJqr.s 			page 8
+
+
+ 221              		.loc 1 187 5 is_stmt 1 view .LVU55
+ 222              		.loc 1 187 14 is_stmt 0 view .LVU56
+ 223 0010 0D4A     		ldr	r2, .L24
+ 224 0012 527C     		ldrb	r2, [r2, #17]	@ zero_extendqisi2
+ 225              		.loc 1 187 8 view .LVU57
+ 226 0014 12B1     		cbz	r2, .L18
+ 188:diff_signal/uw_link_rx.c ****         (s_rx.zero_judge_bit1_seen == 0u))
+ 227              		.loc 1 188 14 discriminator 1 view .LVU58
+ 228 0016 0C4A     		ldr	r2, .L24
+ 229 0018 927C     		ldrb	r2, [r2, #18]	@ zero_extendqisi2
+ 187:diff_signal/uw_link_rx.c ****         (s_rx.zero_judge_bit1_seen == 0u))
+ 230              		.loc 1 187 43 discriminator 1 view .LVU59
+ 231 001a 5AB1     		cbz	r2, .L22
+ 232              	.L18:
+ 189:diff_signal/uw_link_rx.c ****     {
+ 190:diff_signal/uw_link_rx.c ****         *out_bit = 0u;
+ 191:diff_signal/uw_link_rx.c ****         return true;
+ 192:diff_signal/uw_link_rx.c ****     }
+ 193:diff_signal/uw_link_rx.c **** 
+ 194:diff_signal/uw_link_rx.c ****     /* 最后退回到多数票判 0 */
+ 195:diff_signal/uw_link_rx.c ****     if ((s_rx.bit0_votes >= UW_LINK_RX_MIN_MAJORITY) &&
+ 233              		.loc 1 195 5 is_stmt 1 view .LVU60
+ 234              		.loc 1 195 14 is_stmt 0 view .LVU61
+ 235 001c 0A4A     		ldr	r2, .L24
+ 236 001e 927B     		ldrb	r2, [r2, #14]	@ zero_extendqisi2
+ 237              		.loc 1 195 8 view .LVU62
+ 238 0020 012A     		cmp	r2, #1
+ 239 0022 0FD9     		bls	.L19
+ 240              		.loc 1 195 54 discriminator 1 view .LVU63
+ 241 0024 9342     		cmp	r3, r2
+ 242 0026 09D9     		bls	.L23
+ 196:diff_signal/uw_link_rx.c ****         (s_rx.bit0_votes >= s_rx.bit1_votes))
+ 197:diff_signal/uw_link_rx.c ****     {
+ 198:diff_signal/uw_link_rx.c ****         *out_bit = 0u;
+ 199:diff_signal/uw_link_rx.c ****         return true;
+ 200:diff_signal/uw_link_rx.c ****     }
+ 201:diff_signal/uw_link_rx.c **** 
+ 202:diff_signal/uw_link_rx.c ****     return false;
+ 243              		.loc 1 202 12 view .LVU64
+ 244 0028 0020     		movs	r0, #0
+ 245              	.LVL4:
+ 203:diff_signal/uw_link_rx.c **** }
+ 246              		.loc 1 203 1 view .LVU65
+ 247 002a 7047     		bx	lr
+ 248              	.LVL5:
+ 249              	.L21:
+ 182:diff_signal/uw_link_rx.c ****         return true;
+ 250              		.loc 1 182 9 is_stmt 1 view .LVU66
+ 182:diff_signal/uw_link_rx.c ****         return true;
+ 251              		.loc 1 182 18 is_stmt 0 view .LVU67
+ 252 002c 0123     		movs	r3, #1
+ 253 002e 0370     		strb	r3, [r0]
+ 183:diff_signal/uw_link_rx.c ****     }
+ 254              		.loc 1 183 9 is_stmt 1 view .LVU68
+ 183:diff_signal/uw_link_rx.c ****     }
+ 255              		.loc 1 183 16 is_stmt 0 view .LVU69
+ 256 0030 1846     		mov	r0, r3
+ARM GAS  /tmp/cckgvJqr.s 			page 9
+
+
+ 257              	.LVL6:
+ 183:diff_signal/uw_link_rx.c ****     }
+ 258              		.loc 1 183 16 view .LVU70
+ 259 0032 7047     		bx	lr
+ 260              	.LVL7:
+ 261              	.L22:
+ 190:diff_signal/uw_link_rx.c ****         return true;
+ 262              		.loc 1 190 9 is_stmt 1 view .LVU71
+ 190:diff_signal/uw_link_rx.c ****         return true;
+ 263              		.loc 1 190 18 is_stmt 0 view .LVU72
+ 264 0034 0023     		movs	r3, #0
+ 265 0036 0370     		strb	r3, [r0]
+ 191:diff_signal/uw_link_rx.c ****     }
+ 266              		.loc 1 191 9 is_stmt 1 view .LVU73
+ 191:diff_signal/uw_link_rx.c ****     }
+ 267              		.loc 1 191 16 is_stmt 0 view .LVU74
+ 268 0038 0120     		movs	r0, #1
+ 269              	.LVL8:
+ 191:diff_signal/uw_link_rx.c ****     }
+ 270              		.loc 1 191 16 view .LVU75
+ 271 003a 7047     		bx	lr
+ 272              	.LVL9:
+ 273              	.L23:
+ 198:diff_signal/uw_link_rx.c ****         return true;
+ 274              		.loc 1 198 9 is_stmt 1 view .LVU76
+ 198:diff_signal/uw_link_rx.c ****         return true;
+ 275              		.loc 1 198 18 is_stmt 0 view .LVU77
+ 276 003c 0023     		movs	r3, #0
+ 277 003e 0370     		strb	r3, [r0]
+ 199:diff_signal/uw_link_rx.c ****     }
+ 278              		.loc 1 199 9 is_stmt 1 view .LVU78
+ 199:diff_signal/uw_link_rx.c ****     }
+ 279              		.loc 1 199 16 is_stmt 0 view .LVU79
+ 280 0040 0120     		movs	r0, #1
+ 281              	.LVL10:
+ 199:diff_signal/uw_link_rx.c ****     }
+ 282              		.loc 1 199 16 view .LVU80
+ 283 0042 7047     		bx	lr
+ 284              	.LVL11:
+ 285              	.L19:
+ 202:diff_signal/uw_link_rx.c **** }
+ 286              		.loc 1 202 12 view .LVU81
+ 287 0044 0020     		movs	r0, #0
+ 288              	.LVL12:
+ 202:diff_signal/uw_link_rx.c **** }
+ 289              		.loc 1 202 12 view .LVU82
+ 290 0046 7047     		bx	lr
+ 291              	.L25:
+ 292              		.align	2
+ 293              	.L24:
+ 294 0048 00000000 		.word	.LANCHOR0
+ 295              		.cfi_endproc
+ 296              	.LFE72:
+ 298              		.section	.text.UW_LinkRx_PushBitToByte,"ax",%progbits
+ 299              		.align	1
+ 300              		.syntax unified
+ 301              		.thumb
+ARM GAS  /tmp/cckgvJqr.s 			page 10
+
+
+ 302              		.thumb_func
+ 303              		.fpu softvfp
+ 305              	UW_LinkRx_PushBitToByte:
+ 306              	.LVL13:
+ 307              	.LFB73:
+ 204:diff_signal/uw_link_rx.c **** 
+ 205:diff_signal/uw_link_rx.c **** static bool UW_LinkRx_PushBitToByte(uint8_t bit, uint8_t *out_byte_ready, uint8_t *out_byte)
+ 206:diff_signal/uw_link_rx.c **** {
+ 308              		.loc 1 206 1 is_stmt 1 view -0
+ 309              		.cfi_startproc
+ 310              		@ args = 0, pretend = 0, frame = 0
+ 311              		@ frame_needed = 0, uses_anonymous_args = 0
+ 312              		.loc 1 206 1 is_stmt 0 view .LVU84
+ 313 0000 10B5     		push	{r4, lr}
+ 314              	.LCFI2:
+ 315              		.cfi_def_cfa_offset 8
+ 316              		.cfi_offset 4, -8
+ 317              		.cfi_offset 14, -4
+ 207:diff_signal/uw_link_rx.c ****     if (bit != 0u)
+ 318              		.loc 1 207 5 is_stmt 1 view .LVU85
+ 319              		.loc 1 207 8 is_stmt 0 view .LVU86
+ 320 0002 40B1     		cbz	r0, .L27
+ 208:diff_signal/uw_link_rx.c ****     {
+ 209:diff_signal/uw_link_rx.c ****         s_rx.current_byte |= (uint8_t)(1u << s_rx.bit_index);
+ 321              		.loc 1 209 9 is_stmt 1 view .LVU87
+ 322              		.loc 1 209 50 is_stmt 0 view .LVU88
+ 323 0004 0D48     		ldr	r0, .L32
+ 324              	.LVL14:
+ 325              		.loc 1 209 50 view .LVU89
+ 326 0006 90F91740 		ldrsb	r4, [r0, #23]
+ 327              		.loc 1 209 43 view .LVU90
+ 328 000a 0123     		movs	r3, #1
+ 329 000c A340     		lsls	r3, r3, r4
+ 330              		.loc 1 209 30 view .LVU91
+ 331 000e DBB2     		uxtb	r3, r3
+ 332              		.loc 1 209 27 view .LVU92
+ 333 0010 847D     		ldrb	r4, [r0, #22]	@ zero_extendqisi2
+ 334 0012 2343     		orrs	r3, r3, r4
+ 335 0014 8375     		strb	r3, [r0, #22]
+ 336              	.L27:
+ 210:diff_signal/uw_link_rx.c ****     }
+ 211:diff_signal/uw_link_rx.c **** 
+ 212:diff_signal/uw_link_rx.c ****     if (s_rx.bit_index == 0)
+ 337              		.loc 1 212 5 is_stmt 1 view .LVU93
+ 338              		.loc 1 212 13 is_stmt 0 view .LVU94
+ 339 0016 094B     		ldr	r3, .L32
+ 340 0018 93F91730 		ldrsb	r3, [r3, #23]
+ 341              		.loc 1 212 8 view .LVU95
+ 342 001c 33B1     		cbz	r3, .L31
+ 213:diff_signal/uw_link_rx.c ****     {
+ 214:diff_signal/uw_link_rx.c ****         *out_byte = s_rx.current_byte;
+ 215:diff_signal/uw_link_rx.c ****         *out_byte_ready = 1u;
+ 216:diff_signal/uw_link_rx.c ****         UW_LinkRx_ResetByteAssembler();
+ 217:diff_signal/uw_link_rx.c ****         return true;
+ 218:diff_signal/uw_link_rx.c ****     }
+ 219:diff_signal/uw_link_rx.c ****     else
+ 220:diff_signal/uw_link_rx.c ****     {
+ARM GAS  /tmp/cckgvJqr.s 			page 11
+
+
+ 221:diff_signal/uw_link_rx.c ****         s_rx.bit_index--;
+ 343              		.loc 1 221 9 is_stmt 1 view .LVU96
+ 344              		.loc 1 221 23 is_stmt 0 view .LVU97
+ 345 001e 013B     		subs	r3, r3, #1
+ 346 0020 064A     		ldr	r2, .L32
+ 347              	.LVL15:
+ 348              		.loc 1 221 23 view .LVU98
+ 349 0022 D375     		strb	r3, [r2, #23]
+ 222:diff_signal/uw_link_rx.c ****         *out_byte_ready = 0u;
+ 350              		.loc 1 222 9 is_stmt 1 view .LVU99
+ 351              		.loc 1 222 25 is_stmt 0 view .LVU100
+ 352 0024 0023     		movs	r3, #0
+ 353 0026 0B70     		strb	r3, [r1]
+ 223:diff_signal/uw_link_rx.c ****         return true;
+ 354              		.loc 1 223 9 is_stmt 1 view .LVU101
+ 355              	.LVL16:
+ 356              	.L29:
+ 224:diff_signal/uw_link_rx.c ****     }
+ 225:diff_signal/uw_link_rx.c **** }
+ 357              		.loc 1 225 1 is_stmt 0 view .LVU102
+ 358 0028 0120     		movs	r0, #1
+ 359 002a 10BD     		pop	{r4, pc}
+ 360              	.LVL17:
+ 361              	.L31:
+ 214:diff_signal/uw_link_rx.c ****         *out_byte_ready = 1u;
+ 362              		.loc 1 214 9 is_stmt 1 view .LVU103
+ 214:diff_signal/uw_link_rx.c ****         *out_byte_ready = 1u;
+ 363              		.loc 1 214 25 is_stmt 0 view .LVU104
+ 364 002c 034B     		ldr	r3, .L32
+ 365 002e 9B7D     		ldrb	r3, [r3, #22]	@ zero_extendqisi2
+ 214:diff_signal/uw_link_rx.c ****         *out_byte_ready = 1u;
+ 366              		.loc 1 214 19 view .LVU105
+ 367 0030 1370     		strb	r3, [r2]
+ 215:diff_signal/uw_link_rx.c ****         UW_LinkRx_ResetByteAssembler();
+ 368              		.loc 1 215 9 is_stmt 1 view .LVU106
+ 215:diff_signal/uw_link_rx.c ****         UW_LinkRx_ResetByteAssembler();
+ 369              		.loc 1 215 25 is_stmt 0 view .LVU107
+ 370 0032 0123     		movs	r3, #1
+ 371 0034 0B70     		strb	r3, [r1]
+ 216:diff_signal/uw_link_rx.c ****         return true;
+ 372              		.loc 1 216 9 is_stmt 1 view .LVU108
+ 373 0036 FFF7FEFF 		bl	UW_LinkRx_ResetByteAssembler
+ 374              	.LVL18:
+ 217:diff_signal/uw_link_rx.c ****     }
+ 375              		.loc 1 217 9 view .LVU109
+ 217:diff_signal/uw_link_rx.c ****     }
+ 376              		.loc 1 217 16 is_stmt 0 view .LVU110
+ 377 003a F5E7     		b	.L29
+ 378              	.L33:
+ 379              		.align	2
+ 380              	.L32:
+ 381 003c 00000000 		.word	.LANCHOR0
+ 382              		.cfi_endproc
+ 383              	.LFE73:
+ 385              		.section	.text.UW_LinkRx_ReadTone,"ax",%progbits
+ 386              		.align	1
+ 387              		.syntax unified
+ARM GAS  /tmp/cckgvJqr.s 			page 12
+
+
+ 388              		.thumb
+ 389              		.thumb_func
+ 390              		.fpu softvfp
+ 392              	UW_LinkRx_ReadTone:
+ 393              	.LFB66:
+  97:diff_signal/uw_link_rx.c ****     GPIO_PinState pc0 = HAL_GPIO_ReadPin(UW_LINK_BIT0_GPIO_PORT, UW_LINK_BIT0_GPIO_PIN);
+ 394              		.loc 1 97 1 is_stmt 1 view -0
+ 395              		.cfi_startproc
+ 396              		@ args = 0, pretend = 0, frame = 0
+ 397              		@ frame_needed = 0, uses_anonymous_args = 0
+ 398 0000 38B5     		push	{r3, r4, r5, lr}
+ 399              	.LCFI3:
+ 400              		.cfi_def_cfa_offset 16
+ 401              		.cfi_offset 3, -16
+ 402              		.cfi_offset 4, -12
+ 403              		.cfi_offset 5, -8
+ 404              		.cfi_offset 14, -4
+  98:diff_signal/uw_link_rx.c ****     GPIO_PinState pc1 = HAL_GPIO_ReadPin(UW_LINK_BIT1_GPIO_PORT, UW_LINK_BIT1_GPIO_PIN);
+ 405              		.loc 1 98 5 view .LVU112
+  98:diff_signal/uw_link_rx.c ****     GPIO_PinState pc1 = HAL_GPIO_ReadPin(UW_LINK_BIT1_GPIO_PORT, UW_LINK_BIT1_GPIO_PIN);
+ 406              		.loc 1 98 25 is_stmt 0 view .LVU113
+ 407 0002 0D4D     		ldr	r5, .L44
+ 408 0004 0121     		movs	r1, #1
+ 409 0006 2846     		mov	r0, r5
+ 410 0008 FFF7FEFF 		bl	HAL_GPIO_ReadPin
+ 411              	.LVL19:
+ 412 000c 0446     		mov	r4, r0
+ 413              	.LVL20:
+  99:diff_signal/uw_link_rx.c **** 
+ 414              		.loc 1 99 5 is_stmt 1 view .LVU114
+  99:diff_signal/uw_link_rx.c **** 
+ 415              		.loc 1 99 25 is_stmt 0 view .LVU115
+ 416 000e 0221     		movs	r1, #2
+ 417 0010 2846     		mov	r0, r5
+ 418 0012 FFF7FEFF 		bl	HAL_GPIO_ReadPin
+ 419              	.LVL21:
+ 102:diff_signal/uw_link_rx.c ****     bool bit1_active = (pc1 == GPIO_PIN_RESET);
+ 420              		.loc 1 102 5 is_stmt 1 view .LVU116
+ 103:diff_signal/uw_link_rx.c **** 
+ 421              		.loc 1 103 5 view .LVU117
+ 105:diff_signal/uw_link_rx.c ****     {
+ 422              		.loc 1 105 5 view .LVU118
+ 105:diff_signal/uw_link_rx.c ****     {
+ 423              		.loc 1 105 8 is_stmt 0 view .LVU119
+ 424 0016 04B9     		cbnz	r4, .L35
+ 105:diff_signal/uw_link_rx.c ****     {
+ 425              		.loc 1 105 21 discriminator 1 view .LVU120
+ 426 0018 38B9     		cbnz	r0, .L38
+ 427              	.L35:
+ 109:diff_signal/uw_link_rx.c ****     {
+ 428              		.loc 1 109 10 is_stmt 1 view .LVU121
+ 109:diff_signal/uw_link_rx.c ****     {
+ 429              		.loc 1 109 13 is_stmt 0 view .LVU122
+ 430 001a 00B9     		cbnz	r0, .L37
+ 109:diff_signal/uw_link_rx.c ****     {
+ 431              		.loc 1 109 26 discriminator 1 view .LVU123
+ 432 001c 3CB9     		cbnz	r4, .L39
+ARM GAS  /tmp/cckgvJqr.s 			page 13
+
+
+ 433              	.L37:
+ 113:diff_signal/uw_link_rx.c ****     {
+ 434              		.loc 1 113 10 is_stmt 1 view .LVU124
+ 113:diff_signal/uw_link_rx.c ****     {
+ 435              		.loc 1 113 13 is_stmt 0 view .LVU125
+ 436 001e 44B1     		cbz	r4, .L40
+ 113:diff_signal/uw_link_rx.c ****     {
+ 437              		.loc 1 113 29 discriminator 1 view .LVU126
+ 438 0020 08B1     		cbz	r0, .L43
+ 115:diff_signal/uw_link_rx.c ****     }
+ 439              		.loc 1 115 16 view .LVU127
+ 440 0022 0020     		movs	r0, #0
+ 441              	.LVL22:
+ 442              	.L36:
+ 121:diff_signal/uw_link_rx.c **** 
+ 443              		.loc 1 121 1 view .LVU128
+ 444 0024 38BD     		pop	{r3, r4, r5, pc}
+ 445              	.LVL23:
+ 446              	.L43:
+ 119:diff_signal/uw_link_rx.c ****     }
+ 447              		.loc 1 119 16 view .LVU129
+ 448 0026 0320     		movs	r0, #3
+ 449              	.LVL24:
+ 119:diff_signal/uw_link_rx.c ****     }
+ 450              		.loc 1 119 16 view .LVU130
+ 451 0028 FCE7     		b	.L36
+ 452              	.LVL25:
+ 453              	.L38:
+ 107:diff_signal/uw_link_rx.c ****     }
+ 454              		.loc 1 107 16 view .LVU131
+ 455 002a 0120     		movs	r0, #1
+ 456              	.LVL26:
+ 107:diff_signal/uw_link_rx.c ****     }
+ 457              		.loc 1 107 16 view .LVU132
+ 458 002c FAE7     		b	.L36
+ 459              	.LVL27:
+ 460              	.L39:
+ 111:diff_signal/uw_link_rx.c ****     }
+ 461              		.loc 1 111 16 view .LVU133
+ 462 002e 0220     		movs	r0, #2
+ 463              	.LVL28:
+ 111:diff_signal/uw_link_rx.c ****     }
+ 464              		.loc 1 111 16 view .LVU134
+ 465 0030 F8E7     		b	.L36
+ 466              	.LVL29:
+ 467              	.L40:
+ 119:diff_signal/uw_link_rx.c ****     }
+ 468              		.loc 1 119 16 view .LVU135
+ 469 0032 0320     		movs	r0, #3
+ 470              	.LVL30:
+ 119:diff_signal/uw_link_rx.c ****     }
+ 471              		.loc 1 119 16 view .LVU136
+ 472 0034 F6E7     		b	.L36
+ 473              	.L45:
+ 474 0036 00BF     		.align	2
+ 475              	.L44:
+ 476 0038 00100140 		.word	1073811456
+ARM GAS  /tmp/cckgvJqr.s 			page 14
+
+
+ 477              		.cfi_endproc
+ 478              	.LFE66:
+ 480              		.section	.text.UW_LinkRx_Finish,"ax",%progbits
+ 481              		.align	1
+ 482              		.syntax unified
+ 483              		.thumb
+ 484              		.thumb_func
+ 485              		.fpu softvfp
+ 487              	UW_LinkRx_Finish:
+ 488              	.LVL31:
+ 489              	.LFB71:
+ 167:diff_signal/uw_link_rx.c ****     s_rx.ready_device_id = device_id;
+ 490              		.loc 1 167 1 is_stmt 1 view -0
+ 491              		.cfi_startproc
+ 492              		@ args = 0, pretend = 0, frame = 0
+ 493              		@ frame_needed = 0, uses_anonymous_args = 0
+ 167:diff_signal/uw_link_rx.c ****     s_rx.ready_device_id = device_id;
+ 494              		.loc 1 167 1 is_stmt 0 view .LVU138
+ 495 0000 38B5     		push	{r3, r4, r5, lr}
+ 496              	.LCFI4:
+ 497              		.cfi_def_cfa_offset 16
+ 498              		.cfi_offset 3, -16
+ 499              		.cfi_offset 4, -12
+ 500              		.cfi_offset 5, -8
+ 501              		.cfi_offset 14, -4
+ 502 0002 1546     		mov	r5, r2
+ 168:diff_signal/uw_link_rx.c ****     memcpy(s_rx.ready_payload, payload, len);
+ 503              		.loc 1 168 5 is_stmt 1 view .LVU139
+ 168:diff_signal/uw_link_rx.c ****     memcpy(s_rx.ready_payload, payload, len);
+ 504              		.loc 1 168 26 is_stmt 0 view .LVU140
+ 505 0004 074C     		ldr	r4, .L48
+ 506 0006 84F89E00 		strb	r0, [r4, #158]
+ 169:diff_signal/uw_link_rx.c ****     s_rx.ready_len = len;
+ 507              		.loc 1 169 5 is_stmt 1 view .LVU141
+ 508 000a 04F19F00 		add	r0, r4, #159
+ 509              	.LVL32:
+ 169:diff_signal/uw_link_rx.c ****     s_rx.ready_len = len;
+ 510              		.loc 1 169 5 is_stmt 0 view .LVU142
+ 511 000e FFF7FEFF 		bl	memcpy
+ 512              	.LVL33:
+ 170:diff_signal/uw_link_rx.c ****     s_rx.frame_ready = true;
+ 513              		.loc 1 170 5 is_stmt 1 view .LVU143
+ 170:diff_signal/uw_link_rx.c ****     s_rx.frame_ready = true;
+ 514              		.loc 1 170 20 is_stmt 0 view .LVU144
+ 515 0012 A4F82051 		strh	r5, [r4, #288]	@ movhi
+ 171:diff_signal/uw_link_rx.c **** 
+ 516              		.loc 1 171 5 is_stmt 1 view .LVU145
+ 171:diff_signal/uw_link_rx.c **** 
+ 517              		.loc 1 171 22 is_stmt 0 view .LVU146
+ 518 0016 0123     		movs	r3, #1
+ 519 0018 84F82231 		strb	r3, [r4, #290]
+ 173:diff_signal/uw_link_rx.c **** }
+ 520              		.loc 1 173 5 is_stmt 1 view .LVU147
+ 521 001c FFF7FEFF 		bl	UW_LinkRx_Abort
+ 522              	.LVL34:
+ 174:diff_signal/uw_link_rx.c **** 
+ 523              		.loc 1 174 1 is_stmt 0 view .LVU148
+ARM GAS  /tmp/cckgvJqr.s 			page 15
+
+
+ 524 0020 38BD     		pop	{r3, r4, r5, pc}
+ 525              	.L49:
+ 526 0022 00BF     		.align	2
+ 527              	.L48:
+ 528 0024 00000000 		.word	.LANCHOR0
+ 529              		.cfi_endproc
+ 530              	.LFE71:
+ 532              		.section	.text.UW_LinkRx_ProcessDecodedBit,"ax",%progbits
+ 533              		.align	1
+ 534              		.syntax unified
+ 535              		.thumb
+ 536              		.thumb_func
+ 537              		.fpu softvfp
+ 539              	UW_LinkRx_ProcessDecodedBit:
+ 540              	.LVL35:
+ 541              	.LFB74:
+ 226:diff_signal/uw_link_rx.c **** 
+ 227:diff_signal/uw_link_rx.c **** static void UW_LinkRx_ProcessDecodedBit(uint8_t bit)
+ 228:diff_signal/uw_link_rx.c **** {
+ 542              		.loc 1 228 1 is_stmt 1 view -0
+ 543              		.cfi_startproc
+ 544              		@ args = 0, pretend = 0, frame = 136
+ 545              		@ frame_needed = 0, uses_anonymous_args = 0
+ 546              		.loc 1 228 1 is_stmt 0 view .LVU150
+ 547 0000 10B5     		push	{r4, lr}
+ 548              	.LCFI5:
+ 549              		.cfi_def_cfa_offset 8
+ 550              		.cfi_offset 4, -8
+ 551              		.cfi_offset 14, -4
+ 552 0002 A2B0     		sub	sp, sp, #136
+ 553              	.LCFI6:
+ 554              		.cfi_def_cfa_offset 144
+ 229:diff_signal/uw_link_rx.c ****     uint8_t byte_ready = 0u;
+ 555              		.loc 1 229 5 is_stmt 1 view .LVU151
+ 556              		.loc 1 229 13 is_stmt 0 view .LVU152
+ 557 0004 0023     		movs	r3, #0
+ 558 0006 8DF88730 		strb	r3, [sp, #135]
+ 230:diff_signal/uw_link_rx.c ****     uint8_t byte_val = 0u;
+ 559              		.loc 1 230 5 is_stmt 1 view .LVU153
+ 560              		.loc 1 230 13 is_stmt 0 view .LVU154
+ 561 000a 8DF88630 		strb	r3, [sp, #134]
+ 231:diff_signal/uw_link_rx.c ****     uint16_t crc_calc;
+ 562              		.loc 1 231 5 is_stmt 1 view .LVU155
+ 232:diff_signal/uw_link_rx.c ****     uint8_t crc_buf[2u + UW_LINK_RX_PAYLOAD_MAX_LEN];
+ 563              		.loc 1 232 5 view .LVU156
+ 233:diff_signal/uw_link_rx.c **** 
+ 234:diff_signal/uw_link_rx.c ****     switch (s_rx.parse_state)
+ 564              		.loc 1 234 5 view .LVU157
+ 565              		.loc 1 234 17 is_stmt 0 view .LVU158
+ 566 000e 774B     		ldr	r3, .L79
+ 567 0010 5B78     		ldrb	r3, [r3, #1]	@ zero_extendqisi2
+ 568 0012 082B     		cmp	r3, #8
+ 569 0014 00F2E680 		bhi	.L51
+ 570 0018 DFE803F0 		tbb	[pc, r3]
+ 571              	.L53:
+ 572 001c 05       		.byte	(.L61-.L53)/2
+ 573 001d 1A       		.byte	(.L60-.L53)/2
+ARM GAS  /tmp/cckgvJqr.s 			page 16
+
+
+ 574 001e 32       		.byte	(.L59-.L53)/2
+ 575 001f 4D       		.byte	(.L58-.L53)/2
+ 576 0020 6C       		.byte	(.L57-.L53)/2
+ 577 0021 88       		.byte	(.L56-.L53)/2
+ 578 0022 9A       		.byte	(.L55-.L53)/2
+ 579 0023 CF       		.byte	(.L54-.L53)/2
+ 580 0024 D8       		.byte	(.L52-.L53)/2
+ 581 0025 00       		.p2align 1
+ 582              	.L61:
+ 235:diff_signal/uw_link_rx.c ****     {
+ 236:diff_signal/uw_link_rx.c ****     case UW_PARSE_WAIT_PREAMBLE:
+ 237:diff_signal/uw_link_rx.c ****         if (bit == 1u)
+ 583              		.loc 1 237 9 is_stmt 1 view .LVU159
+ 584              		.loc 1 237 12 is_stmt 0 view .LVU160
+ 585 0026 0128     		cmp	r0, #1
+ 586 0028 03D0     		beq	.L74
+ 238:diff_signal/uw_link_rx.c ****         {
+ 239:diff_signal/uw_link_rx.c ****             s_rx.preamble_one_count++;
+ 240:diff_signal/uw_link_rx.c ****             if (s_rx.preamble_one_count >= UW_LINK_PREAMBLE_BITS)
+ 241:diff_signal/uw_link_rx.c ****             {
+ 242:diff_signal/uw_link_rx.c ****                 s_rx.parse_state = UW_PARSE_WAIT_SYNC;
+ 243:diff_signal/uw_link_rx.c ****                 s_rx.shift_reg = 0u;
+ 244:diff_signal/uw_link_rx.c ****                 s_rx.sync_bit_count = 0u;
+ 245:diff_signal/uw_link_rx.c ****             }
+ 246:diff_signal/uw_link_rx.c ****         }
+ 247:diff_signal/uw_link_rx.c ****         else
+ 248:diff_signal/uw_link_rx.c ****         {
+ 249:diff_signal/uw_link_rx.c ****             s_rx.preamble_one_count = 0u;
+ 587              		.loc 1 249 13 is_stmt 1 view .LVU161
+ 588              		.loc 1 249 37 is_stmt 0 view .LVU162
+ 589 002a 704B     		ldr	r3, .L79
+ 590 002c 0022     		movs	r2, #0
+ 591 002e DA74     		strb	r2, [r3, #19]
+ 592 0030 C7E0     		b	.L50
+ 593              	.L74:
+ 239:diff_signal/uw_link_rx.c ****             if (s_rx.preamble_one_count >= UW_LINK_PREAMBLE_BITS)
+ 594              		.loc 1 239 13 is_stmt 1 view .LVU163
+ 239:diff_signal/uw_link_rx.c ****             if (s_rx.preamble_one_count >= UW_LINK_PREAMBLE_BITS)
+ 595              		.loc 1 239 17 is_stmt 0 view .LVU164
+ 596 0032 6E4A     		ldr	r2, .L79
+ 597 0034 D37C     		ldrb	r3, [r2, #19]	@ zero_extendqisi2
+ 239:diff_signal/uw_link_rx.c ****             if (s_rx.preamble_one_count >= UW_LINK_PREAMBLE_BITS)
+ 598              		.loc 1 239 36 view .LVU165
+ 599 0036 0133     		adds	r3, r3, #1
+ 600 0038 DBB2     		uxtb	r3, r3
+ 601 003a D374     		strb	r3, [r2, #19]
+ 240:diff_signal/uw_link_rx.c ****             {
+ 602              		.loc 1 240 13 is_stmt 1 view .LVU166
+ 240:diff_signal/uw_link_rx.c ****             {
+ 603              		.loc 1 240 16 is_stmt 0 view .LVU167
+ 604 003c 012B     		cmp	r3, #1
+ 605 003e 40F2C080 		bls	.L50
+ 242:diff_signal/uw_link_rx.c ****                 s_rx.shift_reg = 0u;
+ 606              		.loc 1 242 17 is_stmt 1 view .LVU168
+ 242:diff_signal/uw_link_rx.c ****                 s_rx.shift_reg = 0u;
+ 607              		.loc 1 242 34 is_stmt 0 view .LVU169
+ 608 0042 1346     		mov	r3, r2
+ARM GAS  /tmp/cckgvJqr.s 			page 17
+
+
+ 609 0044 0122     		movs	r2, #1
+ 610 0046 5A70     		strb	r2, [r3, #1]
+ 243:diff_signal/uw_link_rx.c ****                 s_rx.sync_bit_count = 0u;
+ 611              		.loc 1 243 17 is_stmt 1 view .LVU170
+ 243:diff_signal/uw_link_rx.c ****                 s_rx.sync_bit_count = 0u;
+ 612              		.loc 1 243 32 is_stmt 0 view .LVU171
+ 613 0048 0022     		movs	r2, #0
+ 614 004a 1A75     		strb	r2, [r3, #20]
+ 244:diff_signal/uw_link_rx.c ****             }
+ 615              		.loc 1 244 17 is_stmt 1 view .LVU172
+ 244:diff_signal/uw_link_rx.c ****             }
+ 616              		.loc 1 244 37 is_stmt 0 view .LVU173
+ 617 004c 5A75     		strb	r2, [r3, #21]
+ 618 004e B8E0     		b	.L50
+ 619              	.L60:
+ 250:diff_signal/uw_link_rx.c ****         }
+ 251:diff_signal/uw_link_rx.c ****         break;
+ 252:diff_signal/uw_link_rx.c **** 
+ 253:diff_signal/uw_link_rx.c ****     case UW_PARSE_WAIT_SYNC:
+ 254:diff_signal/uw_link_rx.c ****         s_rx.shift_reg = (uint8_t)((s_rx.shift_reg << 1u) | bit);
+ 620              		.loc 1 254 9 is_stmt 1 view .LVU174
+ 621              		.loc 1 254 41 is_stmt 0 view .LVU175
+ 622 0050 664A     		ldr	r2, .L79
+ 623 0052 137D     		ldrb	r3, [r2, #20]	@ zero_extendqisi2
+ 624              		.loc 1 254 59 view .LVU176
+ 625 0054 40EA4300 		orr	r0, r0, r3, lsl #1
+ 626              	.LVL36:
+ 627              		.loc 1 254 26 view .LVU177
+ 628 0058 C0B2     		uxtb	r0, r0
+ 629              		.loc 1 254 24 view .LVU178
+ 630 005a 1075     		strb	r0, [r2, #20]
+ 255:diff_signal/uw_link_rx.c ****         s_rx.sync_bit_count++;
+ 631              		.loc 1 255 9 is_stmt 1 view .LVU179
+ 632              		.loc 1 255 13 is_stmt 0 view .LVU180
+ 633 005c 537D     		ldrb	r3, [r2, #21]	@ zero_extendqisi2
+ 634              		.loc 1 255 28 view .LVU181
+ 635 005e 0133     		adds	r3, r3, #1
+ 636 0060 DBB2     		uxtb	r3, r3
+ 637 0062 5375     		strb	r3, [r2, #21]
+ 256:diff_signal/uw_link_rx.c **** 
+ 257:diff_signal/uw_link_rx.c ****         if (s_rx.sync_bit_count >= 8u)
+ 638              		.loc 1 257 9 is_stmt 1 view .LVU182
+ 639              		.loc 1 257 12 is_stmt 0 view .LVU183
+ 640 0064 072B     		cmp	r3, #7
+ 641 0066 40F2AC80 		bls	.L50
+ 258:diff_signal/uw_link_rx.c ****         {
+ 259:diff_signal/uw_link_rx.c ****             if (s_rx.shift_reg == UW_LINK_SYNC_BYTE)
+ 642              		.loc 1 259 13 is_stmt 1 view .LVU184
+ 643              		.loc 1 259 16 is_stmt 0 view .LVU185
+ 644 006a 5528     		cmp	r0, #85
+ 645 006c 02D0     		beq	.L75
+ 260:diff_signal/uw_link_rx.c ****             {
+ 261:diff_signal/uw_link_rx.c ****                 s_rx.parse_state = UW_PARSE_READ_ID;
+ 262:diff_signal/uw_link_rx.c ****                 UW_LinkRx_ResetByteAssembler();
+ 263:diff_signal/uw_link_rx.c ****             }
+ 264:diff_signal/uw_link_rx.c ****             else
+ 265:diff_signal/uw_link_rx.c ****             {
+ARM GAS  /tmp/cckgvJqr.s 			page 18
+
+
+ 266:diff_signal/uw_link_rx.c ****                 UW_LinkRx_Abort();
+ 646              		.loc 1 266 17 is_stmt 1 view .LVU186
+ 647 006e FFF7FEFF 		bl	UW_LinkRx_Abort
+ 648              	.LVL37:
+ 649 0072 A6E0     		b	.L50
+ 650              	.L75:
+ 261:diff_signal/uw_link_rx.c ****                 UW_LinkRx_ResetByteAssembler();
+ 651              		.loc 1 261 17 view .LVU187
+ 261:diff_signal/uw_link_rx.c ****                 UW_LinkRx_ResetByteAssembler();
+ 652              		.loc 1 261 34 is_stmt 0 view .LVU188
+ 653 0074 1346     		mov	r3, r2
+ 654 0076 0222     		movs	r2, #2
+ 655 0078 5A70     		strb	r2, [r3, #1]
+ 262:diff_signal/uw_link_rx.c ****             }
+ 656              		.loc 1 262 17 is_stmt 1 view .LVU189
+ 657 007a FFF7FEFF 		bl	UW_LinkRx_ResetByteAssembler
+ 658              	.LVL38:
+ 659 007e A0E0     		b	.L50
+ 660              	.LVL39:
+ 661              	.L59:
+ 267:diff_signal/uw_link_rx.c ****             }
+ 268:diff_signal/uw_link_rx.c ****         }
+ 269:diff_signal/uw_link_rx.c ****         break;
+ 270:diff_signal/uw_link_rx.c **** 
+ 271:diff_signal/uw_link_rx.c ****     case UW_PARSE_READ_ID:
+ 272:diff_signal/uw_link_rx.c ****         UW_LinkRx_PushBitToByte(bit, &byte_ready, &byte_val);
+ 662              		.loc 1 272 9 view .LVU190
+ 663 0080 0DF18602 		add	r2, sp, #134
+ 664 0084 0DF18701 		add	r1, sp, #135
+ 665 0088 FFF7FEFF 		bl	UW_LinkRx_PushBitToByte
+ 666              	.LVL40:
+ 273:diff_signal/uw_link_rx.c ****         if (byte_ready != 0u)
+ 667              		.loc 1 273 9 view .LVU191
+ 668              		.loc 1 273 24 is_stmt 0 view .LVU192
+ 669 008c 9DF88730 		ldrb	r3, [sp, #135]	@ zero_extendqisi2
+ 670              		.loc 1 273 12 view .LVU193
+ 671 0090 002B     		cmp	r3, #0
+ 672 0092 00F09680 		beq	.L50
+ 274:diff_signal/uw_link_rx.c ****         {
+ 275:diff_signal/uw_link_rx.c ****             s_rx.rx_device_id = byte_val;
+ 673              		.loc 1 275 13 is_stmt 1 view .LVU194
+ 674              		.loc 1 275 31 is_stmt 0 view .LVU195
+ 675 0096 9DF88630 		ldrb	r3, [sp, #134]	@ zero_extendqisi2
+ 676 009a 544A     		ldr	r2, .L79
+ 677 009c 5376     		strb	r3, [r2, #25]
+ 276:diff_signal/uw_link_rx.c **** 
+ 277:diff_signal/uw_link_rx.c ****             if ((s_rx.rx_device_id == s_rx.local_device_id) ||
+ 678              		.loc 1 277 13 is_stmt 1 view .LVU196
+ 679              		.loc 1 277 43 is_stmt 0 view .LVU197
+ 680 009e 127E     		ldrb	r2, [r2, #24]	@ zero_extendqisi2
+ 681              		.loc 1 277 16 view .LVU198
+ 682 00a0 9342     		cmp	r3, r2
+ 683 00a2 01D0     		beq	.L65
+ 684              		.loc 1 277 61 discriminator 1 view .LVU199
+ 685 00a4 FF2B     		cmp	r3, #255
+ 686 00a6 03D1     		bne	.L66
+ 687              	.L65:
+ARM GAS  /tmp/cckgvJqr.s 			page 19
+
+
+ 278:diff_signal/uw_link_rx.c ****                 (s_rx.rx_device_id == UW_LINK_BROADCAST_ID))
+ 279:diff_signal/uw_link_rx.c ****             {
+ 280:diff_signal/uw_link_rx.c ****                 s_rx.parse_state = UW_PARSE_READ_LEN;
+ 688              		.loc 1 280 17 is_stmt 1 view .LVU200
+ 689              		.loc 1 280 34 is_stmt 0 view .LVU201
+ 690 00a8 504B     		ldr	r3, .L79
+ 691 00aa 0322     		movs	r2, #3
+ 692 00ac 5A70     		strb	r2, [r3, #1]
+ 693 00ae 88E0     		b	.L50
+ 694              	.L66:
+ 281:diff_signal/uw_link_rx.c ****             }
+ 282:diff_signal/uw_link_rx.c ****             else
+ 283:diff_signal/uw_link_rx.c ****             {
+ 284:diff_signal/uw_link_rx.c ****                 UW_LinkRx_Abort();
+ 695              		.loc 1 284 17 is_stmt 1 view .LVU202
+ 696 00b0 FFF7FEFF 		bl	UW_LinkRx_Abort
+ 697              	.LVL41:
+ 698 00b4 85E0     		b	.L50
+ 699              	.LVL42:
+ 700              	.L58:
+ 285:diff_signal/uw_link_rx.c ****             }
+ 286:diff_signal/uw_link_rx.c ****         }
+ 287:diff_signal/uw_link_rx.c ****         break;
+ 288:diff_signal/uw_link_rx.c **** 
+ 289:diff_signal/uw_link_rx.c ****     case UW_PARSE_READ_LEN:
+ 290:diff_signal/uw_link_rx.c ****         UW_LinkRx_PushBitToByte(bit, &byte_ready, &byte_val);
+ 701              		.loc 1 290 9 view .LVU203
+ 702 00b6 0DF18602 		add	r2, sp, #134
+ 703 00ba 0DF18701 		add	r1, sp, #135
+ 704 00be FFF7FEFF 		bl	UW_LinkRx_PushBitToByte
+ 705              	.LVL43:
+ 291:diff_signal/uw_link_rx.c ****         if (byte_ready != 0u)
+ 706              		.loc 1 291 9 view .LVU204
+ 707              		.loc 1 291 24 is_stmt 0 view .LVU205
+ 708 00c2 9DF88730 		ldrb	r3, [sp, #135]	@ zero_extendqisi2
+ 709              		.loc 1 291 12 view .LVU206
+ 710 00c6 002B     		cmp	r3, #0
+ 711 00c8 7BD0     		beq	.L50
+ 292:diff_signal/uw_link_rx.c ****         {
+ 293:diff_signal/uw_link_rx.c ****             s_rx.rx_len = byte_val;
+ 712              		.loc 1 293 13 is_stmt 1 view .LVU207
+ 713              		.loc 1 293 25 is_stmt 0 view .LVU208
+ 714 00ca 9DF88630 		ldrb	r3, [sp, #134]	@ zero_extendqisi2
+ 715 00ce 474A     		ldr	r2, .L79
+ 716 00d0 9376     		strb	r3, [r2, #26]
+ 294:diff_signal/uw_link_rx.c **** 
+ 295:diff_signal/uw_link_rx.c ****             if (s_rx.rx_len > UW_LINK_RX_PAYLOAD_MAX_LEN)
+ 717              		.loc 1 295 13 is_stmt 1 view .LVU209
+ 718              		.loc 1 295 16 is_stmt 0 view .LVU210
+ 719 00d2 802B     		cmp	r3, #128
+ 720 00d4 04D8     		bhi	.L76
+ 296:diff_signal/uw_link_rx.c ****             {
+ 297:diff_signal/uw_link_rx.c ****                 UW_LinkRx_Abort();
+ 298:diff_signal/uw_link_rx.c ****             }
+ 299:diff_signal/uw_link_rx.c ****             else if (s_rx.rx_len == 0u)
+ 721              		.loc 1 299 18 is_stmt 1 view .LVU211
+ 722              		.loc 1 299 21 is_stmt 0 view .LVU212
+ARM GAS  /tmp/cckgvJqr.s 			page 20
+
+
+ 723 00d6 33B9     		cbnz	r3, .L68
+ 300:diff_signal/uw_link_rx.c ****             {
+ 301:diff_signal/uw_link_rx.c ****                 s_rx.parse_state = UW_PARSE_READ_CRC_L;
+ 724              		.loc 1 301 17 is_stmt 1 view .LVU213
+ 725              		.loc 1 301 34 is_stmt 0 view .LVU214
+ 726 00d8 444B     		ldr	r3, .L79
+ 727 00da 0522     		movs	r2, #5
+ 728 00dc 5A70     		strb	r2, [r3, #1]
+ 729 00de 70E0     		b	.L50
+ 730              	.L76:
+ 297:diff_signal/uw_link_rx.c ****             }
+ 731              		.loc 1 297 17 is_stmt 1 view .LVU215
+ 732 00e0 FFF7FEFF 		bl	UW_LinkRx_Abort
+ 733              	.LVL44:
+ 734 00e4 6DE0     		b	.L50
+ 735              	.L68:
+ 302:diff_signal/uw_link_rx.c ****             }
+ 303:diff_signal/uw_link_rx.c ****             else
+ 304:diff_signal/uw_link_rx.c ****             {
+ 305:diff_signal/uw_link_rx.c ****                 s_rx.rx_payload_index = 0u;
+ 736              		.loc 1 305 17 view .LVU216
+ 737              		.loc 1 305 39 is_stmt 0 view .LVU217
+ 738 00e6 414B     		ldr	r3, .L79
+ 739 00e8 0022     		movs	r2, #0
+ 740 00ea 83F89B20 		strb	r2, [r3, #155]
+ 306:diff_signal/uw_link_rx.c ****                 s_rx.parse_state = UW_PARSE_READ_PAYLOAD;
+ 741              		.loc 1 306 17 is_stmt 1 view .LVU218
+ 742              		.loc 1 306 34 is_stmt 0 view .LVU219
+ 743 00ee 0422     		movs	r2, #4
+ 744 00f0 5A70     		strb	r2, [r3, #1]
+ 745 00f2 66E0     		b	.L50
+ 746              	.LVL45:
+ 747              	.L57:
+ 307:diff_signal/uw_link_rx.c ****             }
+ 308:diff_signal/uw_link_rx.c ****         }
+ 309:diff_signal/uw_link_rx.c ****         break;
+ 310:diff_signal/uw_link_rx.c **** 
+ 311:diff_signal/uw_link_rx.c ****     case UW_PARSE_READ_PAYLOAD:
+ 312:diff_signal/uw_link_rx.c ****         UW_LinkRx_PushBitToByte(bit, &byte_ready, &byte_val);
+ 748              		.loc 1 312 9 is_stmt 1 view .LVU220
+ 749 00f4 0DF18602 		add	r2, sp, #134
+ 750 00f8 0DF18701 		add	r1, sp, #135
+ 751 00fc FFF7FEFF 		bl	UW_LinkRx_PushBitToByte
+ 752              	.LVL46:
+ 313:diff_signal/uw_link_rx.c ****         if (byte_ready != 0u)
+ 753              		.loc 1 313 9 view .LVU221
+ 754              		.loc 1 313 24 is_stmt 0 view .LVU222
+ 755 0100 9DF88730 		ldrb	r3, [sp, #135]	@ zero_extendqisi2
+ 756              		.loc 1 313 12 view .LVU223
+ 757 0104 002B     		cmp	r3, #0
+ 758 0106 5CD0     		beq	.L50
+ 314:diff_signal/uw_link_rx.c ****         {
+ 315:diff_signal/uw_link_rx.c ****             s_rx.rx_payload[s_rx.rx_payload_index++] = byte_val;
+ 759              		.loc 1 315 13 is_stmt 1 view .LVU224
+ 760              		.loc 1 315 33 is_stmt 0 view .LVU225
+ 761 0108 384A     		ldr	r2, .L79
+ 762 010a 92F89B10 		ldrb	r1, [r2, #155]	@ zero_extendqisi2
+ARM GAS  /tmp/cckgvJqr.s 			page 21
+
+
+ 763              		.loc 1 315 50 view .LVU226
+ 764 010e 4B1C     		adds	r3, r1, #1
+ 765 0110 DBB2     		uxtb	r3, r3
+ 766 0112 82F89B30 		strb	r3, [r2, #155]
+ 767              		.loc 1 315 54 view .LVU227
+ 768 0116 1144     		add	r1, r1, r2
+ 769 0118 9DF88600 		ldrb	r0, [sp, #134]	@ zero_extendqisi2
+ 770 011c C876     		strb	r0, [r1, #27]
+ 316:diff_signal/uw_link_rx.c **** 
+ 317:diff_signal/uw_link_rx.c ****             if (s_rx.rx_payload_index >= s_rx.rx_len)
+ 771              		.loc 1 317 13 is_stmt 1 view .LVU228
+ 772              		.loc 1 317 46 is_stmt 0 view .LVU229
+ 773 011e 927E     		ldrb	r2, [r2, #26]	@ zero_extendqisi2
+ 774              		.loc 1 317 16 view .LVU230
+ 775 0120 9342     		cmp	r3, r2
+ 776 0122 4ED3     		bcc	.L50
+ 318:diff_signal/uw_link_rx.c ****             {
+ 319:diff_signal/uw_link_rx.c ****                 s_rx.parse_state = UW_PARSE_READ_CRC_L;
+ 777              		.loc 1 319 17 is_stmt 1 view .LVU231
+ 778              		.loc 1 319 34 is_stmt 0 view .LVU232
+ 779 0124 314B     		ldr	r3, .L79
+ 780 0126 0522     		movs	r2, #5
+ 781 0128 5A70     		strb	r2, [r3, #1]
+ 782 012a 4AE0     		b	.L50
+ 783              	.LVL47:
+ 784              	.L56:
+ 320:diff_signal/uw_link_rx.c ****             }
+ 321:diff_signal/uw_link_rx.c ****         }
+ 322:diff_signal/uw_link_rx.c ****         break;
+ 323:diff_signal/uw_link_rx.c **** 
+ 324:diff_signal/uw_link_rx.c ****     case UW_PARSE_READ_CRC_L:
+ 325:diff_signal/uw_link_rx.c ****         UW_LinkRx_PushBitToByte(bit, &byte_ready, &byte_val);
+ 785              		.loc 1 325 9 is_stmt 1 view .LVU233
+ 786 012c 0DF18602 		add	r2, sp, #134
+ 787 0130 0DF18701 		add	r1, sp, #135
+ 788 0134 FFF7FEFF 		bl	UW_LinkRx_PushBitToByte
+ 789              	.LVL48:
+ 326:diff_signal/uw_link_rx.c ****         if (byte_ready != 0u)
+ 790              		.loc 1 326 9 view .LVU234
+ 791              		.loc 1 326 24 is_stmt 0 view .LVU235
+ 792 0138 9DF88730 		ldrb	r3, [sp, #135]	@ zero_extendqisi2
+ 793              		.loc 1 326 12 view .LVU236
+ 794 013c 002B     		cmp	r3, #0
+ 795 013e 40D0     		beq	.L50
+ 327:diff_signal/uw_link_rx.c ****         {
+ 328:diff_signal/uw_link_rx.c ****             s_rx.crc_l = byte_val;
+ 796              		.loc 1 328 13 is_stmt 1 view .LVU237
+ 797              		.loc 1 328 24 is_stmt 0 view .LVU238
+ 798 0140 2A4B     		ldr	r3, .L79
+ 799 0142 9DF88620 		ldrb	r2, [sp, #134]	@ zero_extendqisi2
+ 800 0146 83F89C20 		strb	r2, [r3, #156]
+ 329:diff_signal/uw_link_rx.c ****             s_rx.parse_state = UW_PARSE_READ_CRC_H;
+ 801              		.loc 1 329 13 is_stmt 1 view .LVU239
+ 802              		.loc 1 329 30 is_stmt 0 view .LVU240
+ 803 014a 0622     		movs	r2, #6
+ 804 014c 5A70     		strb	r2, [r3, #1]
+ 805 014e 38E0     		b	.L50
+ARM GAS  /tmp/cckgvJqr.s 			page 22
+
+
+ 806              	.LVL49:
+ 807              	.L55:
+ 330:diff_signal/uw_link_rx.c ****         }
+ 331:diff_signal/uw_link_rx.c ****         break;
+ 332:diff_signal/uw_link_rx.c **** 
+ 333:diff_signal/uw_link_rx.c ****     case UW_PARSE_READ_CRC_H:
+ 334:diff_signal/uw_link_rx.c ****         UW_LinkRx_PushBitToByte(bit, &byte_ready, &byte_val);
+ 808              		.loc 1 334 9 is_stmt 1 view .LVU241
+ 809 0150 0DF18602 		add	r2, sp, #134
+ 810 0154 0DF18701 		add	r1, sp, #135
+ 811 0158 FFF7FEFF 		bl	UW_LinkRx_PushBitToByte
+ 812              	.LVL50:
+ 335:diff_signal/uw_link_rx.c ****         if (byte_ready != 0u)
+ 813              		.loc 1 335 9 view .LVU242
+ 814              		.loc 1 335 24 is_stmt 0 view .LVU243
+ 815 015c 9DF88730 		ldrb	r3, [sp, #135]	@ zero_extendqisi2
+ 816              		.loc 1 335 12 view .LVU244
+ 817 0160 7BB3     		cbz	r3, .L50
+ 336:diff_signal/uw_link_rx.c ****         {
+ 337:diff_signal/uw_link_rx.c ****             s_rx.crc_h = byte_val;
+ 818              		.loc 1 337 13 is_stmt 1 view .LVU245
+ 819              		.loc 1 337 24 is_stmt 0 view .LVU246
+ 820 0162 224B     		ldr	r3, .L79
+ 821 0164 9DF88620 		ldrb	r2, [sp, #134]	@ zero_extendqisi2
+ 822 0168 83F89D20 		strb	r2, [r3, #157]
+ 338:diff_signal/uw_link_rx.c **** 
+ 339:diff_signal/uw_link_rx.c ****             crc_buf[0] = s_rx.rx_device_id;
+ 823              		.loc 1 339 13 is_stmt 1 view .LVU247
+ 824              		.loc 1 339 30 is_stmt 0 view .LVU248
+ 825 016c 5A7E     		ldrb	r2, [r3, #25]	@ zero_extendqisi2
+ 826              		.loc 1 339 24 view .LVU249
+ 827 016e 8DF80420 		strb	r2, [sp, #4]
+ 340:diff_signal/uw_link_rx.c ****             crc_buf[1] = s_rx.rx_len;
+ 828              		.loc 1 340 13 is_stmt 1 view .LVU250
+ 829              		.loc 1 340 30 is_stmt 0 view .LVU251
+ 830 0172 9C7E     		ldrb	r4, [r3, #26]	@ zero_extendqisi2
+ 831              		.loc 1 340 24 view .LVU252
+ 832 0174 8DF80540 		strb	r4, [sp, #5]
+ 341:diff_signal/uw_link_rx.c **** 
+ 342:diff_signal/uw_link_rx.c ****             if (s_rx.rx_len > 0u)
+ 833              		.loc 1 342 13 is_stmt 1 view .LVU253
+ 834              		.loc 1 342 16 is_stmt 0 view .LVU254
+ 835 0178 9CB9     		cbnz	r4, .L77
+ 836              	.L69:
+ 343:diff_signal/uw_link_rx.c ****             {
+ 344:diff_signal/uw_link_rx.c ****                 memcpy(&crc_buf[2], s_rx.rx_payload, s_rx.rx_len);
+ 345:diff_signal/uw_link_rx.c ****             }
+ 346:diff_signal/uw_link_rx.c **** 
+ 347:diff_signal/uw_link_rx.c ****             crc_calc = UW_Link_CalcCrc16(crc_buf, (uint16_t)(2u + s_rx.rx_len));
+ 837              		.loc 1 347 13 is_stmt 1 view .LVU255
+ 838              		.loc 1 347 24 is_stmt 0 view .LVU256
+ 839 017a A11C     		adds	r1, r4, #2
+ 840 017c 01A8     		add	r0, sp, #4
+ 841 017e FFF7FEFF 		bl	UW_Link_CalcCrc16
+ 842              	.LVL51:
+ 348:diff_signal/uw_link_rx.c ****             if (((uint8_t)(crc_calc & 0xFFu) == s_rx.crc_l) &&
+ 843              		.loc 1 348 13 is_stmt 1 view .LVU257
+ARM GAS  /tmp/cckgvJqr.s 			page 23
+
+
+ 844              		.loc 1 348 18 is_stmt 0 view .LVU258
+ 845 0182 C2B2     		uxtb	r2, r0
+ 846              		.loc 1 348 53 view .LVU259
+ 847 0184 194B     		ldr	r3, .L79
+ 848 0186 93F89C30 		ldrb	r3, [r3, #156]	@ zero_extendqisi2
+ 849              		.loc 1 348 16 view .LVU260
+ 850 018a 9A42     		cmp	r2, r3
+ 851 018c 06D1     		bne	.L70
+ 349:diff_signal/uw_link_rx.c ****                 ((uint8_t)((crc_calc >> 8u) & 0xFFu) == s_rx.crc_h))
+ 852              		.loc 1 349 18 discriminator 1 view .LVU261
+ 853 018e C0F30720 		ubfx	r0, r0, #8, #8
+ 854              	.LVL52:
+ 855              		.loc 1 349 61 discriminator 1 view .LVU262
+ 856 0192 164B     		ldr	r3, .L79
+ 857 0194 93F89D30 		ldrb	r3, [r3, #157]	@ zero_extendqisi2
+ 348:diff_signal/uw_link_rx.c ****             if (((uint8_t)(crc_calc & 0xFFu) == s_rx.crc_l) &&
+ 858              		.loc 1 348 61 discriminator 1 view .LVU263
+ 859 0198 9842     		cmp	r0, r3
+ 860 019a 0AD0     		beq	.L78
+ 861              	.L70:
+ 350:diff_signal/uw_link_rx.c ****             {
+ 351:diff_signal/uw_link_rx.c ****                 s_rx.parse_state = UW_PARSE_WAIT_TAIL0_A;
+ 352:diff_signal/uw_link_rx.c ****             }
+ 353:diff_signal/uw_link_rx.c ****             else
+ 354:diff_signal/uw_link_rx.c ****             {
+ 355:diff_signal/uw_link_rx.c ****                 UW_LinkRx_Abort();
+ 862              		.loc 1 355 17 is_stmt 1 view .LVU264
+ 863 019c FFF7FEFF 		bl	UW_LinkRx_Abort
+ 864              	.LVL53:
+ 865 01a0 0FE0     		b	.L50
+ 866              	.L77:
+ 344:diff_signal/uw_link_rx.c ****             }
+ 867              		.loc 1 344 17 view .LVU265
+ 868 01a2 2246     		mov	r2, r4
+ 869 01a4 03F11B01 		add	r1, r3, #27
+ 870 01a8 0DF10600 		add	r0, sp, #6
+ 871 01ac FFF7FEFF 		bl	memcpy
+ 872              	.LVL54:
+ 873 01b0 E3E7     		b	.L69
+ 874              	.L78:
+ 351:diff_signal/uw_link_rx.c ****             }
+ 875              		.loc 1 351 17 view .LVU266
+ 351:diff_signal/uw_link_rx.c ****             }
+ 876              		.loc 1 351 34 is_stmt 0 view .LVU267
+ 877 01b2 0E4B     		ldr	r3, .L79
+ 878 01b4 0722     		movs	r2, #7
+ 879 01b6 5A70     		strb	r2, [r3, #1]
+ 880 01b8 03E0     		b	.L50
+ 881              	.LVL55:
+ 882              	.L54:
+ 356:diff_signal/uw_link_rx.c ****             }
+ 357:diff_signal/uw_link_rx.c ****         }
+ 358:diff_signal/uw_link_rx.c ****         break;
+ 359:diff_signal/uw_link_rx.c **** 
+ 360:diff_signal/uw_link_rx.c ****     case UW_PARSE_WAIT_TAIL0_A:
+ 361:diff_signal/uw_link_rx.c ****         if (bit == 0u)
+ 883              		.loc 1 361 9 is_stmt 1 view .LVU268
+ARM GAS  /tmp/cckgvJqr.s 			page 24
+
+
+ 884              		.loc 1 361 12 is_stmt 0 view .LVU269
+ 885 01ba 20B9     		cbnz	r0, .L71
+ 362:diff_signal/uw_link_rx.c ****         {
+ 363:diff_signal/uw_link_rx.c ****             s_rx.parse_state = UW_PARSE_WAIT_TAIL0_B;
+ 886              		.loc 1 363 13 is_stmt 1 view .LVU270
+ 887              		.loc 1 363 30 is_stmt 0 view .LVU271
+ 888 01bc 0B4B     		ldr	r3, .L79
+ 889 01be 0822     		movs	r2, #8
+ 890 01c0 5A70     		strb	r2, [r3, #1]
+ 891              	.LVL56:
+ 892              	.L50:
+ 364:diff_signal/uw_link_rx.c ****         }
+ 365:diff_signal/uw_link_rx.c ****         else
+ 366:diff_signal/uw_link_rx.c ****         {
+ 367:diff_signal/uw_link_rx.c ****             UW_LinkRx_Abort();
+ 368:diff_signal/uw_link_rx.c ****         }
+ 369:diff_signal/uw_link_rx.c ****         break;
+ 370:diff_signal/uw_link_rx.c **** 
+ 371:diff_signal/uw_link_rx.c ****     case UW_PARSE_WAIT_TAIL0_B:
+ 372:diff_signal/uw_link_rx.c ****         if (bit == 0u)
+ 373:diff_signal/uw_link_rx.c ****         {
+ 374:diff_signal/uw_link_rx.c ****             UW_LinkRx_Finish(s_rx.rx_device_id, s_rx.rx_payload, s_rx.rx_len);
+ 375:diff_signal/uw_link_rx.c ****         }
+ 376:diff_signal/uw_link_rx.c ****         else
+ 377:diff_signal/uw_link_rx.c ****         {
+ 378:diff_signal/uw_link_rx.c ****             UW_LinkRx_Abort();
+ 379:diff_signal/uw_link_rx.c ****         }
+ 380:diff_signal/uw_link_rx.c ****         break;
+ 381:diff_signal/uw_link_rx.c **** 
+ 382:diff_signal/uw_link_rx.c ****     default:
+ 383:diff_signal/uw_link_rx.c ****         UW_LinkRx_Abort();
+ 384:diff_signal/uw_link_rx.c ****         break;
+ 385:diff_signal/uw_link_rx.c ****     }
+ 386:diff_signal/uw_link_rx.c **** }
+ 893              		.loc 1 386 1 view .LVU272
+ 894 01c2 22B0     		add	sp, sp, #136
+ 895              	.LCFI7:
+ 896              		.cfi_remember_state
+ 897              		.cfi_def_cfa_offset 8
+ 898              		@ sp needed
+ 899 01c4 10BD     		pop	{r4, pc}
+ 900              	.LVL57:
+ 901              	.L71:
+ 902              	.LCFI8:
+ 903              		.cfi_restore_state
+ 367:diff_signal/uw_link_rx.c ****         }
+ 904              		.loc 1 367 13 is_stmt 1 view .LVU273
+ 905 01c6 FFF7FEFF 		bl	UW_LinkRx_Abort
+ 906              	.LVL58:
+ 367:diff_signal/uw_link_rx.c ****         }
+ 907              		.loc 1 367 13 is_stmt 0 view .LVU274
+ 908 01ca FAE7     		b	.L50
+ 909              	.LVL59:
+ 910              	.L52:
+ 372:diff_signal/uw_link_rx.c ****         {
+ 911              		.loc 1 372 9 is_stmt 1 view .LVU275
+ 372:diff_signal/uw_link_rx.c ****         {
+ARM GAS  /tmp/cckgvJqr.s 			page 25
+
+
+ 912              		.loc 1 372 12 is_stmt 0 view .LVU276
+ 913 01cc 38B9     		cbnz	r0, .L72
+ 374:diff_signal/uw_link_rx.c ****         }
+ 914              		.loc 1 374 13 is_stmt 1 view .LVU277
+ 915 01ce 074B     		ldr	r3, .L79
+ 916 01d0 9A7E     		ldrb	r2, [r3, #26]	@ zero_extendqisi2
+ 917 01d2 03F11B01 		add	r1, r3, #27
+ 918 01d6 587E     		ldrb	r0, [r3, #25]	@ zero_extendqisi2
+ 919              	.LVL60:
+ 374:diff_signal/uw_link_rx.c ****         }
+ 920              		.loc 1 374 13 is_stmt 0 view .LVU278
+ 921 01d8 FFF7FEFF 		bl	UW_LinkRx_Finish
+ 922              	.LVL61:
+ 923 01dc F1E7     		b	.L50
+ 924              	.LVL62:
+ 925              	.L72:
+ 378:diff_signal/uw_link_rx.c ****         }
+ 926              		.loc 1 378 13 is_stmt 1 view .LVU279
+ 927 01de FFF7FEFF 		bl	UW_LinkRx_Abort
+ 928              	.LVL63:
+ 378:diff_signal/uw_link_rx.c ****         }
+ 929              		.loc 1 378 13 is_stmt 0 view .LVU280
+ 930 01e2 EEE7     		b	.L50
+ 931              	.LVL64:
+ 932              	.L51:
+ 383:diff_signal/uw_link_rx.c ****         break;
+ 933              		.loc 1 383 9 is_stmt 1 view .LVU281
+ 934 01e4 FFF7FEFF 		bl	UW_LinkRx_Abort
+ 935              	.LVL65:
+ 384:diff_signal/uw_link_rx.c ****     }
+ 936              		.loc 1 384 9 view .LVU282
+ 937              		.loc 1 386 1 is_stmt 0 view .LVU283
+ 938 01e8 EBE7     		b	.L50
+ 939              	.L80:
+ 940 01ea 00BF     		.align	2
+ 941              	.L79:
+ 942 01ec 00000000 		.word	.LANCHOR0
+ 943              		.cfi_endproc
+ 944              	.LFE74:
+ 946              		.section	.text.UW_LinkRx_Init,"ax",%progbits
+ 947              		.align	1
+ 948              		.global	UW_LinkRx_Init
+ 949              		.syntax unified
+ 950              		.thumb
+ 951              		.thumb_func
+ 952              		.fpu softvfp
+ 954              	UW_LinkRx_Init:
+ 955              	.LVL66:
+ 956              	.LFB75:
+ 387:diff_signal/uw_link_rx.c **** 
+ 388:diff_signal/uw_link_rx.c **** /* ========================= 对外接口 ========================= */
+ 389:diff_signal/uw_link_rx.c **** 
+ 390:diff_signal/uw_link_rx.c **** void UW_LinkRx_Init(uint8_t local_device_id)
+ 391:diff_signal/uw_link_rx.c **** {
+ 957              		.loc 1 391 1 is_stmt 1 view -0
+ 958              		.cfi_startproc
+ 959              		@ args = 0, pretend = 0, frame = 0
+ARM GAS  /tmp/cckgvJqr.s 			page 26
+
+
+ 960              		@ frame_needed = 0, uses_anonymous_args = 0
+ 961              		.loc 1 391 1 is_stmt 0 view .LVU285
+ 962 0000 38B5     		push	{r3, r4, r5, lr}
+ 963              	.LCFI9:
+ 964              		.cfi_def_cfa_offset 16
+ 965              		.cfi_offset 3, -16
+ 966              		.cfi_offset 4, -12
+ 967              		.cfi_offset 5, -8
+ 968              		.cfi_offset 14, -4
+ 969 0002 0546     		mov	r5, r0
+ 392:diff_signal/uw_link_rx.c ****     memset(&s_rx, 0, sizeof(s_rx));
+ 970              		.loc 1 392 5 is_stmt 1 view .LVU286
+ 971 0004 064C     		ldr	r4, .L83
+ 972 0006 4FF49272 		mov	r2, #292
+ 973 000a 0021     		movs	r1, #0
+ 974 000c 2046     		mov	r0, r4
+ 975              	.LVL67:
+ 976              		.loc 1 392 5 is_stmt 0 view .LVU287
+ 977 000e FFF7FEFF 		bl	memset
+ 978              	.LVL68:
+ 393:diff_signal/uw_link_rx.c ****     s_rx.local_device_id = local_device_id;
+ 979              		.loc 1 393 5 is_stmt 1 view .LVU288
+ 980              		.loc 1 393 26 is_stmt 0 view .LVU289
+ 981 0012 2576     		strb	r5, [r4, #24]
+ 394:diff_signal/uw_link_rx.c ****     s_rx.state = UW_RX_IDLE;
+ 982              		.loc 1 394 5 is_stmt 1 view .LVU290
+ 983              		.loc 1 394 16 is_stmt 0 view .LVU291
+ 984 0014 0023     		movs	r3, #0
+ 985 0016 2370     		strb	r3, [r4]
+ 395:diff_signal/uw_link_rx.c ****     UW_LinkRx_ResetParser();
+ 986              		.loc 1 395 5 is_stmt 1 view .LVU292
+ 987 0018 FFF7FEFF 		bl	UW_LinkRx_ResetParser
+ 988              	.LVL69:
+ 396:diff_signal/uw_link_rx.c **** }
+ 989              		.loc 1 396 1 is_stmt 0 view .LVU293
+ 990 001c 38BD     		pop	{r3, r4, r5, pc}
+ 991              	.L84:
+ 992 001e 00BF     		.align	2
+ 993              	.L83:
+ 994 0020 00000000 		.word	.LANCHOR0
+ 995              		.cfi_endproc
+ 996              	.LFE75:
+ 998              		.section	.text.UW_LinkRx_IsReceiving,"ax",%progbits
+ 999              		.align	1
+ 1000              		.global	UW_LinkRx_IsReceiving
+ 1001              		.syntax unified
+ 1002              		.thumb
+ 1003              		.thumb_func
+ 1004              		.fpu softvfp
+ 1006              	UW_LinkRx_IsReceiving:
+ 1007              	.LFB76:
+ 397:diff_signal/uw_link_rx.c **** 
+ 398:diff_signal/uw_link_rx.c **** bool UW_LinkRx_IsReceiving(void)
+ 399:diff_signal/uw_link_rx.c **** {
+ 1008              		.loc 1 399 1 is_stmt 1 view -0
+ 1009              		.cfi_startproc
+ 1010              		@ args = 0, pretend = 0, frame = 0
+ARM GAS  /tmp/cckgvJqr.s 			page 27
+
+
+ 1011              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1012              		@ link register save eliminated.
+ 400:diff_signal/uw_link_rx.c ****     return (s_rx.state != UW_RX_IDLE);
+ 1013              		.loc 1 400 5 view .LVU295
+ 1014              		.loc 1 400 17 is_stmt 0 view .LVU296
+ 1015 0000 024B     		ldr	r3, .L86
+ 1016 0002 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 401:diff_signal/uw_link_rx.c **** }
+ 1017              		.loc 1 401 1 view .LVU297
+ 1018 0004 0038     		subs	r0, r0, #0
+ 1019 0006 18BF     		it	ne
+ 1020 0008 0120     		movne	r0, #1
+ 1021 000a 7047     		bx	lr
+ 1022              	.L87:
+ 1023              		.align	2
+ 1024              	.L86:
+ 1025 000c 00000000 		.word	.LANCHOR0
+ 1026              		.cfi_endproc
+ 1027              	.LFE76:
+ 1029              		.section	.text.UW_LinkRx_EXTI_Callback,"ax",%progbits
+ 1030              		.align	1
+ 1031              		.global	UW_LinkRx_EXTI_Callback
+ 1032              		.syntax unified
+ 1033              		.thumb
+ 1034              		.thumb_func
+ 1035              		.fpu softvfp
+ 1037              	UW_LinkRx_EXTI_Callback:
+ 1038              	.LVL70:
+ 1039              	.LFB77:
+ 402:diff_signal/uw_link_rx.c **** 
+ 403:diff_signal/uw_link_rx.c **** void UW_LinkRx_EXTI_Callback(uint16_t GPIO_Pin)
+ 404:diff_signal/uw_link_rx.c **** {
+ 1040              		.loc 1 404 1 is_stmt 1 view -0
+ 1041              		.cfi_startproc
+ 1042              		@ args = 0, pretend = 0, frame = 0
+ 1043              		@ frame_needed = 0, uses_anonymous_args = 0
+ 405:diff_signal/uw_link_rx.c ****     if ((GPIO_Pin != UW_LINK_BIT0_GPIO_PIN) &&
+ 1044              		.loc 1 405 5 view .LVU299
+ 1045              		.loc 1 405 45 is_stmt 0 view .LVU300
+ 1046 0000 0138     		subs	r0, r0, #1
+ 1047              	.LVL71:
+ 1048              		.loc 1 405 45 view .LVU301
+ 1049 0002 80B2     		uxth	r0, r0
+ 1050              		.loc 1 405 8 view .LVU302
+ 1051 0004 0128     		cmp	r0, #1
+ 1052 0006 12D8     		bhi	.L91
+ 404:diff_signal/uw_link_rx.c ****     if ((GPIO_Pin != UW_LINK_BIT0_GPIO_PIN) &&
+ 1053              		.loc 1 404 1 view .LVU303
+ 1054 0008 08B5     		push	{r3, lr}
+ 1055              	.LCFI10:
+ 1056              		.cfi_def_cfa_offset 8
+ 1057              		.cfi_offset 3, -8
+ 1058              		.cfi_offset 14, -4
+ 406:diff_signal/uw_link_rx.c ****         (GPIO_Pin != UW_LINK_BIT1_GPIO_PIN))
+ 407:diff_signal/uw_link_rx.c ****     {
+ 408:diff_signal/uw_link_rx.c ****         return;
+ 409:diff_signal/uw_link_rx.c ****     }
+ARM GAS  /tmp/cckgvJqr.s 			page 28
+
+
+ 410:diff_signal/uw_link_rx.c **** 
+ 411:diff_signal/uw_link_rx.c ****     if (s_rx.state == UW_RX_IDLE)
+ 1059              		.loc 1 411 5 is_stmt 1 view .LVU304
+ 1060              		.loc 1 411 13 is_stmt 0 view .LVU305
+ 1061 000a 094B     		ldr	r3, .L95
+ 1062 000c 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 1063              		.loc 1 411 8 view .LVU306
+ 1064 000e 03B1     		cbz	r3, .L94
+ 1065              	.L88:
+ 412:diff_signal/uw_link_rx.c ****     {
+ 413:diff_signal/uw_link_rx.c ****         UW_LinkRx_ResetParser();
+ 414:diff_signal/uw_link_rx.c ****         UW_LinkRx_ResetVotes();
+ 415:diff_signal/uw_link_rx.c **** 
+ 416:diff_signal/uw_link_rx.c ****         s_rx.state = UW_RX_START_COMP;
+ 417:diff_signal/uw_link_rx.c ****         s_rx.start_comp_ms_left = UW_LINK_RX_START_COMP_MS;
+ 418:diff_signal/uw_link_rx.c ****         s_rx.last_valid_tone_ms = s_rx.tick_ms;
+ 419:diff_signal/uw_link_rx.c ****         s_rx.bit_ms_index = 0u;
+ 420:diff_signal/uw_link_rx.c ****     }
+ 421:diff_signal/uw_link_rx.c **** }
+ 1066              		.loc 1 421 1 view .LVU307
+ 1067 0010 08BD     		pop	{r3, pc}
+ 1068              	.L94:
+ 413:diff_signal/uw_link_rx.c ****         UW_LinkRx_ResetVotes();
+ 1069              		.loc 1 413 9 is_stmt 1 view .LVU308
+ 1070 0012 FFF7FEFF 		bl	UW_LinkRx_ResetParser
+ 1071              	.LVL72:
+ 414:diff_signal/uw_link_rx.c **** 
+ 1072              		.loc 1 414 9 view .LVU309
+ 1073 0016 FFF7FEFF 		bl	UW_LinkRx_ResetVotes
+ 1074              	.LVL73:
+ 416:diff_signal/uw_link_rx.c ****         s_rx.start_comp_ms_left = UW_LINK_RX_START_COMP_MS;
+ 1075              		.loc 1 416 9 view .LVU310
+ 416:diff_signal/uw_link_rx.c ****         s_rx.start_comp_ms_left = UW_LINK_RX_START_COMP_MS;
+ 1076              		.loc 1 416 20 is_stmt 0 view .LVU311
+ 1077 001a 054B     		ldr	r3, .L95
+ 1078 001c 0122     		movs	r2, #1
+ 1079 001e 1A70     		strb	r2, [r3]
+ 417:diff_signal/uw_link_rx.c ****         s_rx.last_valid_tone_ms = s_rx.tick_ms;
+ 1080              		.loc 1 417 9 is_stmt 1 view .LVU312
+ 417:diff_signal/uw_link_rx.c ****         s_rx.last_valid_tone_ms = s_rx.tick_ms;
+ 1081              		.loc 1 417 33 is_stmt 0 view .LVU313
+ 1082 0020 0222     		movs	r2, #2
+ 1083 0022 1A73     		strb	r2, [r3, #12]
+ 418:diff_signal/uw_link_rx.c ****         s_rx.bit_ms_index = 0u;
+ 1084              		.loc 1 418 9 is_stmt 1 view .LVU314
+ 418:diff_signal/uw_link_rx.c ****         s_rx.bit_ms_index = 0u;
+ 1085              		.loc 1 418 39 is_stmt 0 view .LVU315
+ 1086 0024 5A68     		ldr	r2, [r3, #4]
+ 418:diff_signal/uw_link_rx.c ****         s_rx.bit_ms_index = 0u;
+ 1087              		.loc 1 418 33 view .LVU316
+ 1088 0026 9A60     		str	r2, [r3, #8]
+ 419:diff_signal/uw_link_rx.c ****     }
+ 1089              		.loc 1 419 9 is_stmt 1 view .LVU317
+ 419:diff_signal/uw_link_rx.c ****     }
+ 1090              		.loc 1 419 27 is_stmt 0 view .LVU318
+ 1091 0028 0022     		movs	r2, #0
+ 1092 002a 5A73     		strb	r2, [r3, #13]
+ARM GAS  /tmp/cckgvJqr.s 			page 29
+
+
+ 1093 002c F0E7     		b	.L88
+ 1094              	.L91:
+ 1095              	.LCFI11:
+ 1096              		.cfi_def_cfa_offset 0
+ 1097              		.cfi_restore 3
+ 1098              		.cfi_restore 14
+ 1099 002e 7047     		bx	lr
+ 1100              	.L96:
+ 1101              		.align	2
+ 1102              	.L95:
+ 1103 0030 00000000 		.word	.LANCHOR0
+ 1104              		.cfi_endproc
+ 1105              	.LFE77:
+ 1107              		.section	.text.UW_LinkRx_1msTick,"ax",%progbits
+ 1108              		.align	1
+ 1109              		.global	UW_LinkRx_1msTick
+ 1110              		.syntax unified
+ 1111              		.thumb
+ 1112              		.thumb_func
+ 1113              		.fpu softvfp
+ 1115              	UW_LinkRx_1msTick:
+ 1116              	.LFB78:
+ 422:diff_signal/uw_link_rx.c **** 
+ 423:diff_signal/uw_link_rx.c **** void UW_LinkRx_1msTick(void)
+ 424:diff_signal/uw_link_rx.c **** {
+ 1117              		.loc 1 424 1 is_stmt 1 view -0
+ 1118              		.cfi_startproc
+ 1119              		@ args = 0, pretend = 0, frame = 8
+ 1120              		@ frame_needed = 0, uses_anonymous_args = 0
+ 425:diff_signal/uw_link_rx.c ****     UW_ToneState_t tone;
+ 1121              		.loc 1 425 5 view .LVU320
+ 426:diff_signal/uw_link_rx.c ****     uint8_t decided_bit;
+ 1122              		.loc 1 426 5 view .LVU321
+ 427:diff_signal/uw_link_rx.c **** 
+ 428:diff_signal/uw_link_rx.c ****     s_rx.tick_ms++;
+ 1123              		.loc 1 428 5 view .LVU322
+ 1124              		.loc 1 428 9 is_stmt 0 view .LVU323
+ 1125 0000 494B     		ldr	r3, .L134
+ 1126 0002 5A68     		ldr	r2, [r3, #4]
+ 1127              		.loc 1 428 17 view .LVU324
+ 1128 0004 0132     		adds	r2, r2, #1
+ 1129 0006 5A60     		str	r2, [r3, #4]
+ 429:diff_signal/uw_link_rx.c **** 
+ 430:diff_signal/uw_link_rx.c ****     if (s_rx.state == UW_RX_IDLE)
+ 1130              		.loc 1 430 5 is_stmt 1 view .LVU325
+ 1131              		.loc 1 430 13 is_stmt 0 view .LVU326
+ 1132 0008 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 1133              		.loc 1 430 8 view .LVU327
+ 1134 000a 03B9     		cbnz	r3, .L123
+ 1135 000c 7047     		bx	lr
+ 1136              	.L123:
+ 424:diff_signal/uw_link_rx.c ****     UW_ToneState_t tone;
+ 1137              		.loc 1 424 1 view .LVU328
+ 1138 000e 10B5     		push	{r4, lr}
+ 1139              	.LCFI12:
+ 1140              		.cfi_def_cfa_offset 8
+ 1141              		.cfi_offset 4, -8
+ARM GAS  /tmp/cckgvJqr.s 			page 30
+
+
+ 1142              		.cfi_offset 14, -4
+ 1143 0010 82B0     		sub	sp, sp, #8
+ 1144              	.LCFI13:
+ 1145              		.cfi_def_cfa_offset 16
+ 431:diff_signal/uw_link_rx.c ****     {
+ 432:diff_signal/uw_link_rx.c ****         return;
+ 433:diff_signal/uw_link_rx.c ****     }
+ 434:diff_signal/uw_link_rx.c **** 
+ 435:diff_signal/uw_link_rx.c ****     tone = UW_LinkRx_ReadTone();
+ 1146              		.loc 1 435 5 is_stmt 1 view .LVU329
+ 1147              		.loc 1 435 12 is_stmt 0 view .LVU330
+ 1148 0012 FFF7FEFF 		bl	UW_LinkRx_ReadTone
+ 1149              	.LVL74:
+ 1150 0016 0446     		mov	r4, r0
+ 1151              	.LVL75:
+ 436:diff_signal/uw_link_rx.c **** 
+ 437:diff_signal/uw_link_rx.c ****     /* 任意时刻检测到有效音调，都刷新活动时间 */
+ 438:diff_signal/uw_link_rx.c ****     if ((tone == UW_TONE_BIT0) || (tone == UW_TONE_BIT1))
+ 1152              		.loc 1 438 5 is_stmt 1 view .LVU331
+ 1153              		.loc 1 438 32 is_stmt 0 view .LVU332
+ 1154 0018 431E     		subs	r3, r0, #1
+ 1155 001a DBB2     		uxtb	r3, r3
+ 1156              		.loc 1 438 8 view .LVU333
+ 1157 001c 012B     		cmp	r3, #1
+ 1158 001e 1BD9     		bls	.L124
+ 1159              	.L99:
+ 439:diff_signal/uw_link_rx.c ****     {
+ 440:diff_signal/uw_link_rx.c ****         s_rx.last_valid_tone_ms = s_rx.tick_ms;
+ 441:diff_signal/uw_link_rx.c ****     }
+ 442:diff_signal/uw_link_rx.c **** 
+ 443:diff_signal/uw_link_rx.c ****     /* 太久没看到有效音调，认为接收失效/结束 */
+ 444:diff_signal/uw_link_rx.c ****     if ((s_rx.tick_ms - s_rx.last_valid_tone_ms) >= UW_LINK_RX_FRAME_IDLE_MS)
+ 1160              		.loc 1 444 5 is_stmt 1 view .LVU334
+ 1161              		.loc 1 444 14 is_stmt 0 view .LVU335
+ 1162 0020 414A     		ldr	r2, .L134
+ 1163 0022 5368     		ldr	r3, [r2, #4]
+ 1164              		.loc 1 444 29 view .LVU336
+ 1165 0024 9268     		ldr	r2, [r2, #8]
+ 1166              		.loc 1 444 23 view .LVU337
+ 1167 0026 9B1A     		subs	r3, r3, r2
+ 1168              		.loc 1 444 8 view .LVU338
+ 1169 0028 1D2B     		cmp	r3, #29
+ 1170 002a 19D8     		bhi	.L125
+ 445:diff_signal/uw_link_rx.c ****     {
+ 446:diff_signal/uw_link_rx.c ****         if ((s_rx.parse_state == UW_PARSE_WAIT_TAIL0_A) ||
+ 447:diff_signal/uw_link_rx.c ****             (s_rx.parse_state == UW_PARSE_WAIT_TAIL0_B))
+ 448:diff_signal/uw_link_rx.c ****         {
+ 449:diff_signal/uw_link_rx.c ****             UW_LinkRx_Finish(s_rx.rx_device_id, s_rx.rx_payload, s_rx.rx_len);
+ 450:diff_signal/uw_link_rx.c ****         }
+ 451:diff_signal/uw_link_rx.c ****         else
+ 452:diff_signal/uw_link_rx.c ****         {
+ 453:diff_signal/uw_link_rx.c ****             UW_LinkRx_Abort();
+ 454:diff_signal/uw_link_rx.c ****         }
+ 455:diff_signal/uw_link_rx.c ****         return;
+ 456:diff_signal/uw_link_rx.c ****     }
+ 457:diff_signal/uw_link_rx.c **** 
+ 458:diff_signal/uw_link_rx.c ****     /* 起始补偿阶段 */
+ARM GAS  /tmp/cckgvJqr.s 			page 31
+
+
+ 459:diff_signal/uw_link_rx.c ****     if (s_rx.state == UW_RX_START_COMP)
+ 1171              		.loc 1 459 5 is_stmt 1 view .LVU339
+ 1172              		.loc 1 459 13 is_stmt 0 view .LVU340
+ 1173 002c 3E4B     		ldr	r3, .L134
+ 1174 002e 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 1175              		.loc 1 459 8 view .LVU341
+ 1176 0030 012B     		cmp	r3, #1
+ 1177 0032 27D0     		beq	.L126
+ 1178              	.LVL76:
+ 1179              	.L103:
+ 460:diff_signal/uw_link_rx.c ****     {
+ 461:diff_signal/uw_link_rx.c ****         if (s_rx.start_comp_ms_left > 0u)
+ 462:diff_signal/uw_link_rx.c ****         {
+ 463:diff_signal/uw_link_rx.c ****             s_rx.start_comp_ms_left--;
+ 464:diff_signal/uw_link_rx.c ****             return;
+ 465:diff_signal/uw_link_rx.c ****         }
+ 466:diff_signal/uw_link_rx.c **** 
+ 467:diff_signal/uw_link_rx.c ****         s_rx.state = UW_RX_RECV;
+ 468:diff_signal/uw_link_rx.c ****         s_rx.bit_ms_index = 0u;
+ 469:diff_signal/uw_link_rx.c ****         UW_LinkRx_ResetVotes();
+ 470:diff_signal/uw_link_rx.c ****     }
+ 471:diff_signal/uw_link_rx.c **** 
+ 472:diff_signal/uw_link_rx.c ****     if (s_rx.state != UW_RX_RECV)
+ 1180              		.loc 1 472 5 is_stmt 1 view .LVU342
+ 1181              		.loc 1 472 13 is_stmt 0 view .LVU343
+ 1182 0034 3C4B     		ldr	r3, .L134
+ 1183 0036 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 1184              		.loc 1 472 8 view .LVU344
+ 1185 0038 022B     		cmp	r3, #2
+ 1186 003a 19D1     		bne	.L97
+ 473:diff_signal/uw_link_rx.c ****     {
+ 474:diff_signal/uw_link_rx.c ****         return;
+ 475:diff_signal/uw_link_rx.c ****     }
+ 476:diff_signal/uw_link_rx.c **** 
+ 477:diff_signal/uw_link_rx.c ****     /* 正常多次采样 */
+ 478:diff_signal/uw_link_rx.c ****     if (UW_LinkRx_IsSamplePoint(s_rx.bit_ms_index))
+ 1187              		.loc 1 478 5 is_stmt 1 view .LVU345
+ 1188              		.loc 1 478 9 is_stmt 0 view .LVU346
+ 1189 003c 3A4B     		ldr	r3, .L134
+ 1190 003e 5B7B     		ldrb	r3, [r3, #13]	@ zero_extendqisi2
+ 1191              	.LVL77:
+ 1192              	.LBB4:
+ 1193              	.LBI4:
+  86:diff_signal/uw_link_rx.c **** {
+ 1194              		.loc 1 86 20 is_stmt 1 view .LVU347
+ 1195              	.LBB5:
+  89:diff_signal/uw_link_rx.c ****            (bit_ms_index == 4u) ||
+ 1196              		.loc 1 89 5 view .LVU348
+  92:diff_signal/uw_link_rx.c ****            (bit_ms_index == 8u);
+ 1197              		.loc 1 92 33 is_stmt 0 view .LVU349
+ 1198 0040 022B     		cmp	r3, #2
+ 1199 0042 30D0     		beq	.L114
+  89:diff_signal/uw_link_rx.c ****            (bit_ms_index == 4u) ||
+ 1200              		.loc 1 89 33 view .LVU350
+ 1201 0044 042B     		cmp	r3, #4
+ 1202 0046 3BD0     		beq	.L115
+  90:diff_signal/uw_link_rx.c ****            (bit_ms_index == 5u) ||
+ARM GAS  /tmp/cckgvJqr.s 			page 32
+
+
+ 1203              		.loc 1 90 33 view .LVU351
+ 1204 0048 052B     		cmp	r3, #5
+ 1205 004a 3BD0     		beq	.L116
+  91:diff_signal/uw_link_rx.c ****            (bit_ms_index == 6u) ||
+ 1206              		.loc 1 91 33 view .LVU352
+ 1207 004c 062B     		cmp	r3, #6
+ 1208 004e 3BD0     		beq	.L117
+  92:diff_signal/uw_link_rx.c ****            (bit_ms_index == 8u);
+ 1209              		.loc 1 92 33 view .LVU353
+ 1210 0050 082B     		cmp	r3, #8
+ 1211 0052 26D0     		beq	.L127
+ 1212 0054 0022     		movs	r2, #0
+ 1213 0056 27E0     		b	.L105
+ 1214              	.LVL78:
+ 1215              	.L124:
+  92:diff_signal/uw_link_rx.c ****            (bit_ms_index == 8u);
+ 1216              		.loc 1 92 33 view .LVU354
+ 1217              	.LBE5:
+ 1218              	.LBE4:
+ 440:diff_signal/uw_link_rx.c ****     }
+ 1219              		.loc 1 440 9 is_stmt 1 view .LVU355
+ 440:diff_signal/uw_link_rx.c ****     }
+ 1220              		.loc 1 440 39 is_stmt 0 view .LVU356
+ 1221 0058 334B     		ldr	r3, .L134
+ 1222 005a 5A68     		ldr	r2, [r3, #4]
+ 440:diff_signal/uw_link_rx.c ****     }
+ 1223              		.loc 1 440 33 view .LVU357
+ 1224 005c 9A60     		str	r2, [r3, #8]
+ 1225 005e DFE7     		b	.L99
+ 1226              	.L125:
+ 446:diff_signal/uw_link_rx.c ****             (s_rx.parse_state == UW_PARSE_WAIT_TAIL0_B))
+ 1227              		.loc 1 446 9 is_stmt 1 view .LVU358
+ 446:diff_signal/uw_link_rx.c ****             (s_rx.parse_state == UW_PARSE_WAIT_TAIL0_B))
+ 1228              		.loc 1 446 18 is_stmt 0 view .LVU359
+ 1229 0060 314B     		ldr	r3, .L134
+ 1230 0062 5B78     		ldrb	r3, [r3, #1]	@ zero_extendqisi2
+ 446:diff_signal/uw_link_rx.c ****             (s_rx.parse_state == UW_PARSE_WAIT_TAIL0_B))
+ 1231              		.loc 1 446 57 view .LVU360
+ 1232 0064 073B     		subs	r3, r3, #7
+ 1233 0066 DBB2     		uxtb	r3, r3
+ 446:diff_signal/uw_link_rx.c ****             (s_rx.parse_state == UW_PARSE_WAIT_TAIL0_B))
+ 1234              		.loc 1 446 12 view .LVU361
+ 1235 0068 012B     		cmp	r3, #1
+ 1236 006a 03D9     		bls	.L128
+ 453:diff_signal/uw_link_rx.c ****         }
+ 1237              		.loc 1 453 13 is_stmt 1 view .LVU362
+ 1238 006c FFF7FEFF 		bl	UW_LinkRx_Abort
+ 1239              	.LVL79:
+ 455:diff_signal/uw_link_rx.c ****     }
+ 1240              		.loc 1 455 9 view .LVU363
+ 1241              	.L97:
+ 479:diff_signal/uw_link_rx.c ****     {
+ 480:diff_signal/uw_link_rx.c ****         if (tone == UW_TONE_BIT0)
+ 481:diff_signal/uw_link_rx.c ****         {
+ 482:diff_signal/uw_link_rx.c ****             s_rx.bit0_votes++;
+ 483:diff_signal/uw_link_rx.c ****         }
+ 484:diff_signal/uw_link_rx.c ****         else if (tone == UW_TONE_BIT1)
+ARM GAS  /tmp/cckgvJqr.s 			page 33
+
+
+ 485:diff_signal/uw_link_rx.c ****         {
+ 486:diff_signal/uw_link_rx.c ****             s_rx.bit1_votes++;
+ 487:diff_signal/uw_link_rx.c ****         }
+ 488:diff_signal/uw_link_rx.c ****         else if (tone == UW_TONE_ERROR)
+ 489:diff_signal/uw_link_rx.c ****         {
+ 490:diff_signal/uw_link_rx.c ****             s_rx.err_votes++;
+ 491:diff_signal/uw_link_rx.c ****         }
+ 492:diff_signal/uw_link_rx.c ****     }
+ 493:diff_signal/uw_link_rx.c **** 
+ 494:diff_signal/uw_link_rx.c ****     /* 在指定时刻额外记录一次“0 的重点判断状态” */
+ 495:diff_signal/uw_link_rx.c ****     if (s_rx.bit_ms_index == UW_LINK_RX_ZERO_JUDGE_MS)
+ 496:diff_signal/uw_link_rx.c ****     {
+ 497:diff_signal/uw_link_rx.c ****         if (tone == UW_TONE_BIT0)
+ 498:diff_signal/uw_link_rx.c ****         {
+ 499:diff_signal/uw_link_rx.c ****             s_rx.zero_judge_bit0_seen = 1u;
+ 500:diff_signal/uw_link_rx.c ****         }
+ 501:diff_signal/uw_link_rx.c ****         else if (tone == UW_TONE_BIT1)
+ 502:diff_signal/uw_link_rx.c ****         {
+ 503:diff_signal/uw_link_rx.c ****             s_rx.zero_judge_bit1_seen = 1u;
+ 504:diff_signal/uw_link_rx.c ****         }
+ 505:diff_signal/uw_link_rx.c ****     }
+ 506:diff_signal/uw_link_rx.c **** 
+ 507:diff_signal/uw_link_rx.c ****     s_rx.bit_ms_index++;
+ 508:diff_signal/uw_link_rx.c **** 
+ 509:diff_signal/uw_link_rx.c ****     if (s_rx.bit_ms_index >= UW_LINK_RX_BIT_PERIOD_MS)
+ 510:diff_signal/uw_link_rx.c ****     {
+ 511:diff_signal/uw_link_rx.c ****         s_rx.bit_ms_index = 0u;
+ 512:diff_signal/uw_link_rx.c **** 
+ 513:diff_signal/uw_link_rx.c ****         if (UW_LinkRx_DecideBit(&decided_bit))
+ 514:diff_signal/uw_link_rx.c ****         {
+ 515:diff_signal/uw_link_rx.c ****             UW_LinkRx_ProcessDecodedBit(decided_bit);
+ 516:diff_signal/uw_link_rx.c ****         }
+ 517:diff_signal/uw_link_rx.c **** 
+ 518:diff_signal/uw_link_rx.c ****         UW_LinkRx_ResetVotes();
+ 519:diff_signal/uw_link_rx.c ****     }
+ 520:diff_signal/uw_link_rx.c **** }
+ 1242              		.loc 1 520 1 is_stmt 0 view .LVU364
+ 1243 0070 02B0     		add	sp, sp, #8
+ 1244              	.LCFI14:
+ 1245              		.cfi_remember_state
+ 1246              		.cfi_def_cfa_offset 8
+ 1247              		@ sp needed
+ 1248 0072 10BD     		pop	{r4, pc}
+ 1249              	.LVL80:
+ 1250              	.L128:
+ 1251              	.LCFI15:
+ 1252              		.cfi_restore_state
+ 449:diff_signal/uw_link_rx.c ****         }
+ 1253              		.loc 1 449 13 is_stmt 1 view .LVU365
+ 1254 0074 2C4B     		ldr	r3, .L134
+ 1255 0076 9A7E     		ldrb	r2, [r3, #26]	@ zero_extendqisi2
+ 1256 0078 03F11B01 		add	r1, r3, #27
+ 1257 007c 587E     		ldrb	r0, [r3, #25]	@ zero_extendqisi2
+ 1258              	.LVL81:
+ 449:diff_signal/uw_link_rx.c ****         }
+ 1259              		.loc 1 449 13 is_stmt 0 view .LVU366
+ 1260 007e FFF7FEFF 		bl	UW_LinkRx_Finish
+ARM GAS  /tmp/cckgvJqr.s 			page 34
+
+
+ 1261              	.LVL82:
+ 1262 0082 F5E7     		b	.L97
+ 1263              	.LVL83:
+ 1264              	.L126:
+ 461:diff_signal/uw_link_rx.c ****         {
+ 1265              		.loc 1 461 9 is_stmt 1 view .LVU367
+ 461:diff_signal/uw_link_rx.c ****         {
+ 1266              		.loc 1 461 17 is_stmt 0 view .LVU368
+ 1267 0084 284B     		ldr	r3, .L134
+ 1268 0086 1B7B     		ldrb	r3, [r3, #12]	@ zero_extendqisi2
+ 461:diff_signal/uw_link_rx.c ****         {
+ 1269              		.loc 1 461 12 view .LVU369
+ 1270 0088 1BB1     		cbz	r3, .L104
+ 463:diff_signal/uw_link_rx.c ****             return;
+ 1271              		.loc 1 463 13 is_stmt 1 view .LVU370
+ 463:diff_signal/uw_link_rx.c ****             return;
+ 1272              		.loc 1 463 36 is_stmt 0 view .LVU371
+ 1273 008a 013B     		subs	r3, r3, #1
+ 1274 008c 264A     		ldr	r2, .L134
+ 1275 008e 1373     		strb	r3, [r2, #12]
+ 464:diff_signal/uw_link_rx.c ****         }
+ 1276              		.loc 1 464 13 is_stmt 1 view .LVU372
+ 1277 0090 EEE7     		b	.L97
+ 1278              	.L104:
+ 467:diff_signal/uw_link_rx.c ****         s_rx.bit_ms_index = 0u;
+ 1279              		.loc 1 467 9 view .LVU373
+ 467:diff_signal/uw_link_rx.c ****         s_rx.bit_ms_index = 0u;
+ 1280              		.loc 1 467 20 is_stmt 0 view .LVU374
+ 1281 0092 254B     		ldr	r3, .L134
+ 1282 0094 0222     		movs	r2, #2
+ 1283 0096 1A70     		strb	r2, [r3]
+ 468:diff_signal/uw_link_rx.c ****         UW_LinkRx_ResetVotes();
+ 1284              		.loc 1 468 9 is_stmt 1 view .LVU375
+ 468:diff_signal/uw_link_rx.c ****         UW_LinkRx_ResetVotes();
+ 1285              		.loc 1 468 27 is_stmt 0 view .LVU376
+ 1286 0098 0022     		movs	r2, #0
+ 1287 009a 5A73     		strb	r2, [r3, #13]
+ 469:diff_signal/uw_link_rx.c ****     }
+ 1288              		.loc 1 469 9 is_stmt 1 view .LVU377
+ 1289 009c FFF7FEFF 		bl	UW_LinkRx_ResetVotes
+ 1290              	.LVL84:
+ 469:diff_signal/uw_link_rx.c ****     }
+ 1291              		.loc 1 469 9 is_stmt 0 view .LVU378
+ 1292 00a0 C8E7     		b	.L103
+ 1293              	.LVL85:
+ 1294              	.L127:
+ 1295              	.LBB8:
+ 1296              	.LBB6:
+  92:diff_signal/uw_link_rx.c ****            (bit_ms_index == 8u);
+ 1297              		.loc 1 92 33 view .LVU379
+ 1298 00a2 0122     		movs	r2, #1
+ 1299 00a4 00E0     		b	.L105
+ 1300              	.L114:
+ 1301 00a6 0122     		movs	r2, #1
+ 1302              	.L105:
+ 1303              	.LVL86:
+  92:diff_signal/uw_link_rx.c ****            (bit_ms_index == 8u);
+ARM GAS  /tmp/cckgvJqr.s 			page 35
+
+
+ 1304              		.loc 1 92 33 view .LVU380
+ 1305              	.LBE6:
+ 1306              	.LBE8:
+ 478:diff_signal/uw_link_rx.c ****     {
+ 1307              		.loc 1 478 8 view .LVU381
+ 1308 00a8 A2B1     		cbz	r2, .L106
+ 480:diff_signal/uw_link_rx.c ****         {
+ 1309              		.loc 1 480 9 is_stmt 1 view .LVU382
+ 480:diff_signal/uw_link_rx.c ****         {
+ 1310              		.loc 1 480 12 is_stmt 0 view .LVU383
+ 1311 00aa 012C     		cmp	r4, #1
+ 1312 00ac 0ED0     		beq	.L129
+ 484:diff_signal/uw_link_rx.c ****         {
+ 1313              		.loc 1 484 14 is_stmt 1 view .LVU384
+ 484:diff_signal/uw_link_rx.c ****         {
+ 1314              		.loc 1 484 17 is_stmt 0 view .LVU385
+ 1315 00ae 022C     		cmp	r4, #2
+ 1316 00b0 23D0     		beq	.L130
+ 488:diff_signal/uw_link_rx.c ****         {
+ 1317              		.loc 1 488 14 is_stmt 1 view .LVU386
+ 488:diff_signal/uw_link_rx.c ****         {
+ 1318              		.loc 1 488 17 is_stmt 0 view .LVU387
+ 1319 00b2 032C     		cmp	r4, #3
+ 1320 00b4 0ED1     		bne	.L106
+ 490:diff_signal/uw_link_rx.c ****         }
+ 1321              		.loc 1 490 13 is_stmt 1 view .LVU388
+ 490:diff_signal/uw_link_rx.c ****         }
+ 1322              		.loc 1 490 17 is_stmt 0 view .LVU389
+ 1323 00b6 1C49     		ldr	r1, .L134
+ 1324 00b8 0A7C     		ldrb	r2, [r1, #16]	@ zero_extendqisi2
+ 490:diff_signal/uw_link_rx.c ****         }
+ 1325              		.loc 1 490 27 view .LVU390
+ 1326 00ba 0132     		adds	r2, r2, #1
+ 1327 00bc 0A74     		strb	r2, [r1, #16]
+ 1328 00be 09E0     		b	.L106
+ 1329              	.LVL87:
+ 1330              	.L115:
+ 1331              	.LBB9:
+ 1332              	.LBB7:
+  92:diff_signal/uw_link_rx.c ****            (bit_ms_index == 8u);
+ 1333              		.loc 1 92 33 view .LVU391
+ 1334 00c0 0122     		movs	r2, #1
+ 1335 00c2 F1E7     		b	.L105
+ 1336              	.L116:
+ 1337 00c4 0122     		movs	r2, #1
+ 1338 00c6 EFE7     		b	.L105
+ 1339              	.L117:
+ 1340 00c8 0122     		movs	r2, #1
+ 1341 00ca EDE7     		b	.L105
+ 1342              	.LVL88:
+ 1343              	.L129:
+  92:diff_signal/uw_link_rx.c ****            (bit_ms_index == 8u);
+ 1344              		.loc 1 92 33 view .LVU392
+ 1345              	.LBE7:
+ 1346              	.LBE9:
+ 482:diff_signal/uw_link_rx.c ****         }
+ 1347              		.loc 1 482 13 is_stmt 1 view .LVU393
+ARM GAS  /tmp/cckgvJqr.s 			page 36
+
+
+ 482:diff_signal/uw_link_rx.c ****         }
+ 1348              		.loc 1 482 17 is_stmt 0 view .LVU394
+ 1349 00cc 1649     		ldr	r1, .L134
+ 1350 00ce 8A7B     		ldrb	r2, [r1, #14]	@ zero_extendqisi2
+ 482:diff_signal/uw_link_rx.c ****         }
+ 1351              		.loc 1 482 28 view .LVU395
+ 1352 00d0 0132     		adds	r2, r2, #1
+ 1353 00d2 8A73     		strb	r2, [r1, #14]
+ 1354              	.L106:
+ 495:diff_signal/uw_link_rx.c ****     {
+ 1355              		.loc 1 495 5 is_stmt 1 view .LVU396
+ 495:diff_signal/uw_link_rx.c ****     {
+ 1356              		.loc 1 495 8 is_stmt 0 view .LVU397
+ 1357 00d4 042B     		cmp	r3, #4
+ 1358 00d6 15D0     		beq	.L131
+ 1359              	.L109:
+ 507:diff_signal/uw_link_rx.c **** 
+ 1360              		.loc 1 507 5 is_stmt 1 view .LVU398
+ 507:diff_signal/uw_link_rx.c **** 
+ 1361              		.loc 1 507 22 is_stmt 0 view .LVU399
+ 1362 00d8 0133     		adds	r3, r3, #1
+ 1363 00da DBB2     		uxtb	r3, r3
+ 1364 00dc 124A     		ldr	r2, .L134
+ 1365 00de 5373     		strb	r3, [r2, #13]
+ 509:diff_signal/uw_link_rx.c ****     {
+ 1366              		.loc 1 509 5 is_stmt 1 view .LVU400
+ 509:diff_signal/uw_link_rx.c ****     {
+ 1367              		.loc 1 509 8 is_stmt 0 view .LVU401
+ 1368 00e0 092B     		cmp	r3, #9
+ 1369 00e2 C5D9     		bls	.L97
+ 511:diff_signal/uw_link_rx.c **** 
+ 1370              		.loc 1 511 9 is_stmt 1 view .LVU402
+ 511:diff_signal/uw_link_rx.c **** 
+ 1371              		.loc 1 511 27 is_stmt 0 view .LVU403
+ 1372 00e4 1346     		mov	r3, r2
+ 1373 00e6 0022     		movs	r2, #0
+ 1374 00e8 5A73     		strb	r2, [r3, #13]
+ 513:diff_signal/uw_link_rx.c ****         {
+ 1375              		.loc 1 513 9 is_stmt 1 view .LVU404
+ 513:diff_signal/uw_link_rx.c ****         {
+ 1376              		.loc 1 513 13 is_stmt 0 view .LVU405
+ 1377 00ea 0DF10700 		add	r0, sp, #7
+ 1378 00ee FFF7FEFF 		bl	UW_LinkRx_DecideBit
+ 1379              	.LVL89:
+ 513:diff_signal/uw_link_rx.c ****         {
+ 1380              		.loc 1 513 12 view .LVU406
+ 1381 00f2 98B9     		cbnz	r0, .L132
+ 1382              	.L112:
+ 518:diff_signal/uw_link_rx.c ****     }
+ 1383              		.loc 1 518 9 is_stmt 1 view .LVU407
+ 1384 00f4 FFF7FEFF 		bl	UW_LinkRx_ResetVotes
+ 1385              	.LVL90:
+ 1386 00f8 BAE7     		b	.L97
+ 1387              	.L130:
+ 486:diff_signal/uw_link_rx.c ****         }
+ 1388              		.loc 1 486 13 view .LVU408
+ 486:diff_signal/uw_link_rx.c ****         }
+ARM GAS  /tmp/cckgvJqr.s 			page 37
+
+
+ 1389              		.loc 1 486 17 is_stmt 0 view .LVU409
+ 1390 00fa 0B49     		ldr	r1, .L134
+ 1391 00fc CA7B     		ldrb	r2, [r1, #15]	@ zero_extendqisi2
+ 486:diff_signal/uw_link_rx.c ****         }
+ 1392              		.loc 1 486 28 view .LVU410
+ 1393 00fe 0132     		adds	r2, r2, #1
+ 1394 0100 CA73     		strb	r2, [r1, #15]
+ 1395 0102 E7E7     		b	.L106
+ 1396              	.L131:
+ 497:diff_signal/uw_link_rx.c ****         {
+ 1397              		.loc 1 497 9 is_stmt 1 view .LVU411
+ 497:diff_signal/uw_link_rx.c ****         {
+ 1398              		.loc 1 497 12 is_stmt 0 view .LVU412
+ 1399 0104 012C     		cmp	r4, #1
+ 1400 0106 05D0     		beq	.L133
+ 501:diff_signal/uw_link_rx.c ****         {
+ 1401              		.loc 1 501 14 is_stmt 1 view .LVU413
+ 501:diff_signal/uw_link_rx.c ****         {
+ 1402              		.loc 1 501 17 is_stmt 0 view .LVU414
+ 1403 0108 022C     		cmp	r4, #2
+ 1404 010a E5D1     		bne	.L109
+ 503:diff_signal/uw_link_rx.c ****         }
+ 1405              		.loc 1 503 13 is_stmt 1 view .LVU415
+ 503:diff_signal/uw_link_rx.c ****         }
+ 1406              		.loc 1 503 39 is_stmt 0 view .LVU416
+ 1407 010c 064A     		ldr	r2, .L134
+ 1408 010e 0121     		movs	r1, #1
+ 1409 0110 9174     		strb	r1, [r2, #18]
+ 1410 0112 E1E7     		b	.L109
+ 1411              	.L133:
+ 499:diff_signal/uw_link_rx.c ****         }
+ 1412              		.loc 1 499 13 is_stmt 1 view .LVU417
+ 499:diff_signal/uw_link_rx.c ****         }
+ 1413              		.loc 1 499 39 is_stmt 0 view .LVU418
+ 1414 0114 044A     		ldr	r2, .L134
+ 1415 0116 0121     		movs	r1, #1
+ 1416 0118 5174     		strb	r1, [r2, #17]
+ 1417 011a DDE7     		b	.L109
+ 1418              	.L132:
+ 515:diff_signal/uw_link_rx.c ****         }
+ 1419              		.loc 1 515 13 is_stmt 1 view .LVU419
+ 1420 011c 9DF80700 		ldrb	r0, [sp, #7]	@ zero_extendqisi2
+ 1421 0120 FFF7FEFF 		bl	UW_LinkRx_ProcessDecodedBit
+ 1422              	.LVL91:
+ 1423 0124 E6E7     		b	.L112
+ 1424              	.L135:
+ 1425 0126 00BF     		.align	2
+ 1426              	.L134:
+ 1427 0128 00000000 		.word	.LANCHOR0
+ 1428              		.cfi_endproc
+ 1429              	.LFE78:
+ 1431              		.section	.text.UW_LinkRx_FrameReady,"ax",%progbits
+ 1432              		.align	1
+ 1433              		.global	UW_LinkRx_FrameReady
+ 1434              		.syntax unified
+ 1435              		.thumb
+ 1436              		.thumb_func
+ARM GAS  /tmp/cckgvJqr.s 			page 38
+
+
+ 1437              		.fpu softvfp
+ 1439              	UW_LinkRx_FrameReady:
+ 1440              	.LFB79:
+ 521:diff_signal/uw_link_rx.c **** 
+ 522:diff_signal/uw_link_rx.c **** bool UW_LinkRx_FrameReady(void)
+ 523:diff_signal/uw_link_rx.c **** {
+ 1441              		.loc 1 523 1 view -0
+ 1442              		.cfi_startproc
+ 1443              		@ args = 0, pretend = 0, frame = 0
+ 1444              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1445              		@ link register save eliminated.
+ 524:diff_signal/uw_link_rx.c ****     return s_rx.frame_ready;
+ 1446              		.loc 1 524 5 view .LVU421
+ 525:diff_signal/uw_link_rx.c **** }
+ 1447              		.loc 1 525 1 is_stmt 0 view .LVU422
+ 1448 0000 014B     		ldr	r3, .L137
+ 1449 0002 93F82201 		ldrb	r0, [r3, #290]	@ zero_extendqisi2
+ 1450 0006 7047     		bx	lr
+ 1451              	.L138:
+ 1452              		.align	2
+ 1453              	.L137:
+ 1454 0008 00000000 		.word	.LANCHOR0
+ 1455              		.cfi_endproc
+ 1456              	.LFE79:
+ 1458              		.section	.text.UW_LinkRx_GetFrame,"ax",%progbits
+ 1459              		.align	1
+ 1460              		.global	UW_LinkRx_GetFrame
+ 1461              		.syntax unified
+ 1462              		.thumb
+ 1463              		.thumb_func
+ 1464              		.fpu softvfp
+ 1466              	UW_LinkRx_GetFrame:
+ 1467              	.LVL92:
+ 1468              	.LFB80:
+ 526:diff_signal/uw_link_rx.c **** 
+ 527:diff_signal/uw_link_rx.c **** bool UW_LinkRx_GetFrame(uint8_t *device_id, uint8_t *payload, uint16_t *len)
+ 528:diff_signal/uw_link_rx.c **** {
+ 1469              		.loc 1 528 1 is_stmt 1 view -0
+ 1470              		.cfi_startproc
+ 1471              		@ args = 0, pretend = 0, frame = 0
+ 1472              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1473              		.loc 1 528 1 is_stmt 0 view .LVU424
+ 1474 0000 70B5     		push	{r4, r5, r6, lr}
+ 1475              	.LCFI16:
+ 1476              		.cfi_def_cfa_offset 16
+ 1477              		.cfi_offset 4, -16
+ 1478              		.cfi_offset 5, -12
+ 1479              		.cfi_offset 6, -8
+ 1480              		.cfi_offset 14, -4
+ 1481 0002 1446     		mov	r4, r2
+ 529:diff_signal/uw_link_rx.c ****     if ((!s_rx.frame_ready) || (device_id == NULL) || (payload == NULL) || (len == NULL))
+ 1482              		.loc 1 529 5 is_stmt 1 view .LVU425
+ 1483              		.loc 1 529 15 is_stmt 0 view .LVU426
+ 1484 0004 104A     		ldr	r2, .L145
+ 1485              	.LVL93:
+ 1486              		.loc 1 529 15 view .LVU427
+ 1487 0006 92F82251 		ldrb	r5, [r2, #290]	@ zero_extendqisi2
+ARM GAS  /tmp/cckgvJqr.s 			page 39
+
+
+ 1488              		.loc 1 529 8 view .LVU428
+ 1489 000a A5B1     		cbz	r5, .L140
+ 1490 000c 0B46     		mov	r3, r1
+ 1491              		.loc 1 529 29 discriminator 1 view .LVU429
+ 1492 000e A0B1     		cbz	r0, .L141
+ 1493              		.loc 1 529 52 discriminator 2 view .LVU430
+ 1494 0010 A9B1     		cbz	r1, .L142
+ 1495              		.loc 1 529 73 discriminator 3 view .LVU431
+ 1496 0012 B4B1     		cbz	r4, .L143
+ 530:diff_signal/uw_link_rx.c ****     {
+ 531:diff_signal/uw_link_rx.c ****         return false;
+ 532:diff_signal/uw_link_rx.c ****     }
+ 533:diff_signal/uw_link_rx.c **** 
+ 534:diff_signal/uw_link_rx.c ****     *device_id = s_rx.ready_device_id;
+ 1497              		.loc 1 534 5 is_stmt 1 view .LVU432
+ 1498              		.loc 1 534 22 is_stmt 0 view .LVU433
+ 1499 0014 1646     		mov	r6, r2
+ 1500 0016 92F89E20 		ldrb	r2, [r2, #158]	@ zero_extendqisi2
+ 1501              		.loc 1 534 16 view .LVU434
+ 1502 001a 0270     		strb	r2, [r0]
+ 535:diff_signal/uw_link_rx.c ****     memcpy(payload, s_rx.ready_payload, s_rx.ready_len);
+ 1503              		.loc 1 535 5 is_stmt 1 view .LVU435
+ 1504 001c B6F82021 		ldrh	r2, [r6, #288]
+ 1505 0020 06F19F01 		add	r1, r6, #159
+ 1506              	.LVL94:
+ 1507              		.loc 1 535 5 is_stmt 0 view .LVU436
+ 1508 0024 1846     		mov	r0, r3
+ 1509              	.LVL95:
+ 1510              		.loc 1 535 5 view .LVU437
+ 1511 0026 FFF7FEFF 		bl	memcpy
+ 1512              	.LVL96:
+ 536:diff_signal/uw_link_rx.c ****     *len = s_rx.ready_len;
+ 1513              		.loc 1 536 5 is_stmt 1 view .LVU438
+ 1514              		.loc 1 536 16 is_stmt 0 view .LVU439
+ 1515 002a B6F82031 		ldrh	r3, [r6, #288]
+ 1516              		.loc 1 536 10 view .LVU440
+ 1517 002e 2380     		strh	r3, [r4]	@ movhi
+ 537:diff_signal/uw_link_rx.c ****     s_rx.frame_ready = false;
+ 1518              		.loc 1 537 5 is_stmt 1 view .LVU441
+ 1519              		.loc 1 537 22 is_stmt 0 view .LVU442
+ 1520 0030 0023     		movs	r3, #0
+ 1521 0032 86F82231 		strb	r3, [r6, #290]
+ 538:diff_signal/uw_link_rx.c **** 
+ 539:diff_signal/uw_link_rx.c ****     return true;
+ 1522              		.loc 1 539 5 is_stmt 1 view .LVU443
+ 1523              	.L140:
+ 540:diff_signal/uw_link_rx.c **** }...
+ 1524              		.loc 1 540 1 is_stmt 0 view .LVU444
+ 1525 0036 2846     		mov	r0, r5
+ 1526 0038 70BD     		pop	{r4, r5, r6, pc}
+ 1527              	.LVL97:
+ 1528              	.L141:
+ 531:diff_signal/uw_link_rx.c ****         return false;
+ 1529              		.loc 1 531 16 view .LVU445
+ 1530 003a 0025     		movs	r5, #0
+ 1531 003c FBE7     		b	.L140
+ 1532              	.L142:
+ARM GAS  /tmp/cckgvJqr.s 			page 40
+
+
+ 1533 003e 0025     		movs	r5, #0
+ 1534 0040 F9E7     		b	.L140
+ 1535              	.L143:
+ 1536 0042 0025     		movs	r5, #0
+ 1537 0044 F7E7     		b	.L140
+ 1538              	.L146:
+ 1539 0046 00BF     		.align	2
+ 1540              	.L145:
+ 1541 0048 00000000 		.word	.LANCHOR0
+ 1542              		.cfi_endproc
+ 1543              	.LFE80:
+ 1545              		.section	.bss.s_rx,"aw",%nobits
+ 1546              		.align	2
+ 1547              		.set	.LANCHOR0,. + 0
+ 1550              	s_rx:
+ 1551 0000 00000000 		.space	292
+ 1551      00000000 
+ 1551      00000000 
+ 1551      00000000 
+ 1551      00000000 
+ 1552              		.text
+ 1553              	.Letext0:
+ 1554              		.file 2 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/machine/_default_types.h"
+ 1555              		.file 3 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/_stdint.h"
+ 1556              		.file 4 "Drivers/CMSIS/Include/core_cm3.h"
+ 1557              		.file 5 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/system_stm32f1xx.h"
+ 1558              		.file 6 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xe.h"
+ 1559              		.file 7 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio.h"
+ 1560              		.file 8 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h"
+ 1561              		.file 9 "/opt/gcc-arm-none-eabi-9-2020-q2-update/lib/gcc/arm-none-eabi/9.3.1/include/stddef.h"
+ 1562              		.file 10 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/_types.h"
+ 1563              		.file 11 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/reent.h"
+ 1564              		.file 12 "/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include/sys/lock.h"
+ 1565              		.file 13 "<built-in>"
+ 1566              		.file 14 "bridge_protocol/uw_link_proto.h"
+ARM GAS  /tmp/cckgvJqr.s 			page 41
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 uw_link_rx.c
+     /tmp/cckgvJqr.s:16     .text.UW_LinkRx_ResetVotes:0000000000000000 $t
+     /tmp/cckgvJqr.s:23     .text.UW_LinkRx_ResetVotes:0000000000000000 UW_LinkRx_ResetVotes
+     /tmp/cckgvJqr.s:53     .text.UW_LinkRx_ResetVotes:0000000000000010 $d
+     /tmp/cckgvJqr.s:58     .text.UW_LinkRx_ResetByteAssembler:0000000000000000 $t
+     /tmp/cckgvJqr.s:64     .text.UW_LinkRx_ResetByteAssembler:0000000000000000 UW_LinkRx_ResetByteAssembler
+     /tmp/cckgvJqr.s:85     .text.UW_LinkRx_ResetByteAssembler:000000000000000c $d
+     /tmp/cckgvJqr.s:90     .text.UW_LinkRx_ResetParser:0000000000000000 $t
+     /tmp/cckgvJqr.s:96     .text.UW_LinkRx_ResetParser:0000000000000000 UW_LinkRx_ResetParser
+     /tmp/cckgvJqr.s:144    .text.UW_LinkRx_ResetParser:0000000000000024 $d
+     /tmp/cckgvJqr.s:149    .text.UW_LinkRx_Abort:0000000000000000 $t
+     /tmp/cckgvJqr.s:155    .text.UW_LinkRx_Abort:0000000000000000 UW_LinkRx_Abort
+     /tmp/cckgvJqr.s:188    .text.UW_LinkRx_Abort:0000000000000018 $d
+     /tmp/cckgvJqr.s:193    .text.UW_LinkRx_DecideBit:0000000000000000 $t
+     /tmp/cckgvJqr.s:199    .text.UW_LinkRx_DecideBit:0000000000000000 UW_LinkRx_DecideBit
+     /tmp/cckgvJqr.s:294    .text.UW_LinkRx_DecideBit:0000000000000048 $d
+     /tmp/cckgvJqr.s:299    .text.UW_LinkRx_PushBitToByte:0000000000000000 $t
+     /tmp/cckgvJqr.s:305    .text.UW_LinkRx_PushBitToByte:0000000000000000 UW_LinkRx_PushBitToByte
+     /tmp/cckgvJqr.s:381    .text.UW_LinkRx_PushBitToByte:000000000000003c $d
+     /tmp/cckgvJqr.s:386    .text.UW_LinkRx_ReadTone:0000000000000000 $t
+     /tmp/cckgvJqr.s:392    .text.UW_LinkRx_ReadTone:0000000000000000 UW_LinkRx_ReadTone
+     /tmp/cckgvJqr.s:476    .text.UW_LinkRx_ReadTone:0000000000000038 $d
+     /tmp/cckgvJqr.s:481    .text.UW_LinkRx_Finish:0000000000000000 $t
+     /tmp/cckgvJqr.s:487    .text.UW_LinkRx_Finish:0000000000000000 UW_LinkRx_Finish
+     /tmp/cckgvJqr.s:528    .text.UW_LinkRx_Finish:0000000000000024 $d
+     /tmp/cckgvJqr.s:533    .text.UW_LinkRx_ProcessDecodedBit:0000000000000000 $t
+     /tmp/cckgvJqr.s:539    .text.UW_LinkRx_ProcessDecodedBit:0000000000000000 UW_LinkRx_ProcessDecodedBit
+     /tmp/cckgvJqr.s:572    .text.UW_LinkRx_ProcessDecodedBit:000000000000001c $d
+     /tmp/cckgvJqr.s:942    .text.UW_LinkRx_ProcessDecodedBit:00000000000001ec $d
+     /tmp/cckgvJqr.s:947    .text.UW_LinkRx_Init:0000000000000000 $t
+     /tmp/cckgvJqr.s:954    .text.UW_LinkRx_Init:0000000000000000 UW_LinkRx_Init
+     /tmp/cckgvJqr.s:994    .text.UW_LinkRx_Init:0000000000000020 $d
+     /tmp/cckgvJqr.s:999    .text.UW_LinkRx_IsReceiving:0000000000000000 $t
+     /tmp/cckgvJqr.s:1006   .text.UW_LinkRx_IsReceiving:0000000000000000 UW_LinkRx_IsReceiving
+     /tmp/cckgvJqr.s:1025   .text.UW_LinkRx_IsReceiving:000000000000000c $d
+     /tmp/cckgvJqr.s:1030   .text.UW_LinkRx_EXTI_Callback:0000000000000000 $t
+     /tmp/cckgvJqr.s:1037   .text.UW_LinkRx_EXTI_Callback:0000000000000000 UW_LinkRx_EXTI_Callback
+     /tmp/cckgvJqr.s:1103   .text.UW_LinkRx_EXTI_Callback:0000000000000030 $d
+     /tmp/cckgvJqr.s:1108   .text.UW_LinkRx_1msTick:0000000000000000 $t
+     /tmp/cckgvJqr.s:1115   .text.UW_LinkRx_1msTick:0000000000000000 UW_LinkRx_1msTick
+     /tmp/cckgvJqr.s:1427   .text.UW_LinkRx_1msTick:0000000000000128 $d
+     /tmp/cckgvJqr.s:1432   .text.UW_LinkRx_FrameReady:0000000000000000 $t
+     /tmp/cckgvJqr.s:1439   .text.UW_LinkRx_FrameReady:0000000000000000 UW_LinkRx_FrameReady
+     /tmp/cckgvJqr.s:1454   .text.UW_LinkRx_FrameReady:0000000000000008 $d
+     /tmp/cckgvJqr.s:1459   .text.UW_LinkRx_GetFrame:0000000000000000 $t
+     /tmp/cckgvJqr.s:1466   .text.UW_LinkRx_GetFrame:0000000000000000 UW_LinkRx_GetFrame
+     /tmp/cckgvJqr.s:1541   .text.UW_LinkRx_GetFrame:0000000000000048 $d
+     /tmp/cckgvJqr.s:1546   .bss.s_rx:0000000000000000 $d
+     /tmp/cckgvJqr.s:1550   .bss.s_rx:0000000000000000 s_rx
+     /tmp/cckgvJqr.s:581    .text.UW_LinkRx_ProcessDecodedBit:0000000000000025 $d
+     /tmp/cckgvJqr.s:581    .text.UW_LinkRx_ProcessDecodedBit:0000000000000026 $t
+
+UNDEFINED SYMBOLS
+HAL_GPIO_ReadPin
+memcpy
+UW_Link_CalcCrc16
+ARM GAS  /tmp/cckgvJqr.s 			page 42
+
+
+memset

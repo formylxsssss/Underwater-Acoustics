@@ -1,250 +1,98 @@
-/* USER CODE BEGIN Header */
-/**
- ******************************************************************************
- * @file    stm32f1xx_it.c
- * @brief   Interrupt Service Routines.
- ******************************************************************************
- * @attention
- *
- * <h2><center>&copy; Copyright (c) 2025 STMicroelectronics.
- * All rights reserved.</center></h2>
- *
- * This software component is licensed by ST under BSD 3-Clause license,
- * the "License"; You may not use this file except in compliance with the
- * License. You may obtain a copy of the License at:
- *                        opensource.org/licenses/BSD-3-Clause
- *
- ******************************************************************************
- */
-/* USER CODE END Header */
-
-/* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "tim.h"
 #include "stm32f1xx_it.h"
-#include "diff_signal_rx.h"
-#include "stm32f1xx_hal_adc.h"
-#include "soft_timer.h"
+#include "uart3_drv.h"
 #include "SEGGER_RTT.h"
-extern TIM_HandleTypeDef htim6;
-extern TIM_HandleTypeDef htim2;
-extern ADC_HandleTypeDef hadc1;
-/* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
-/* USER CODE END Includes */
+#include "bridge_app.h"
+#include "tim.h"
+#include "diff_signal.h"
+void NMI_Handler(void)
+{
+}
 
-/* Private typedef -----------------------------------------------------------*/
-/* USER CODE BEGIN TD */
+void HardFault_Handler(void)
+{
+    while (1)
+    {
+    }
+}
 
-/* USER CODE END TD */
+void MemManage_Handler(void)
+{
+    while (1)
+    {
+    }
+}
 
-/* Private define ------------------------------------------------------------*/
-/* USER CODE BEGIN PD */
+void BusFault_Handler(void)
+{
+    while (1)
+    {
+    }
+}
 
-/* USER CODE END PD */
+void UsageFault_Handler(void)
+{
+    while (1)
+    {
+    }
+}
 
-/* Private macro -------------------------------------------------------------*/
-/* USER CODE BEGIN PM */
+void SVC_Handler(void)
+{
+}
 
-/* USER CODE END PM */
+void DebugMon_Handler(void)
+{
+}
 
-/* Private variables ---------------------------------------------------------*/
-/* USER CODE BEGIN PV */
+void PendSV_Handler(void)
+{
+}
 
-/* USER CODE END PV */
+void SysTick_Handler(void)
+{
+    HAL_IncTick();
+    HAL_SYSTICK_IRQHandler();
+}
 
-/* Private function prototypes -----------------------------------------------*/
-/* USER CODE BEGIN PFP */
+void USART3_IRQHandler(void)
+{
+    HAL_UART_IRQHandler(&huart3);
+}
 
-/* USER CODE END PFP */
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+    if (huart->Instance == USART3)
+    {
+        BridgeApp_UartRxCpltCallback(huart);
+    }
+}
 
-/* Private user code ---------------------------------------------------------*/
-/* USER CODE BEGIN 0 */
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
+{
+    if (huart->Instance == USART3)
+    {
+        BridgeApp_UartErrorCallback(huart);
+    }
+}
+void TIM4_IRQHandler(void)
+{
+    HAL_TIM_IRQHandler(&htim4);
+}
 
-/* USER CODE END 0 */
-
-/* External variables --------------------------------------------------------*/
-
-/* USER CODE BEGIN EV */
-
-/* USER CODE END EV */
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-  if (htim->Instance == TIM6)
-  {
-    
-    SoftTimer_Tick();
-  // myprintf("hello_world\n");
-  }
-  if (htim->Instance == TIM2)
-  {
-  // myprintf("hello_world\n");
-    // 每 BIT_DURATION_US 微秒触发一次 ADC 转换
-    HAL_ADC_Start_IT(&hadc1);
-  }
+    if(htim->Instance == TIM4)
+    {
+       DiffSignal_TimerPeriodElapsedCallback(htim);
+    }
+     if (htim->Instance == TIM6)
+    {
+         UW_LinkRx_1msTick();
+    }
 }
-
-void EXTI1_IRQHandler(void)
-{
-  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_1);
-}
-
-void TIM2_IRQHandler(void)
-{
-  HAL_TIM_IRQHandler(&htim2);
-}
-
-void ADC1_2_IRQHandler(void)
-{
-  HAL_ADC_IRQHandler(&hadc1);
-}
-
 void TIM6_DAC_IRQHandler(void)
 {
-  /* 调用 HAL 库的中断处理入口，会进而调用 HAL_TIM_PeriodElapsedCallback */
-  HAL_TIM_IRQHandler(&htim6);
+    HAL_TIM_IRQHandler(&htim6);
 }
-
-/******************************************************************************/
-/*           Cortex-M3 Processor Interruption and Exception Handlers          */
-/******************************************************************************/
-/**
- * @brief This function handles Non maskable interrupt.
- */
-void NMI_Handler(void)
-{
-  /* USER CODE BEGIN NonMaskableInt_IRQn 0 */
-
-  /* USER CODE END NonMaskableInt_IRQn 0 */
-  /* USER CODE BEGIN NonMaskableInt_IRQn 1 */
-  while (1)
-  {
-  }
-  /* USER CODE END NonMaskableInt_IRQn 1 */
-}
-
-/**
- * @brief This function handles Hard fault interrupt.
- */
-void HardFault_Handler(void)
-{
-  /* USER CODE BEGIN HardFault_IRQn 0 */
-
-  /* USER CODE END HardFault_IRQn 0 */
-  while (1)
-  {
-    /* USER CODE BEGIN W1_HardFault_IRQn 0 */
-    /* USER CODE END W1_HardFault_IRQn 0 */
-  }
-}
-
-/**
- * @brief This function handles Memory management fault.
- */
-void MemManage_Handler(void)
-{
-  /* USER CODE BEGIN MemoryManagement_IRQn 0 */
-
-  /* USER CODE END MemoryManagement_IRQn 0 */
-  while (1)
-  {
-    /* USER CODE BEGIN W1_MemoryManagement_IRQn 0 */
-    /* USER CODE END W1_MemoryManagement_IRQn 0 */
-  }
-}
-
-/**
- * @brief This function handles Prefetch fault, memory access fault.
- */
-void BusFault_Handler(void)
-{
-  /* USER CODE BEGIN BusFault_IRQn 0 */
-
-  /* USER CODE END BusFault_IRQn 0 */
-  while (1)
-  {
-    /* USER CODE BEGIN W1_BusFault_IRQn 0 */
-    /* USER CODE END W1_BusFault_IRQn 0 */
-  }
-}
-
-/**
- * @brief This function handles Undefined instruction or illegal state.
- */
-void UsageFault_Handler(void)
-{
-  /* USER CODE BEGIN UsageFault_IRQn 0 */
-
-  /* USER CODE END UsageFault_IRQn 0 */
-  while (1)
-  {
-    /* USER CODE BEGIN W1_UsageFault_IRQn 0 */
-    /* USER CODE END W1_UsageFault_IRQn 0 */
-  }
-}
-
-/**
- * @brief This function handles System service call via SWI instruction.
- */
-void SVC_Handler(void)
-{
-  /* USER CODE BEGIN SVCall_IRQn 0 */
-
-  /* USER CODE END SVCall_IRQn 0 */
-  /* USER CODE BEGIN SVCall_IRQn 1 */
-
-  /* USER CODE END SVCall_IRQn 1 */
-}
-
-/**
- * @brief This function handles Debug monitor.
- */
-void DebugMon_Handler(void)
-{
-  /* USER CODE BEGIN DebugMonitor_IRQn 0 */
-
-  /* USER CODE END DebugMonitor_IRQn 0 */
-  /* USER CODE BEGIN DebugMonitor_IRQn 1 */
-
-  /* USER CODE END DebugMonitor_IRQn 1 */
-}
-
-/**
- * @brief This function handles Pendable request for system service.
- */
-void PendSV_Handler(void)
-{
-  /* USER CODE BEGIN PendSV_IRQn 0 */
-
-  /* USER CODE END PendSV_IRQn 0 */
-  /* USER CODE BEGIN PendSV_IRQn 1 */
-
-  /* USER CODE END PendSV_IRQn 1 */
-}
-
-/**
- * @brief This function handles System tick timer.
- */
-void SysTick_Handler(void)
-{
-  /* USER CODE BEGIN SysTick_IRQn 0 */
-
-  /* USER CODE END SysTick_IRQn 0 */
-  HAL_IncTick();
-  /* USER CODE BEGIN SysTick_IRQn 1 */
-
-  /* USER CODE END SysTick_IRQn 1 */
-}
-
-/******************************************************************************/
-/* STM32F1xx Peripheral Interrupt Handlers                                    */
-/* Add here the Interrupt Handlers for the used peripherals.                  */
-/* For the available peripheral interrupt handler names,                      */
-/* please refer to the startup file (startup_stm32f1xx.s).                    */
-/******************************************************************************/
-
-/* USER CODE BEGIN 1 */
-
-/* USER CODE END 1 */
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

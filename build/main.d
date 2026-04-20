@@ -25,6 +25,7 @@ build/main.o: Core/Src/main.c Core/Inc/main.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h \
+ Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_usart.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h Core/Inc/spi.h \
@@ -35,9 +36,9 @@ build/main.o: Core/Src/main.c Core/Inc/main.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio_ex.h Custcom_Pin.h \
  Core/Inc/battery_adc.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_adc_ex.h \
- Core/Inc/uart3_drv.h sensor_device/eeprom.h sensor_device/soft_timer.h \
- sensor_device/data_collect.h modbus/RTUmodbus_slave.h \
- modbus/RTUmodbus_CRC.h
+ Core/Inc/uart3_drv.h bridge_protocol/bridge_app.h \
+ sensor_device/soft_timer.h sensor_device/data_collect.h \
+ rs_485_port/rs485_port.h bridge_protocol/bridge_proto_cfg.h
 
 Core/Inc/main.h:
 
@@ -97,6 +98,8 @@ Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h:
 
 Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h:
 
+Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_usart.h:
+
 Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd.h:
 
 Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h:
@@ -133,12 +136,12 @@ Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_adc_ex.h:
 
 Core/Inc/uart3_drv.h:
 
-sensor_device/eeprom.h:
+bridge_protocol/bridge_app.h:
 
 sensor_device/soft_timer.h:
 
 sensor_device/data_collect.h:
 
-modbus/RTUmodbus_slave.h:
+rs_485_port/rs485_port.h:
 
-modbus/RTUmodbus_CRC.h:
+bridge_protocol/bridge_proto_cfg.h:

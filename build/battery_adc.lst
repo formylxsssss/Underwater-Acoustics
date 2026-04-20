@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccvfjXdd.s 			page 1
+ARM GAS  /tmp/ccp8196y.s 			page 1
 
 
    1              		.cpu cortex-m3
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccvfjXdd.s 			page 1
   47 0014 009A     		ldr	r2, [sp]
   48              	.LBE2:
   49              		.loc 1 9 5 view .LVU6
-ARM GAS  /tmp/ccvfjXdd.s 			page 2
+ARM GAS  /tmp/ccp8196y.s 			page 2
 
 
   10:Core/Src/battery_adc.c ****     __HAL_RCC_ADC1_CLK_ENABLE();
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccvfjXdd.s 			page 1
   97              	.LCFI2:
   98              		.cfi_def_cfa_offset 4
   99              		.cfi_offset 14, -4
-ARM GAS  /tmp/ccvfjXdd.s 			page 3
+ARM GAS  /tmp/ccp8196y.s 			page 3
 
 
  100 0002 85B0     		sub	sp, sp, #20
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccvfjXdd.s 			page 1
  147 0000 70B5     		push	{r4, r5, r6, lr}
  148              	.LCFI5:
  149              		.cfi_def_cfa_offset 16
-ARM GAS  /tmp/ccvfjXdd.s 			page 4
+ARM GAS  /tmp/ccp8196y.s 			page 4
 
 
  150              		.cfi_offset 4, -16
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccvfjXdd.s 			page 1
  189              		.loc 1 42 26 is_stmt 0 view .LVU42
  190 0024 0195     		str	r5, [sp, #4]
   43:Core/Src/battery_adc.c ****     sConfig.Rank         = ADC_REGULAR_RANK_1;
-ARM GAS  /tmp/ccvfjXdd.s 			page 5
+ARM GAS  /tmp/ccp8196y.s 			page 5
 
 
  191              		.loc 1 43 5 is_stmt 1 view .LVU43
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccvfjXdd.s 			page 1
   52:Core/Src/battery_adc.c ****     BatteryADC_GPIO_Init();
  239              		.loc 1 52 5 view .LVU51
  240 0006 FFF7FEFF 		bl	BatteryADC_GPIO_Init
-ARM GAS  /tmp/ccvfjXdd.s 			page 6
+ARM GAS  /tmp/ccp8196y.s 			page 6
 
 
  241              	.LVL4:
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccvfjXdd.s 			page 1
   66:Core/Src/battery_adc.c ****     {
   67:Core/Src/battery_adc.c ****         HAL_ADC_Stop(&hadc1);
   68:Core/Src/battery_adc.c ****         return 0;
-ARM GAS  /tmp/ccvfjXdd.s 			page 7
+ARM GAS  /tmp/ccp8196y.s 			page 7
 
 
   69:Core/Src/battery_adc.c ****     }
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccvfjXdd.s 			page 1
   67:Core/Src/battery_adc.c ****         return 0;
  320              		.loc 1 67 9 is_stmt 1 view .LVU74
  321 002c 0248     		ldr	r0, .L22
-ARM GAS  /tmp/ccvfjXdd.s 			page 8
+ARM GAS  /tmp/ccp8196y.s 			page 8
 
 
  322              	.LVL16:
@@ -478,7 +478,7 @@ ARM GAS  /tmp/ccvfjXdd.s 			page 1
  369              	.L25:
  370              	.LBB5:
  371              		.loc 1 79 26 is_stmt 1 discriminator 1 view .LVU84
-ARM GAS  /tmp/ccvfjXdd.s 			page 9
+ARM GAS  /tmp/ccp8196y.s 			page 9
 
 
  372              		.loc 1 79 5 is_stmt 0 discriminator 1 view .LVU85
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccvfjXdd.s 			page 1
  416              		.cfi_def_cfa_offset 16
  417              		.cfi_offset 3, -16
  418              		.cfi_offset 4, -12
-ARM GAS  /tmp/ccvfjXdd.s 			page 10
+ARM GAS  /tmp/ccp8196y.s 			page 10
 
 
  419              		.cfi_offset 5, -8
@@ -598,7 +598,7 @@ ARM GAS  /tmp/ccvfjXdd.s 			page 1
   94:Core/Src/battery_adc.c **** {
  469              		.loc 1 94 1 is_stmt 1 view -0
  470              		.cfi_startproc
-ARM GAS  /tmp/ccvfjXdd.s 			page 11
+ARM GAS  /tmp/ccp8196y.s 			page 11
 
 
  471              		@ args = 0, pretend = 0, frame = 0
@@ -658,7 +658,7 @@ ARM GAS  /tmp/ccvfjXdd.s 			page 1
  517              		.loc 1 104 1 is_stmt 1 view -0
  518              		.cfi_startproc
  519              		@ args = 0, pretend = 0, frame = 0
-ARM GAS  /tmp/ccvfjXdd.s 			page 12
+ARM GAS  /tmp/ccp8196y.s 			page 12
 
 
  520              		@ frame_needed = 0, uses_anonymous_args = 0
@@ -718,7 +718,7 @@ ARM GAS  /tmp/ccvfjXdd.s 			page 1
  566              	.LVL35:
  113:Core/Src/battery_adc.c ****     return (uint8_t)real_data;
  567              		.loc 1 113 5 is_stmt 1 view .LVU130
-ARM GAS  /tmp/ccvfjXdd.s 			page 13
+ARM GAS  /tmp/ccp8196y.s 			page 13
 
 
  568              		.loc 1 113 12 is_stmt 0 view .LVU131
@@ -778,40 +778,40 @@ ARM GAS  /tmp/ccvfjXdd.s 			page 1
  616              		.file 10 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma.h"
  617              		.file 11 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_adc.h"
  618              		.file 12 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h"
-ARM GAS  /tmp/ccvfjXdd.s 			page 14
+ARM GAS  /tmp/ccp8196y.s 			page 14
 
 
-ARM GAS  /tmp/ccvfjXdd.s 			page 15
+ARM GAS  /tmp/ccp8196y.s 			page 15
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 battery_adc.c
-     /tmp/ccvfjXdd.s:16     .text.BatteryADC_EnableClocks:0000000000000000 $t
-     /tmp/ccvfjXdd.s:23     .text.BatteryADC_EnableClocks:0000000000000000 BatteryADC_EnableClocks
-     /tmp/ccvfjXdd.s:79     .text.BatteryADC_EnableClocks:0000000000000038 $d
-     /tmp/ccvfjXdd.s:84     .text.BatteryADC_GPIO_Init:0000000000000000 $t
-     /tmp/ccvfjXdd.s:90     .text.BatteryADC_GPIO_Init:0000000000000000 BatteryADC_GPIO_Init
-     /tmp/ccvfjXdd.s:130    .text.BatteryADC_GPIO_Init:0000000000000020 $d
-     /tmp/ccvfjXdd.s:135    .text.BatteryADC_ADC1_CoreInit:0000000000000000 $t
-     /tmp/ccvfjXdd.s:141    .text.BatteryADC_ADC1_CoreInit:0000000000000000 BatteryADC_ADC1_CoreInit
-     /tmp/ccvfjXdd.s:212    .text.BatteryADC_ADC1_CoreInit:0000000000000038 $d
-     /tmp/ccvfjXdd.s:218    .text.BatteryADC_Init:0000000000000000 $t
-     /tmp/ccvfjXdd.s:225    .text.BatteryADC_Init:0000000000000000 BatteryADC_Init
-     /tmp/ccvfjXdd.s:251    .text.BatteryADC_ReadRawOnce:0000000000000000 $t
-     /tmp/ccvfjXdd.s:258    .text.BatteryADC_ReadRawOnce:0000000000000000 BatteryADC_ReadRawOnce
-     /tmp/ccvfjXdd.s:333    .text.BatteryADC_ReadRawOnce:0000000000000038 $d
-     /tmp/ccvfjXdd.s:338    .text.BatteryADC_ReadRawAverage:0000000000000000 $t
-     /tmp/ccvfjXdd.s:345    .text.BatteryADC_ReadRawAverage:0000000000000000 BatteryADC_ReadRawAverage
-     /tmp/ccvfjXdd.s:401    .text.BatteryADC_ReadPA0_mV:0000000000000000 $t
-     /tmp/ccvfjXdd.s:408    .text.BatteryADC_ReadPA0_mV:0000000000000000 BatteryADC_ReadPA0_mV
-     /tmp/ccvfjXdd.s:460    .text.BatteryADC_ReadBattery_mV:0000000000000000 $t
-     /tmp/ccvfjXdd.s:467    .text.BatteryADC_ReadBattery_mV:0000000000000000 BatteryADC_ReadBattery_mV
-     /tmp/ccvfjXdd.s:499    .text.BatteryADC_ReadBattery_mV:0000000000000018 $d
-     /tmp/ccvfjXdd.s:508    .text.BatteryADC_ReadPercent:0000000000000000 $t
-     /tmp/ccvfjXdd.s:515    .text.BatteryADC_ReadPercent:0000000000000000 BatteryADC_ReadPercent
-     /tmp/ccvfjXdd.s:593    .text.BatteryADC_ReadPercent:0000000000000050 $d
-     /tmp/ccvfjXdd.s:600    .bss.hadc1:0000000000000000 $d
-     /tmp/ccvfjXdd.s:604    .bss.hadc1:0000000000000000 hadc1
+     /tmp/ccp8196y.s:16     .text.BatteryADC_EnableClocks:0000000000000000 $t
+     /tmp/ccp8196y.s:23     .text.BatteryADC_EnableClocks:0000000000000000 BatteryADC_EnableClocks
+     /tmp/ccp8196y.s:79     .text.BatteryADC_EnableClocks:0000000000000038 $d
+     /tmp/ccp8196y.s:84     .text.BatteryADC_GPIO_Init:0000000000000000 $t
+     /tmp/ccp8196y.s:90     .text.BatteryADC_GPIO_Init:0000000000000000 BatteryADC_GPIO_Init
+     /tmp/ccp8196y.s:130    .text.BatteryADC_GPIO_Init:0000000000000020 $d
+     /tmp/ccp8196y.s:135    .text.BatteryADC_ADC1_CoreInit:0000000000000000 $t
+     /tmp/ccp8196y.s:141    .text.BatteryADC_ADC1_CoreInit:0000000000000000 BatteryADC_ADC1_CoreInit
+     /tmp/ccp8196y.s:212    .text.BatteryADC_ADC1_CoreInit:0000000000000038 $d
+     /tmp/ccp8196y.s:218    .text.BatteryADC_Init:0000000000000000 $t
+     /tmp/ccp8196y.s:225    .text.BatteryADC_Init:0000000000000000 BatteryADC_Init
+     /tmp/ccp8196y.s:251    .text.BatteryADC_ReadRawOnce:0000000000000000 $t
+     /tmp/ccp8196y.s:258    .text.BatteryADC_ReadRawOnce:0000000000000000 BatteryADC_ReadRawOnce
+     /tmp/ccp8196y.s:333    .text.BatteryADC_ReadRawOnce:0000000000000038 $d
+     /tmp/ccp8196y.s:338    .text.BatteryADC_ReadRawAverage:0000000000000000 $t
+     /tmp/ccp8196y.s:345    .text.BatteryADC_ReadRawAverage:0000000000000000 BatteryADC_ReadRawAverage
+     /tmp/ccp8196y.s:401    .text.BatteryADC_ReadPA0_mV:0000000000000000 $t
+     /tmp/ccp8196y.s:408    .text.BatteryADC_ReadPA0_mV:0000000000000000 BatteryADC_ReadPA0_mV
+     /tmp/ccp8196y.s:460    .text.BatteryADC_ReadBattery_mV:0000000000000000 $t
+     /tmp/ccp8196y.s:467    .text.BatteryADC_ReadBattery_mV:0000000000000000 BatteryADC_ReadBattery_mV
+     /tmp/ccp8196y.s:499    .text.BatteryADC_ReadBattery_mV:0000000000000018 $d
+     /tmp/ccp8196y.s:508    .text.BatteryADC_ReadPercent:0000000000000000 $t
+     /tmp/ccp8196y.s:515    .text.BatteryADC_ReadPercent:0000000000000000 BatteryADC_ReadPercent
+     /tmp/ccp8196y.s:593    .text.BatteryADC_ReadPercent:0000000000000050 $d
+     /tmp/ccp8196y.s:600    .bss.hadc1:0000000000000000 $d
+     /tmp/ccp8196y.s:604    .bss.hadc1:0000000000000000 hadc1
 
 UNDEFINED SYMBOLS
 HAL_GPIO_Init

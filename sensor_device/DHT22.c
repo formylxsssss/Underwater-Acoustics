@@ -5,7 +5,7 @@
 // 延时 us 微秒
 static void Delay_us(uint32_t us)
 {
-    DWT_Delay_us(us);
+    // DWT_Delay_us(us);
 }
 
 // 切换为输出模式
@@ -120,7 +120,7 @@ uint8_t DHT22_ReadData(float *temperature, float *humidity)
 
     DHT22_StartSignal();
     if (!DHT22_CheckResponse()) return 1;
-    DWT_Delay_us(50);
+    // DWT_Delay_us(50);
 
     // 依次读取 5 个字节：湿度高、湿度低、温度高、温度低、校验
     for (uint8_t i = 0; i < 5; i++)

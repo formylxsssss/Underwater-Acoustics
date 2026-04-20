@@ -32,97 +32,117 @@ TIM_HandleTypeDef htim6;
 /* TIM1 init function */
 void MX_TIM1_Init(void)
 {
-  TIM_MasterConfigTypeDef sMasterConfig = {0};
-  TIM_OC_InitTypeDef sConfigOC = {0};
+  TIM_MasterConfigTypeDef        sMasterConfig = {0};
+  TIM_OC_InitTypeDef             sConfigOC = {0};
   TIM_BreakDeadTimeConfigTypeDef sBreakDeadTimeConfig = {0};
 
-  htim1.Instance = TIM1;
-  htim1.Init.Prescaler = 47;
-  htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim1.Init.Period = 114;
-  htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim1.Instance               = TIM1;
+  htim1.Init.Prescaler         = 0;                 // ★ PSC=0
+  htim1.Init.CounterMode       = TIM_COUNTERMODE_UP;
+  htim1.Init.Period            = 5999;             // ★ ARR=5999 → 12 kHz
+  htim1.Init.ClockDivision     = TIM_CLOCKDIVISION_DIV1;
   htim1.Init.RepetitionCounter = 0;
   htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-  if (HAL_TIM_PWM_Init(&htim1) != HAL_OK)
-  {
-    Error_Handler();
-  }
+  if (HAL_TIM_PWM_Init(&htim1) != HAL_OK) { Error_Handler(); }
+
   sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
-  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-  if (HAL_TIMEx_MasterConfigSynchronization(&htim1, &sMasterConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 0;
-  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
-  sConfigOC.OCNPolarity = TIM_OCNPOLARITY_HIGH;
-  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
-  sConfigOC.OCIdleState = TIM_OCIDLESTATE_RESET;
+  sMasterConfig.MasterSlaveMode     = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim1, &sMasterConfig) != HAL_OK) { Error_Handler(); }
+
+  sConfigOC.OCMode       = TIM_OCMODE_PWM1;
+  sConfigOC.Pulse        = (5999 + 1) / 2;         // ★ 固定 50%
+  sConfigOC.OCPolarity   = TIM_OCPOLARITY_HIGH;
+  sConfigOC.OCNPolarity  = TIM_OCNPOLARITY_HIGH;
+  sConfigOC.OCFastMode   = TIM_OCFAST_DISABLE;
+  sConfigOC.OCIdleState  = TIM_OCIDLESTATE_RESET;
   sConfigOC.OCNIdleState = TIM_OCNIDLESTATE_RESET;
-  if (HAL_TIM_PWM_ConfigChannel(&htim1, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
-  {
-    Error_Handler();
-  }
+  if (HAL_TIM_PWM_ConfigChannel(&htim1, &sConfigOC, TIM_CHANNEL_1) != HAL_OK) { Error_Handler(); }
+
+  /* 死区按你之前示例保留 0xAD（≈5us@72MHz） */
   sBreakDeadTimeConfig.OffStateRunMode  = TIM_OSSR_DISABLE;
   sBreakDeadTimeConfig.OffStateIDLEMode = TIM_OSSI_DISABLE;
   sBreakDeadTimeConfig.LockLevel        = TIM_LOCKLEVEL_OFF;
-  sBreakDeadTimeConfig.DeadTime         = 0xAD;              // 5us @ TIM1=72MHz；36MHz 用 0x9A
+  sBreakDeadTimeConfig.DeadTime         = 0x48;   
   sBreakDeadTimeConfig.BreakState       = TIM_BREAK_DISABLE;
   sBreakDeadTimeConfig.BreakPolarity    = TIM_BREAKPOLARITY_HIGH;
-  sBreakDeadTimeConfig.AutomaticOutput  = TIM_AUTOMATICOUTPUT_ENABLE; // 建议打开
-  HAL_TIMEx_ConfigBreakDeadTime(&htim1, &sBreakDeadTimeConfig);
-  HAL_TIM_MspPostInit(&htim1);
+  sBreakDeadTimeConfig.AutomaticOutput  = TIM_AUTOMATICOUTPUT_ENABLE;
+  if (HAL_TIMEx_ConfigBreakDeadTime(&htim1, &sBreakDeadTimeConfig) != HAL_OK) { Error_Handler(); }
+
+  HAL_TIM_MspPostInit(&htim1);  // 确保 PA8/PA7 设为 AF_PP 50MHz
 }
+
+
+
+
+TIM_HandleTypeDef htim4;
+
+void MX_TIM4_Init(void)
+{
+    htim4.Instance = TIM4;
+    htim4.Init.Prescaler = 72 - 1;          /* 72MHz / 72 = 1MHz */
+    htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
+    htim4.Init.Period = 10000 - 1;          /* 默认 10ms */
+    htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+    htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+
+    if (HAL_TIM_Base_Init(&htim4) != HAL_OK)
+    {
+        Error_Handler();
+    }
+}
+
+void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *tim_baseHandle)
+{
+    if (tim_baseHandle->Instance == TIM4)
+    {
+        __HAL_RCC_TIM4_CLK_ENABLE();
+
+        HAL_NVIC_SetPriority(TIM4_IRQn, 1, 0);
+        HAL_NVIC_EnableIRQ(TIM4_IRQn);
+    }
+}
+
 
 /* TIM8 init function */
 void MX_TIM8_Init(void)
 {
-  TIM_MasterConfigTypeDef sMasterConfig = {0};
-  TIM_OC_InitTypeDef sConfigOC = {0};
+  TIM_MasterConfigTypeDef        sMasterConfig = {0};
+  TIM_OC_InitTypeDef             sConfigOC = {0};
   TIM_BreakDeadTimeConfigTypeDef sBreakDeadTimeConfig = {0};
 
-  htim8.Instance = TIM8;
-  htim8.Init.Prescaler = 0;
-  htim8.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim8.Init.Period = 65535;
-  htim8.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim8.Instance               = TIM8;
+  htim8.Init.Prescaler         = 0;                 // ★ PSC=0
+  htim8.Init.CounterMode       = TIM_COUNTERMODE_UP;
+  htim8.Init.Period            = 5142;             // ★ ARR=5142 → ≈14 kHz
+  htim8.Init.ClockDivision     = TIM_CLOCKDIVISION_DIV1;
   htim8.Init.RepetitionCounter = 0;
   htim8.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-  if (HAL_TIM_PWM_Init(&htim8) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
-  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-  if (HAL_TIMEx_MasterConfigSynchronization(&htim8, &sMasterConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 0;
-  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
-  sConfigOC.OCNPolarity = TIM_OCNPOLARITY_HIGH;
-  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
-  sConfigOC.OCIdleState = TIM_OCIDLESTATE_RESET;
-  sConfigOC.OCNIdleState = TIM_OCNIDLESTATE_RESET;
-  if (HAL_TIM_PWM_ConfigChannel(&htim8, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  sBreakDeadTimeConfig.OffStateRunMode = TIM_OSSR_DISABLE;
-  sBreakDeadTimeConfig.OffStateIDLEMode = TIM_OSSI_DISABLE;
-  sBreakDeadTimeConfig.LockLevel = TIM_LOCKLEVEL_OFF;
-  sBreakDeadTimeConfig.DeadTime = 0;
-  sBreakDeadTimeConfig.BreakState = TIM_BREAK_DISABLE;
-  sBreakDeadTimeConfig.BreakPolarity = TIM_BREAKPOLARITY_HIGH;
-  sBreakDeadTimeConfig.AutomaticOutput = TIM_AUTOMATICOUTPUT_DISABLE;
-  if (HAL_TIMEx_ConfigBreakDeadTime(&htim8, &sBreakDeadTimeConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  HAL_TIM_MspPostInit(&htim8);
+  if (HAL_TIM_PWM_Init(&htim8) != HAL_OK) { Error_Handler(); }
 
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode     = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim8, &sMasterConfig) != HAL_OK) { Error_Handler(); }
+
+  sConfigOC.OCMode       = TIM_OCMODE_PWM1;
+  sConfigOC.Pulse        = (5142 + 1) / 2;         // ★ 固定 50%
+  sConfigOC.OCPolarity   = TIM_OCPOLARITY_HIGH;
+  sConfigOC.OCNPolarity  = TIM_OCNPOLARITY_HIGH;
+  sConfigOC.OCFastMode   = TIM_OCFAST_DISABLE;
+  sConfigOC.OCIdleState  = TIM_OCIDLESTATE_RESET;
+  sConfigOC.OCNIdleState = TIM_OCNIDLESTATE_RESET;
+  if (HAL_TIM_PWM_ConfigChannel(&htim8, &sConfigOC, TIM_CHANNEL_2) != HAL_OK) { Error_Handler(); }
+
+  /* 死区示例：~1 µs（DTG≈ 1us / 13.89ns ≈ 0x48） */
+  sBreakDeadTimeConfig.OffStateRunMode  = TIM_OSSR_DISABLE;
+  sBreakDeadTimeConfig.OffStateIDLEMode = TIM_OSSI_DISABLE;
+  sBreakDeadTimeConfig.LockLevel        = TIM_LOCKLEVEL_OFF;
+  sBreakDeadTimeConfig.DeadTime         = 0x48;    // ≈1 µs
+  sBreakDeadTimeConfig.BreakState       = TIM_BREAK_DISABLE;
+  sBreakDeadTimeConfig.BreakPolarity    = TIM_BREAKPOLARITY_HIGH;
+  sBreakDeadTimeConfig.AutomaticOutput  = TIM_AUTOMATICOUTPUT_ENABLE;
+  if (HAL_TIMEx_ConfigBreakDeadTime(&htim8, &sBreakDeadTimeConfig) != HAL_OK) { Error_Handler(); }
+
+  HAL_TIM_MspPostInit(&htim8);  // 确保 PC7/PB0 设为 AF_PP 50MHz
 }
 
 /********************* TIM6 INIT ************************/

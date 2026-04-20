@@ -22,7 +22,8 @@ ALLINC =
 include ARM_SEGGER_RTT/segger_rtt.mk
 include diff_signal/diff_signal.mk
 include sensor_device/sensor_device.mk
-include modbus/RTUmodbus.mk
+include bridge_protocol/bridge_protocol.mk
+include rs_485_port/rs_485_port.mk
 ######################################
 # building variables
 ######################################
@@ -199,6 +200,7 @@ $(BUILD_DIR)/%.bin: $(BUILD_DIR)/%.elf | $(BUILD_DIR)
 $(BUILD_DIR):
 	mkdir $@		
 
+JLINK_SN = 20722677
 #######################################
 # clean up
 #######################################
@@ -208,24 +210,22 @@ clean:
 
 flash: all
 	@echo "Uploading to firmware..."
-	-JLinkExe -Device STM32F103RC -CommandFile ./flash.jlink
-
-
+	-JLinkExe -SelectEmuBySN $(JLINK_SN) -Device STM32F103RC -if SWD -Speed 4000 -CommandFile ./flash.jlink
 
 erase:
 	@echo "Erase chip..."
-	-JLinkExe -Device STM32F103RC -CommandFile ./erase.jlink
+	-JLinkExe -SelectEmuBySN $(JLINK_SN) -Device STM32F103RC -CommandFile ./erase.jlink
 
 
 
 run:
 	@echo "Try to run MCU"
-	-JLinkExe  -Device STM32F103RC -if SWD -Speed 2400 -RTTTelnetPort 1189 -autoconnect 1
+	-JLinkExe -SelectEmuBySN $(JLINK_SN) -Device STM32F103RC -if SWD -Speed 2400 -RTTTelnetPort 4899 -autoconnect 1
 
 
 
 telnet:
-	-while true;do telnet localhost 1189; sleep 1; done
+	-while true;do telnet localhost 4899; sleep 1; done
 
 #######################################
 # dependencies

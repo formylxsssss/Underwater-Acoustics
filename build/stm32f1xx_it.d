@@ -25,12 +25,13 @@ build/stm32f1xx_it.o: Core/Src/stm32f1xx_it.c Core/Inc/main.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h \
+ Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_usart.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h \
- Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h Core/Inc/tim.h \
- Core/Inc/main.h Core/Inc/stm32f1xx_it.h diff_signal/diff_signal_rx.h \
- diff_signal/diff_signal.h sensor_device/soft_timer.h \
- ARM_SEGGER_RTT/SEGGER_RTT.h ARM_SEGGER_RTT/SEGGER_RTT_Conf.h
+ Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h \
+ Core/Inc/stm32f1xx_it.h Core/Inc/uart3_drv.h Core/Inc/main.h \
+ ARM_SEGGER_RTT/SEGGER_RTT.h ARM_SEGGER_RTT/SEGGER_RTT_Conf.h \
+ bridge_protocol/bridge_app.h Core/Inc/tim.h diff_signal/diff_signal.h
 
 Core/Inc/main.h:
 
@@ -90,24 +91,26 @@ Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h:
 
 Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h:
 
+Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_usart.h:
+
 Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd.h:
 
 Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h:
 
 Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h:
 
-Core/Inc/tim.h:
-
-Core/Inc/main.h:
-
 Core/Inc/stm32f1xx_it.h:
 
-diff_signal/diff_signal_rx.h:
+Core/Inc/uart3_drv.h:
 
-diff_signal/diff_signal.h:
-
-sensor_device/soft_timer.h:
+Core/Inc/main.h:
 
 ARM_SEGGER_RTT/SEGGER_RTT.h:
 
 ARM_SEGGER_RTT/SEGGER_RTT_Conf.h:
+
+bridge_protocol/bridge_app.h:
+
+Core/Inc/tim.h:
+
+diff_signal/diff_signal.h:

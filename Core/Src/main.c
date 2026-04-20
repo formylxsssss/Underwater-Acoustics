@@ -33,11 +33,11 @@
 #include "Custcom_Pin.h"
 #include "battery_adc.h"
 #include "uart3_drv.h"
-#include "eeprom.h"
+#include "bridge_app.h"
 #include "soft_timer.h"
 #include "data_collect.h"
-#include "RTUmodbus_slave.h"
 #include "stm32f1xx_hal_tim.h"
+#include "rs485_port.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -67,8 +67,6 @@
 void SystemClock_Config(void);
 void dht22_data_read_callback(void);
 void ADXL345_data_read_call_back(void);
-void test_rx_Data_call_back(void);
-volatile uint8_t modbus_analyze_status = 0x01;
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -111,58 +109,22 @@ int main(void)
   MX_SPI2_Init();
   MX_TIM1_Init();
   MX_TIM6_Init(); // CubeMX 生成的 TIM6 初始化
+  MX_TIM4_Init();
   MX_TIM8_Init();
-  ADXL345_Init();
   BatteryADC_Init();
-  USART3_Driver_Init(UART_BAUD_RARE);
-  DiffSignal_Init();
-  SoftTimer_Init();
-  HAL_TIM_Base_Start_IT(&htim6);
-
   HAL_Delay(100);
-  DHT22_Init();
-  EEPROM_Init();
-  myprintf("peripheral init success\n");
+  DiffSignal_Init();
+  DiffSignal_SetBitRate(100);
+  USART3_Driver_Init(9600);
+  BridgeApp_Init();
   HAL_Delay(2000);
-  SoftTimer_StartPeriodic(2000, dht22_data_read_callback);
-  SoftTimer_StartPeriodic(2000, ADXL345_data_read_call_back);
   /* USER CODE BEGIN 2 */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    uart_modbus_poll(modbus_analyze_status,test_rx_Data_call_back); 
-    
+    BridgeApp_Process();
   }
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 void dht22_data_read_callback(void)
 {
@@ -179,14 +141,7 @@ void ADXL345_data_read_call_back(void)
 {
   float x_data, y_data, z_data;
   ADXL345_ReadXYZ(&x_data, &y_data, &z_data);
-  // myprintf("xdata is %f,ydata is %f,zdata is %f\n", x_data, y_data, z_data);
   set_local_adxl_345_data(x_data, y_data, z_data);
-}
-
-void test_rx_Data_call_back(void)
-{
-  modbus_analyze_status = 0x01;
-  MODS_RxTimeOut();
 }
 /**
  * @brief System Clock Configuration

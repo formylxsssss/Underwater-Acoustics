@@ -4,7 +4,7 @@
 #include "SEGGER_RTT.h"
 static void _Delay_us(void)
 {
-    DWT_Delay_us(1);
+    // DWT_Delay_us(1);
     // 简单软件延时，需根据实际时钟微调
     
 }
