@@ -16,6 +16,8 @@ void DebugMon_Handler(void);
 void PendSV_Handler(void);
 void SysTick_Handler(void);
 void USART3_IRQHandler(void);
+void EXTI0_IRQHandler(void);
+void EXTI1_IRQHandler(void);
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart);
 #ifdef __cplusplus
